@@ -1,0 +1,14 @@
+config.local.php
+Guardfile
+cleanup
+dist
+node_modules
+components
+.sass-cache
+*.dev.css
+*.dev.js
+tmp
+htdocs/images/uploads/cache
+templates/default_site/test.group
+htdocs/img/icons-*.png
+.DS_Store*
