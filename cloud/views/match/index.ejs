@@ -3,14 +3,13 @@
 
 <h1>Hello World</h1>
 <p><%= message %></p>
-<form method="post" action="/login">
+<form method="post" action="/create">
 	<fieldset>
-        <input name="username" type="text" placeholder="Email address"></input>
+        <input name="email" type="text" placeholder="Email address"></input>
         <input name="password" type="password" placeholder="Password"></input>
         <input class="button" type="submit" value="Login">
 	</fieldset>
 </form>
-
 
 <!-- Include the footer partial -->
 <% include ../_footer %>
