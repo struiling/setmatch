@@ -1,5 +1,5 @@
 var express = require('express');
-var expressLayouts = require('cloud/express-layouts');
+var expressLayouts = require('cloud/lib/express-layouts');
 var moment = require('moment');
 var _ = require('underscore');
 
