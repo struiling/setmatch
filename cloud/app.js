@@ -1,3 +1,4 @@
+/* stuff provided by Parse */
 var express = require('express');
 var expressLayouts = require('cloud/lib/express-layouts');
 var parseExpressHttpsRedirect = require('parse-express-https-redirect');
@@ -5,7 +6,9 @@ var parseExpressCookieSession = require('parse-express-cookie-session');
 var moment = require('moment');
 var _ = require('underscore');
 
+/* stuff I wrote */
 var userController = require('cloud/controllers/user.js');
+var profileController = require('cloud/controllers/profile.js');
 
 
 // Required for initializing Express app in Cloud Code.
@@ -18,25 +21,70 @@ app.use(parseExpressHttpsRedirect());  // Require user to be on HTTPS.
 app.use(expressLayouts);
 app.use(express.bodyParser());     // Middleware for reading request body
 app.use(express.methodOverride()); // Allow HTML forms to do other RESTful calls besides PUT and GET
-app.use(express.cookieParser('YOUR_SIGNING_SECRET'));
-app.use(parseExpressCookieSession({ cookie: { maxAge: 3600000 } }));
+app.use(express.cookieParser('YOUR_SIGNING_SECRET')); /* TODO: change this */
+app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
 
 app.use(app.router);				// Explicitly user route handlers, even though Express would add it otherwise
 
+function checkAuth(req, res, next) {
+  Parse.Cloud.run("checkUser", {}, {
+		success: function(user) {
+			next();
+		},
+		error: function(error) {
+			res.redirect("/");
+		}
+	});
+}
+
+
 // Routes routes routes
 app.get('/', function(req, res) {
-  res.render('match/index', { message: 'Congrats, you just set up your app!' });
+	if (Parse.User.current()) {		
+	    res.render('match/index', { message: "Think you're logged in." });
+	} else {
+		res.render('index', { message: "Perhaps you'd like to sign up." });
+	}
 });
 
 app.get('/login', function(req, res) {
-  res.render('match/index', { message: "You're not logged in!" });
+  res.redirect('/');
 });
-app.get('/logout', userController.logout);
-app.get('/welcome', userController.welcome);
-
-app.post('/create', userController.new);
 app.post('/login', userController.login);
+app.get('/signup', function(req, res) {
+  res.redirect('/');
+});
+app.post('/signup', userController.new);
 
+app.get('/logout', userController.logout);
+/*app.get('/welcome', userController.welcome);*/
+
+app.get('/profile/edit', profileController.edit);
+app.post('/profile/edit', profileController.edit);
+
+app.get('/profile', profileController.view);
+app.get('/profile/save', profileController.view);
+app.post('/profile/save', profileController.save);
+
+
+app.get('/welcome', function(req, res) {
+    // Display the user profile if user is logged in.
+    if (Parse.User.current()) {
+        // We need to fetch because we need to show fields on the user object.
+        Parse.User.current().fetch().then(function(user) {
+        // Render the user profile information (e.g. email, phone, etc).
+		res.render('profile', { message: user.get("username") });
+        // to try 
+        //user.get("username")
+        },
+        function(error) {
+            // Render error page.
+        });
+    } else {
+        // User not logged in, redirect to login form.
+        res.redirect('/');
+    }
+});
 
 // // Example reading from the request query string of an HTTP get request.
 // app.get('/test', function(req, res) {

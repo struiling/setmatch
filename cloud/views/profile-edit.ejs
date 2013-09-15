@@ -1,0 +1,19 @@
+
+<% if (typeof(error) !== 'undefined') { %>
+	<p><%= error %></p>
+	<p><%= errorParseMessage %></p>
+<% } %>
+<% if (typeof(message) !== 'undefined') { %>
+	<p><%= message %></p>
+<% } %>
+
+<form method="post" action="/profile/save">
+	<fieldset>
+		<legend>Edit Profile</legend>
+        <input name="fname" type="text" placeholder="First Name" value="<%- user.get("fname") %>">
+        <input name="lname" type="text" placeholder="Last Name" value="<%- user.get("lname") %>">
+        <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>">
+        <input name="password" type="password" placeholder="Password">
+        <input class="button" type="submit" value="Save profile info">
+	</fieldset>
+</form>

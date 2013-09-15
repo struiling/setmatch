@@ -1,0 +1,25 @@
+
+<% if (typeof(error) !== 'undefined') { %>
+	<p><%= error %></p>
+	<p><%= errorParseMessage %></p>
+<% } %>
+<% if (typeof(message) !== 'undefined') { %>
+	<p><%= message %></p>
+<% } %>
+<form method="post" action="/signup">
+	<fieldset>
+		<legend>Sign up</legend>
+        <input name="email" type="text" placeholder="Email address">
+        <input name="password" type="password" placeholder="Password">
+        <input class="button" type="submit" value="Sign up">
+	</fieldset>
+</form>
+
+<form method="post" action="/login">
+	<fieldset>
+		<legend>Log in</legend>
+        <input name="email" type="text" placeholder="Email address">
+        <input name="password" type="password" placeholder="Password">
+        <input class="button" type="submit" value="Login">
+	</fieldset>
+</form>

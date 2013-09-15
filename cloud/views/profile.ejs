@@ -6,4 +6,16 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
-<p>match/index: You're logged in</p>
+
+First name:
+<%- user.get("fname") %>
+<br />
+
+Last name:
+<%- user.get("lname") %>
+<br />
+
+Email
+<%- user.getEmail() %>
+
+<p><a href="/profile/edit">Edit profile</a></p>

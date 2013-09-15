@@ -10,8 +10,9 @@ Parse.Cloud.define("hello", function(request, response) {
 Parse.Cloud.define("checkUser", function(request, response) {
     var user = request.user;
     if (user) {
-    	response.success(user.get("username"));	
+    	response.success(user);	
     } else {
     	response.error("User not found");	
     }
 });
+
