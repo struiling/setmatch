@@ -16,3 +16,25 @@ Parse.Cloud.define("checkUser", function(request, response) {
     }
 });
 
+var Group = Parse.Object.extend("Group");
+Parse.Cloud.beforeSave("Group", function(request, response) {
+	if (!request.object.get("urlName")) {
+    	response.error("A URL is required.");
+	} else {
+	    var query = new Parse.Query(Group);
+	    query.equalTo("urlName", request.object.get("urlName"));
+	    query.first({
+	        success: function(object) {
+	      		if (object) {
+	          		response.error("A group with this URL already exists.");
+	        	} else {
+	          		response.success();
+	        	}
+	      	},
+	      	error: function(error) {
+	        	response.error("Could not validate uniqueness for this group URL.");
+	      	}
+	    });
+  	}
+});
+

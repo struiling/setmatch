@@ -10,8 +10,11 @@
 <form method="post" action="/profile/save">
 	<fieldset>
 		<legend>Edit Profile</legend>
+		<label for="fname">First name</label>
         <input name="fname" type="text" placeholder="First Name" value="<%- user.get("fname") %>">
+        <label for="lname">Last name</label>
         <input name="lname" type="text" placeholder="Last Name" value="<%- user.get("lname") %>">
+        <label for="email">Email</label>
         <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>">
         <input name="password" type="password" placeholder="Password">
         <input class="button" type="submit" value="Save profile info">

@@ -9,6 +9,7 @@ var _ = require('underscore');
 /* stuff I wrote */
 var userController = require('cloud/controllers/user.js');
 var profileController = require('cloud/controllers/profile.js');
+var groupController = require('cloud/controllers/group.js');
 
 
 // Required for initializing Express app in Cloud Code.
@@ -24,8 +25,14 @@ app.use(express.methodOverride()); // Allow HTML forms to do other RESTful calls
 app.use(express.cookieParser('YOUR_SIGNING_SECRET')); /* TODO: change this */
 app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
 
+app.locals.copyrightDate = function(){
+    return moment().format("YYYY");
+}
+
 app.use(app.router);				// Explicitly user route handlers, even though Express would add it otherwise
 
+/* if this can be used, it should be converted to a cloud code module. Currently not doing anything */
+/*
 function checkAuth(req, res, next) {
   Parse.Cloud.run("checkUser", {}, {
 		success: function(user) {
@@ -36,6 +43,7 @@ function checkAuth(req, res, next) {
 		}
 	});
 }
+*/
 
 
 // Routes routes routes
@@ -48,24 +56,30 @@ app.get('/', function(req, res) {
 });
 
 app.get('/login', function(req, res) {
-  res.redirect('/');
+    res.redirect('/');
 });
 app.post('/login', userController.login);
+
 app.get('/signup', function(req, res) {
-  res.redirect('/');
+    res.redirect('/');
 });
 app.post('/signup', userController.new);
 
 app.get('/logout', userController.logout);
-/*app.get('/welcome', userController.welcome);*/
 
 app.get('/profile/edit', profileController.edit);
-app.post('/profile/edit', profileController.edit);
-
 app.get('/profile', profileController.view);
+
 app.get('/profile/save', profileController.view);
 app.post('/profile/save', profileController.save);
 
+app.get('/group/new', groupController.new);
+app.post('/group/create', groupController.create);
+app.post('/group/save', groupController.save);
+
+app.get('/group/:urlName', groupController.view);
+app.get('/group/:urlName/edit', groupController.edit);
+app.put('/group/:urlName', groupController.save);
 
 app.get('/welcome', function(req, res) {
     // Display the user profile if user is logged in.

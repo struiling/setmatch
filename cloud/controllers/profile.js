@@ -15,9 +15,9 @@ exports.save = function(req, res) {
 
 	Parse.Cloud.run("checkUser", {}, {
 		success: function(user) {
-
-			user.set("fname", req.body.fname); 
-			user.set("lname", req.body.lname);
+			for (var key in req.body) {
+				user.set(key, req.body[key]);
+			}
 			user.save();
 
 			res.redirect("profile/edit");
