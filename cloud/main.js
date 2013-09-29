@@ -23,9 +23,12 @@ Parse.Cloud.beforeSave("Group", function(request, response) {
 	} else {
 	    var query = new Parse.Query(Group);
 	    query.equalTo("urlName", request.object.get("urlName"));
+	    console.log("request.object.id: "+request.object.id);
+
 	    query.first({
 	        success: function(object) {
-	      		if (object) {
+	        	console.log("object.id: "+object.id);
+	      		if (object.id !== request.object.id) {
 	          		response.error("A group with this URL already exists.");
 	        	} else {
 	          		response.success();

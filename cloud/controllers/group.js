@@ -76,18 +76,15 @@ exports.create = function(req, res) {
 };
 
 exports.save = function(req, res) {
-	// TODO: change beforeSave() to lookup by Group ID rather than req.body.urlName
 
 	var query = new Parse.Query(Group);
-	query.equalTo("urlName", req.params.urlName);
+	query.equalTo("objectId", req.body.id);
 	query.find().then(function(results) {
     	var group = results[0];
-    	group.save(_.pick(req.body, 'name', 'urlName', 'description'));
-	}).then(function() {
-		res.redirect('/group/' + req.body.urlName);
-	}, function(error) {
-		res.send(500, "Could not save group: " + error.message);
+    	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function() {
+    		res.redirect('/group/' + req.body.urlName);	
+    	}, function(error) {
+			res.send(500, "Could not save group: " + error.message);
+		});
 	});
-
-	
 };
