@@ -3,10 +3,12 @@ var express = require('express');
 var expressLayouts = require('cloud/lib/express-layouts');
 var parseExpressHttpsRedirect = require('parse-express-https-redirect');
 var parseExpressCookieSession = require('parse-express-cookie-session');
+var Image = require("parse-image");
 var moment = require('moment');
 var _ = require('underscore');
 
 /* stuff I wrote */
+var requireUser = require('cloud/require-user');
 var userController = require('cloud/controllers/user.js');
 var profileController = require('cloud/controllers/profile.js');
 var groupController = require('cloud/controllers/group.js');
@@ -47,12 +49,8 @@ function checkAuth(req, res, next) {
 
 
 // Routes routes routes
-app.get('/', function(req, res) {
-	if (Parse.User.current()) {		
-	    res.render('match/index', { message: "Think you're logged in." });
-	} else {
-		res.render('index', { message: "Perhaps you'd like to sign up." });
-	}
+app.get('/', requireUser, function(req, res) {
+    res.render('match/index', { message: "Think you're logged in." });
 });
 
 app.get('/login', function(req, res) {
@@ -67,19 +65,19 @@ app.post('/signup', userController.new);
 
 app.get('/logout', userController.logout);
 
-app.get('/profile/edit', profileController.edit);
-app.get('/profile', profileController.view);
+app.get('/profile/edit', requireUser, profileController.edit);
+app.get('/profile', requireUser, profileController.view);
 
-app.get('/profile/save', profileController.view);
-app.post('/profile/save', profileController.save);
+app.get('/profile/save', requireUser, profileController.view);
+app.post('/profile/save', requireUser, requireUser, profileController.save);
 
-app.get('/group/new', groupController.new);
-app.post('/group/create', groupController.create);
-app.post('/group/save', groupController.save);
+app.get('/group/new', requireUser, groupController.new);
+app.post('/group/create', requireUser, groupController.create);
+app.post('/group/save', requireUser, groupController.save);
 
-app.get('/group/:urlName', groupController.view);
-app.get('/group/:urlName/edit', groupController.edit);
-app.put('/group/:urlName', groupController.save);
+app.get('/group/:urlName', requireUser, groupController.view);
+app.get('/group/:urlName/edit', requireUser, groupController.edit);
+app.put('/group/:urlName', requireUser, groupController.save);
 
 app.get('/welcome', function(req, res) {
     // Display the user profile if user is logged in.

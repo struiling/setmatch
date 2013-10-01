@@ -64,6 +64,8 @@ exports.edit = function(req, res) {
 };
 
 exports.create = function(req, res) {
+	//TODO: user creating group should automatically be an admin
+	//TODO: New groups should only be accessible to members
 
 	var group = new Group();
 
@@ -71,7 +73,7 @@ exports.create = function(req, res) {
 	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function() {
 		res.redirect('/group/' + req.body.urlName);
 	}, function(error) {
-		res.send(500, "Could not save group: " + error.message);
+		res.send(500, "Could not create group: " + error.message);
 	});
 };
 
