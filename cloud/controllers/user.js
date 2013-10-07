@@ -22,7 +22,7 @@ exports.logout = function(req, res) {
 exports.new = function(req, res) {
 	var user = new Parse.User();
 
-	user.set("username", req.body.username);
+	user.set("username", req.body.email);
 	user.set("password", req.body.password);
 	user.set("email", req.body.email);
 	 

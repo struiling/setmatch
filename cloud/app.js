@@ -50,7 +50,7 @@ function checkAuth(req, res, next) {
 
 // Routes routes routes
 app.get('/', requireUser, function(req, res) {
-    res.render('match/index', { message: "Think you're logged in." });
+    res.render('match/index', { message: "You're logged in!" });
 });
 
 app.get('/login', function(req, res) {

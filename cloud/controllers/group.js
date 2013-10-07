@@ -82,6 +82,7 @@ exports.save = function(req, res) {
 	var query = new Parse.Query(Group);
 	query.equalTo("objectId", req.body.id);
 	query.find().then(function(results) {
+		console.log(results[0]);
     	var group = results[0];
     	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function() {
     		res.redirect('/group/' + req.body.urlName);	

@@ -11,8 +11,12 @@
         
         <label for="description">Description</label>
         <input name="description" type="textarea" placeholder="Description" value="<%- group.get("description") %>">
+
+        <input type="hidden" name="id" value="<%- group.id %>" />
         
         <input type="hidden" name="_method" value="put" />
         <input class="button" type="submit" value="Save changes">
 	</fieldset>
 </form>
+
+<p><a href="/group/<%- group.get("urlName") %>">View group</a></p>

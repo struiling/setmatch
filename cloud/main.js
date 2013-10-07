@@ -23,20 +23,20 @@ Parse.Cloud.beforeSave("Group", function(request, response) {
 	} else {
 	    var query = new Parse.Query(Group);
 	    query.equalTo("urlName", request.object.get("urlName"));
-	    console.log("request.object.id: "+request.object.id);
+	    //console.log("request.object.id: "+request.object.id);
 
 	    query.first({
-	        success: function(object) {
-	        	console.log("object.id: "+object.id);
-	      		if (object.id !== request.object.id) {
-	          		response.error("A group with this URL already exists.");
-	        	} else {
-	          		response.success();
-	        	}
-	      	},
 	      	error: function(error) {
 	        	response.error("Could not validate uniqueness for this group URL.");
 	      	}
+	    }).then(function(object) {
+        	//console.log("object.id: "+object.id);
+      		if (object !== undefined &&
+      			request.object.id !== object.id) {
+          		response.error("A group with this URL already exists.");
+        	} else {
+          		response.success();
+        	}	    	
 	    });
   	}
 });
