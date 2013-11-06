@@ -60,3 +60,17 @@ exports.welcome = function(req, res) {
 	});
 
 };
+
+exports.reset = function(req, res) {
+
+	Parse.User.requestPasswordReset(req.body.email, {
+		success: function() {
+	    	res.redirect("/");
+		},
+		error: function(error) {
+	    // Show the error message somewhere
+			alert("Error: " + error.code + " " + error.message);
+	  	}
+	});
+
+};

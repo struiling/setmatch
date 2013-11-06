@@ -62,6 +62,10 @@ app.get('/signup', function(req, res) {
     res.redirect('/');
 });
 app.post('/signup', userController.new);
+app.get('/forgot', function(req, res) {
+    res.render("forgot");
+});
+app.post('/reset', userController.reset);
 
 app.get('/logout', userController.logout);
 

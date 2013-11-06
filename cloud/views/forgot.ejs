@@ -1,0 +1,16 @@
+
+<% if (typeof(error) !== 'undefined') { %>
+	<p><%= error %></p>
+	<p><%= errorParseMessage %></p>
+<% } %>
+<% if (typeof(message) !== 'undefined') { %>
+	<p><%= message %></p>
+<% } %>
+
+<form method="post" action="/reset">
+	<fieldset>
+		<legend>Forgot your password? No worries.</legend>
+        <input name="email" type="text" placeholder="Email address">
+        <input class="button" type="submit" value="Login">
+	</fieldset>
+</form>
