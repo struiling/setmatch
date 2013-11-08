@@ -1,6 +1,7 @@
 /* stuff provided by Parse */
 var express = require('express');
 var expressLayouts = require('cloud/lib/express-layouts');
+var flashify = require('cloud/lib/flashify');
 var parseExpressHttpsRedirect = require('parse-express-https-redirect');
 var parseExpressCookieSession = require('parse-express-cookie-session');
 var Image = require("parse-image");
@@ -22,9 +23,12 @@ app.set('views', 'cloud/views');   // Specify the folder to find templates
 app.set('view engine', 'ejs');     // Set the template engine
 app.use(parseExpressHttpsRedirect());  // Require user to be on HTTPS.
 app.use(expressLayouts);
+
 app.use(express.bodyParser());     // Middleware for reading request body
 app.use(express.methodOverride()); // Allow HTML forms to do other RESTful calls besides PUT and GET
 app.use(express.cookieParser('YOUR_SIGNING_SECRET')); /* TODO: change this */
+app.use(express.cookieSession());
+app.use(flashify);
 app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
 
 app.locals.copyrightDate = function(){
@@ -65,6 +69,7 @@ app.post('/signup', userController.new);
 app.get('/forgot', function(req, res) {
     res.render("forgot");
 });
+app.get('/fb', userController.fb);
 app.post('/reset', userController.reset);
 
 app.get('/logout', userController.logout);

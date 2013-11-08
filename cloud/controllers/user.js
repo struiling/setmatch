@@ -4,12 +4,11 @@ exports.login = function(req, res) {
 	    res.redirect('/');
 	}, function(error) {
 	    // The login failed. Check error to see why.
-	    var errorMessage = "Oops! Something went wrong.";
+	    //var errorMessage = "Oops! Something went wrong.";
 
-	    res.render('match/index', {
-	    	error: errorMessage,
-	    	errorParseMessage: error.code + ' ' + error.message
-	    });
+	    res.flash('message', 'Ruh roh! Something went wrong. ' + error.code + ' ' + error.message);
+
+	    res.render('match/index');
 	});
 };
 
@@ -32,6 +31,7 @@ exports.new = function(req, res) {
 	user.signUp(null, {
 		success: function(user) {
 	    // Hooray! Let them use the app now.
+	    	res.flash('message', 'Thanks for signing up!');
 	    	res.redirect('/');
 		},
 		error: function(user, error) {
@@ -74,3 +74,18 @@ exports.reset = function(req, res) {
 	});
 
 };
+
+exports.fb = function(req, res) {
+	Parse.FacebookUtils.logIn(null, {
+	success: function(user) {
+		if (!user.existed()) {
+			alert("User signed up and logged in through Facebook!");
+		} else {
+			alert("User logged in through Facebook!");
+		}
+	},
+	error: function(user, error) {
+		alert("User cancelled the Facebook login or did not fully authorize.");
+	}
+});
+}
