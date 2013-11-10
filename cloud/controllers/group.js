@@ -42,9 +42,14 @@ exports.view = function(req, res) {
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
 	query.find().then(function(results) {
-    	res.render('group', {
-	    	group: results[0]
-		});
+    	if (results[0] != null) {
+			res.render('group', {
+		    	group: results[0]
+			});
+		} else {
+			res.flash("message", "You don't have permission to see this page.");
+			res.redirect("/");	
+		}
     }, function(error) {
 		res.redirect(back);
 	});				
@@ -55,9 +60,15 @@ exports.edit = function(req, res) {
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
 	query.find().then(function(results) {
-    	res.render('group-edit', {
-	    	group: results[0]
-		});
+		if (results[0] != null) {
+			res.render('group-edit', {
+		    	group: results[0]
+			});
+		} else {
+			res.flash("message", "You don't have permission to see this page.");
+			res.redirect("/");	
+		}
+    	
     }, function(error) {
 		res.redirect(back);
 	});			
@@ -75,23 +86,30 @@ exports.create = function(req, res) {
 	    //create admin role
 	    var adminRoleACL = new Parse.ACL();
 	    var adminRole = new Parse.Role(groupId + "_admin", adminRoleACL);
-	    //adminRoleACL.setPublicReadAccess(false);
-	    //adminRoleACL.setPublicWriteAccess(false);
-	    //adminRoleACL.setRoleWriteAccess(adminRole);
+	    adminRole.getUsers().add(Parse.User.current());
+	    adminRoleACL.setPublicReadAccess(false);
+	    adminRoleACL.setPublicWriteAccess(false);
+	    adminRoleACL.setRoleWriteAccess(groupId + "_admin", true);
 
 	    adminRole.save().then(function() {
-	    	console.log("post-save?");
 	    	var userRoleACL = new Parse.ACL();
 		    var userRole = new Parse.Role(groupId + "_member", userRoleACL);
 		    userRoleACL.setPublicReadAccess(false);
 		    userRoleACL.setPublicWriteAccess(false);
-		    //userRoleACL.setRoleWriteAccess(adminRole);
+		    userRoleACL.setRoleReadAccess(groupId + "_member", true);
+		    userRoleACL.setRoleWriteAccess(groupId + "_admin", true);
 	    
 	    	userRole.getRoles().add(adminRole);
 		    userRole.save();
 
-			res.redirect('/group/' + req.body.urlName);
+		    object.setACL(userRoleACL);	
+	    	object.save();
+
+	    	res.redirect('/group/' + req.body.urlName);
+		    
 	    });
+	    
+
 	}, function(error) {
 		res.send(500, "Could not create group: " + error.message);
 	});
