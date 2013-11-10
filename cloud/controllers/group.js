@@ -71,7 +71,22 @@ exports.create = function(req, res) {
 
 	// Explicitly specify which fields to save to prevent bad input data
 	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function() {
-		res.redirect('/group/' + req.body.urlName);
+	    var groupUrl = req.body.urlName;
+	    //create admin role
+	    var adminRoleACL = new Parse.ACL();
+	    adminRoleACL.setPublicReadAccess(false);
+	    adminRoleACL.setPublicWriteAccess(false);
+	    var adminRole = new Parse.Role(groupUrl + "_admin", adminRoleACL);
+	    adminRole.save();
+
+	    //create user role
+	    var userRoleACL = new Parse.ACL();
+	    userRoleACL.setPublicReadAccess(false);
+	    userRoleACL.setPublicWriteAccess(false);
+	    var userRole = new Parse.Role(groupUrl + "_member", userRoleACL);
+	    userRole.save();
+
+		res.redirect('/group/' + groupUrl);
 	}, function(error) {
 		res.send(500, "Could not create group: " + error.message);
 	});
