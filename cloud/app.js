@@ -1,7 +1,8 @@
-/* stuff provided by Parse */
+/* Parse + some npm modules */
 var express = require('express');
 var expressLayouts = require('cloud/lib/express-layouts');
 var flashify = require('cloud/lib/flashify');
+var gravatar = require('cloud/lib/gravatar');
 var parseExpressHttpsRedirect = require('parse-express-https-redirect');
 var parseExpressCookieSession = require('parse-express-cookie-session');
 var Image = require("parse-image");

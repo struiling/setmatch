@@ -1,14 +1,13 @@
 exports.edit = function(req, res) {
 	
-	Parse.Cloud.run("checkUser", {}, {
-		success: function(user) {
-			res.render("profile-edit", { user: user });
-		},
-		error: function(error) {
-			res.redirect("/logout");
-		}
-	});
-
+	Parse.User.current().fetch().then(function(user) {
+        res.render("profile-edit", { user: user });
+    },
+    function(error) {
+    	// Render error page.
+    	console.log("Problem retrieving user information");
+    });
+	
 };
 
 exports.save = function(req, res) {

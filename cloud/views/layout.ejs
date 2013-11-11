@@ -7,6 +7,10 @@
   	<body>
   		<header>
   			<h1>SetMatch</h1>
+            <% if (basicUser != undefined) { %>
+                Email: <%= basicUser.getEmail() %>
+                Name: <%= basicUser.get("fname") %> <%= basicUser.get("lname") %>
+            <% } %>
   		</header>
 
         <% include flashify %>

@@ -1,18 +1,11 @@
 require('cloud/app.js');
 
-
-// Use Parse.Cloud.define to define as many cloud functions as you want.
-// For example:
-Parse.Cloud.define("hello", function(request, response) {
-  response.success("Hello world!");
-});
-
-Parse.Cloud.define("checkUser", function(request, response) {
-    var user = request.user;
+Parse.Cloud.define("checkUser", function(req, res) {
+    var user = req.user;
     if (user) {
-    	response.success(user);	
+    	res.success(user);	
     } else {
-    	response.error("User not found");	
+    	res.error("User not found");	
     }
 });
 
@@ -44,6 +37,8 @@ Parse.Cloud.beforeSave("Group", function(req, res) {
   	}
 });
 
+
+/* Not currently in use */
 Parse.Cloud.define("addUsersToAdmin", function(req, res) {
 
     Parse.Cloud.useMasterKey();
