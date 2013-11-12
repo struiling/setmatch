@@ -17,6 +17,7 @@ exports.save = function(req, res) {
 			for (var key in req.body) {
 				user.set(key, req.body[key]);
 			}
+			user.set("username", req.body.email);
 			user.save();
 
 			res.redirect("profile/edit");
@@ -30,13 +31,12 @@ exports.save = function(req, res) {
 
 exports.view = function(req, res) {
 
-	Parse.Cloud.run("checkUser", {}, {
-		success: function(user) {
-			res.render("profile", { user: user });			
-		},
-		error: function(error) {
-			// res.redirect("/logout");
-		}
-	});
+	Parse.User.current().fetch().then(function(user) {
+    	res.render("profile", { user: user });			
+    },
+    function(error) {
+    	// Render error page.
+    	console.log("Problem retrieving user information");
+    });
 
 };

@@ -105,7 +105,7 @@ exports.create = function(req, res) {
 		    object.setACL(userRoleACL);	
 	    	object.save();
 
-	    	res.redirect('/group/' + req.body.urlName);
+	    	res.redirect('/group/' + object.get("urlName"));
 		    
 	    });
 	    
@@ -122,8 +122,8 @@ exports.save = function(req, res) {
 	query.find().then(function(results) {
 		console.log(results[0]);
     	var group = results[0];
-    	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function() {
-    		res.redirect('/group/' + req.body.urlName);	
+    	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function(object) {
+    		res.redirect('/group/' + object.get("urlName"));	
     	}, function(error) {
 			res.send(500, "Could not save group: " + error.message);
 		});

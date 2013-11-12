@@ -24,6 +24,8 @@ exports.new = function(req, res) {
 	user.set("username", req.body.email);
 	user.set("password", req.body.password);
 	user.set("email", req.body.email);
+	user.set("fname", req.body.fname);
+	user.set("lname", req.body.lname);
 	 
 	// other fields can be set just like with Parse.Object
 	// user.set("phone", "415-392-0202");
