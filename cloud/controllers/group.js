@@ -4,21 +4,6 @@ var Group = Parse.Object.extend('Group');
 exports.new = function(req, res) {
 	res.render('group-new');
 };
-/*
-var currentUser = null;
-
-retrieveCurrentUser = function() {
-	Parse.Cloud.run("checkUser", {}, {
-		success: function(user) {
-			currentUser = user;
-		},
-		error: function(error) {
-			currentUser = null;
-		}
-	});
-
-	return (currentUser != null);
-};*/
 
 exports.view = function(req, res) {
 /*
@@ -81,7 +66,7 @@ exports.create = function(req, res) {
 	var group = new Group();
 
 	// Explicitly specify which fields to save to prevent bad input data
-	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function(object) {
+	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'browsable')).then(function(object) {
 	    var groupId = object.id;
 	    //create admin role
 	    var adminRoleACL = new Parse.ACL();
@@ -89,6 +74,7 @@ exports.create = function(req, res) {
 	    adminRole.getUsers().add(Parse.User.current());
 	    adminRoleACL.setPublicReadAccess(false);
 	    adminRoleACL.setPublicWriteAccess(false);
+	    adminRoleACL.setRoleReadAccess(groupId + "_admin", true);
 	    adminRoleACL.setRoleWriteAccess(groupId + "_admin", true);
 
 	    adminRole.save().then(function() {
