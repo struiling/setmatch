@@ -9,4 +9,11 @@ Group URL:
 Description:
 <%- group.get("description") %>
 
+<br />
+This group is <% if (group.get("secretive") != "y") { %> not<% } %> secretive.
+
+<h3>Members</h3>
+
+
+
 <p><a href="/group/<%- group.get("urlName") %>/edit">Edit group info</a></p>

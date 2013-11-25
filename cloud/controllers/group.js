@@ -6,27 +6,10 @@ exports.new = function(req, res) {
 };
 
 exports.view = function(req, res) {
-/*
-	if (!retrieveCurrentUser()) {
-		res.redirect("/logout");
-	}
-
-	var query = new Parse.Query(Group);
-	query.equalTo("urlName", req.params.urlName);
-	query.find({
-		success: function(results) {
-	    	res.render('group', {
-		    	group: results[0]
-			})
-		},
-		error: function(error) {
-			res.redirect(back);
-		}
-	});			
-*/
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
 	query.find().then(function(results) {
+		console.log("Query for view: " + JSON.stringify(results[0]));
     	if (results[0] != null) {
 			res.render('group', {
 		    	group: results[0]
@@ -45,6 +28,7 @@ exports.edit = function(req, res) {
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
 	query.find().then(function(results) {
+		console.log("Query for edit: " + JSON.stringify(results[0]));
 		if (results[0] != null) {
 			res.render('group-edit', {
 		    	group: results[0]
@@ -66,7 +50,7 @@ exports.create = function(req, res) {
 	var group = new Group();
 
 	// Explicitly specify which fields to save to prevent bad input data
-	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'browsable')).then(function(object) {
+	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(object) {
 	    var groupId = object.id;
 	    //create admin role
 	    var adminRoleACL = new Parse.ACL();
@@ -102,16 +86,34 @@ exports.create = function(req, res) {
 };
 
 exports.save = function(req, res) {
-
 	var query = new Parse.Query(Group);
 	query.equalTo("objectId", req.body.id);
 	query.find().then(function(results) {
 		console.log(results[0]);
     	var group = results[0];
-    	group.save(_.pick(req.body, 'name', 'urlName', 'description')).then(function(object) {
+    	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(object) {
     		res.redirect('/group/' + object.get("urlName"));	
     	}, function(error) {
 			res.send(500, "Could not save group: " + error.message);
 		});
 	});
+};
+
+exports.members = function(req, res) {
+	var members = req.body.addMembers.replace(/\s/g, '');
+	console.log(members);
+	var pieces = members.split(',');
+	console.log(pieces);
+	var JSON = [];
+    req.body.addMembers.each(function(index) {
+        JSON.push({'email': pieces[index]});   
+    });
+    console.log(JSON);
+    console.log(req.url);
+	//Parse.Cloud.run("addUserToGroup", {users: }).then( function() {
+
+
+	//});
+
+
 };

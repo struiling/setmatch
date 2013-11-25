@@ -1,22 +1,37 @@
+<!-- TODO: Add jQuery to make value of checkboxes "n" if unchecked -->
+
 
 <form method="post" action="<%- '/group/' + group.get('urlName') %>">
 	<fieldset>
 		<legend>Edit group</legend>
 
 		<label for="name">Name</label>
-        <input name="name" type="text" placeholder="Name" value="<%- group.get("name") %>">
+        <input name="name" id="name" type="text" placeholder="Name" value="<%- group.get("name") %>">
         
         <label for="urlName">URL</label>
-        <input name="urlName" type="text" placeholder="URL" value="<%- group.get("urlName") %>">
+        <input name="urlName" id="urlName" type="text" placeholder="URL" value="<%- group.get("urlName") %>">
         
         <label for="description">Description</label>
-        <input name="description" type="textarea" placeholder="Description" value="<%- group.get("description") %>">
+        <input name="description" id="description" type="textarea" placeholder="Description" value="<%- group.get("description") %>">
 
         <input type="hidden" name="id" value="<%- group.id %>" />
-        
+        <br />
+        <input type="hidden" name="secretive" value="n" />
+        <input name="secretive" id="secretive" type="checkbox" value="y"<% if (group.get("secretive") == "y") { %> checked="checked"<% } %>> 
+
+        <label for="secretive">Prevent members of this group to view other members (not recommended)</label>
+        <br />
         <input type="hidden" name="_method" value="put" />
         <input class="button" type="submit" value="Save changes">
 	</fieldset>
+</form>
+<form method="post" action="<%- '/group/' + group.get('urlName') + 'add' %>">
+    <fieldset>
+        <legend>Add members</legend>
+        <label for="addMembers">Enter email addresses separated by commas</label>
+        <input type="textarea" name="addMembers" id="addMembers" />
+        <input class="button" type="submit" value="Add members">
+    </fieldset>
 </form>
 
 <p><a href="/group/<%- group.get("urlName") %>">View group</a></p>

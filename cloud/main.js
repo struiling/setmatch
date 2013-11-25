@@ -27,6 +27,7 @@ Parse.Cloud.beforeSave("Group", function(req, res) {
       		if (object !== undefined &&
       			req.object.id !== object.id) {
                 // duplicate group found
+              console.log("dupliacte group found");
           		res.error("A group with this URL already exists.");
         	} else {
           		req.object.set("urlName", urlName);
