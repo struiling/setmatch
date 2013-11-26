@@ -88,7 +88,7 @@ app.post('/group/save', requireUser, groupController.save);
 app.get('/group/:urlName', requireUser, groupController.view);
 app.get('/group/:urlName/edit', requireUser, groupController.edit);
 app.put('/group/:urlName', requireUser, groupController.save);
-app.put('/group/:urlName/add', requireUser, groupController.add);
+app.post('/group/:urlName/add', requireUser, groupController.add);
 
 app.get('/welcome', function(req, res) {
     // Display the user profile if user is logged in.

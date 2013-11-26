@@ -99,17 +99,30 @@ exports.save = function(req, res) {
 	});
 };
 
-exports.members = function(req, res) {
+exports.add = function(req, res) {
 	var members = req.body.addMembers.replace(/\s/g, '');
-	console.log(members);
+	console.log("members: " + members);
 	var pieces = members.split(',');
-	console.log(pieces);
-	var JSON = [];
-    req.body.addMembers.each(function(index) {
-        JSON.push({'email': pieces[index]});   
+	console.log("pieces: " + pieces);
+	console.log("pieces[0]: " + pieces[0]);
+	var membersJSON = [];
+    _.each(pieces, function(index) {
+        //save to DB
+
+        // add members who already exists in system
+    	    
+	        // generate group offer token associated with an email addy to store in the DB
+        	// on user welcome page, list groups they have been invited to join, with button to accept
+        	// send email with new group invite notification
+
+        // add members who do not exist in system
+
+        	// same as above, but different email text to sign up and join group
+        	
+
+        //pieces[index]
     });
-    console.log(JSON);
-    console.log(req.url);
+    console.log("req.url: " + req.url);
 	//Parse.Cloud.run("addUserToGroup", {users: }).then( function() {
 
 

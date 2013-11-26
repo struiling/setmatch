@@ -7,15 +7,20 @@
 	<p><%= message %></p>
 <% } %>
 
-First name:
+<p>First name:</p>
 <%- user.get("fname") %>
 <br />
 
-Last name:
+<p>Last name:</p>
 <%- user.get("lname") %>
 <br />
 
-Email
+<p>Email</p>
 <%- user.getEmail() %>
+
+<br />
+<p>Photo</p>
+var secureUrl = gravatar.url('emerleite@gmail.com', {s: '100', r: 'x', d: 'retro'}, true);
+
 
 <p><a href="/profile/edit">Edit profile</a></p>
