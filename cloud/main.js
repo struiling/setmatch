@@ -47,7 +47,7 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
     } else {
         var query = new Parse.Query(Parse.User);
 
-        // check if another group has this URL, and is not the one you're saving
+        // check if another user has this email address, and is not the one you're saving
         query.equalTo("email", req.object.get("email"));
         console.log("req.object.email: "+req.object.get("email"));
 
@@ -62,6 +62,83 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
             }           
         });
     }
+});
+
+Parse.Cloud.define("addUsersToGroup", function(req, res) {
+
+    Parse.Cloud.useMasterKey();
+    var userQuery = new Parse.Query(Parse.User);
+    userQuery.containedIn("email", req.params.users);
+    userQuery.find().then(function(userResults) {
+        console.log("query results: " + JSON.stringify(userResults));
+        // invite all found users to group
+
+        // create temporary entry for nonexistent users with invites to group
+
+
+        
+    }).then(function() {
+        res.success();
+    });
+
+    var groupQuery = new Parse.Query(Group);
+    groupQuery.equalTo("urlName", req.params.groupUrl);
+    groupQuery.find().then(function(groupResult) {
+        var group = groupResult[0];
+        console.log("Group to add members to: " + JSON.stringify(group));
+        if (results[0] == null) {
+            res.error("Group lookup failed.");
+            return;
+        }
+        
+        // TODO (Changes to the global database):
+        // 
+        // Add a field to the "User" object that is "OpenInvites", groups they've been invited to join.
+        //
+        // Create a new table "GroupInvitesForNewUsers", containing user email addresses (for users that don't exist)
+        // and groups they've been invited to join.
+
+        // TODO (In this function):
+        //
+        // Foreach user to be added to this group
+        //    If the user exists
+        //       Add this group to their list of OpenInvites
+        //       Send them an email notification that they've received a group invitation.
+        //
+        //    If the user doesn't exist
+        //       Add this invite (user email address + group name) to the GroupInvitesForNewUsers
+        //       Send them an email inviting them to sign up, notifying them that they've been invited to join a group
+
+        // TODO (On user account creation):
+        //
+        // If the new user has any listings in GroupInvitesForNewUsers that match their email address
+        //    Move that invite from GroupInvitesForNewUsers to OpenInvites in their User object
+
+        // go through list of newly added members
+        for (var i in req.params.users) {
+            var newUser = req.params.users[i];
+            console.log("got new member: " + newUser);
+
+            //save to DB
+
+            // add members who already exists in system
+            
+                // generate group offer token associated with an email addy to store in the DB
+                // on user welcome page, list groups they have been invited to join, with button to accept
+                // send email with new group invite notification
+
+            // add members who do not exist in system
+
+                // same as above, but different email text to sign up and join group
+        }
+
+
+        
+
+    }, function(error) {
+        res.error("Group lookup failed.");
+    });             
+
 });
 
 

@@ -100,33 +100,18 @@ exports.save = function(req, res) {
 };
 
 exports.add = function(req, res) {
-	var members = req.body.addMembers.replace(/\s/g, '');
-	console.log("members: " + members);
-	var pieces = members.split(',');
-	console.log("pieces: " + pieces);
-	console.log("pieces[0]: " + pieces[0]);
-	var membersJSON = [];
-    _.each(pieces, function(index) {
-        //save to DB
-
-        // add members who already exists in system
-    	    
-	        // generate group offer token associated with an email addy to store in the DB
-        	// on user welcome page, list groups they have been invited to join, with button to accept
-        	// send email with new group invite notification
-
-        // add members who do not exist in system
-
-        	// same as above, but different email text to sign up and join group
-        	
-
-        //pieces[index]
+	// remove whitespace and split on comma
+	/*
+	var membersJSON = req.body.addMembers.replace(/\s/g, '').split(',').map(function(email) {
+        return {newMember: email};
     });
-    console.log("req.url: " + req.url);
-	//Parse.Cloud.run("addUserToGroup", {users: }).then( function() {
+	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
+	*/
+	var newMemberList = req.body.addMembers.replace(/\s/g, '').split(',');
+	console.log("New members list in JSON: " + JSON.stringify(newMemberList));
+	Parse.Cloud.run("addUsersToGroup", { users: newMemberList, groupUrl: req.params.urlName }, { success: function() {} });
 
-
-	//});
-
+	res.redirect('/group/' + req.params.urlName + "/edit");
+    //console.log("req.url: " + req.url);
 
 };
