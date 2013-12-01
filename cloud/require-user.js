@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
         },
         function(error) {
         	// Render error page.
-        	
+        	Parse.User.logOut();
         });
 
 	} else {

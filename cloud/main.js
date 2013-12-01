@@ -1,4 +1,8 @@
 require('cloud/app.js');
+var _ = require('underscore');
+var Group = Parse.Object.extend("Group");
+var Profile = Parse.Object.extend("Profile");
+var Invitation = Parse.Object.extend("Invitation");
 
 Parse.Cloud.define("checkUser", function(req, res) {
     var user = req.user;
@@ -9,7 +13,6 @@ Parse.Cloud.define("checkUser", function(req, res) {
     }
 });
 
-var Group = Parse.Object.extend("Group");
 Parse.Cloud.beforeSave("Group", function(req, res) {
     //TODO: strip spaces and bad characters from urlName (only alphanumeric and - and _)
     var urlName = req.object.get("urlName").toLowerCase();
@@ -27,7 +30,7 @@ Parse.Cloud.beforeSave("Group", function(req, res) {
       		if (object !== undefined &&
       			req.object.id !== object.id) {
                 // duplicate group found
-              console.log("dupliacte group found");
+              console.log("duplicate group found");
           		res.error("A group with this URL already exists.");
         	} else {
           		req.object.set("urlName", urlName);
@@ -37,7 +40,9 @@ Parse.Cloud.beforeSave("Group", function(req, res) {
   	}
 });
 
+/* TODO: Figure out why this function stops addInviteToUser, below, from saving a user change.
 Parse.Cloud.beforeSave(Parse.User, function(req, res) {
+    Parse.Cloud.useMasterKey();
 
     var email = req.object.get("email");
     req.object.set("email", email.toLowerCase());
@@ -63,87 +68,128 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
         });
     }
 });
+*/
 
-Parse.Cloud.define("addUsersToGroup", function(req, res) {
-
+Parse.Cloud.define("addInviteToUser", function(req, res) {
     Parse.Cloud.useMasterKey();
-    var userQuery = new Parse.Query(Parse.User);
-    userQuery.containedIn("email", req.params.users);
-    userQuery.find().then(function(userResults) {
-        console.log("query results: " + JSON.stringify(userResults));
-        // invite all found users to group
-
-        // create temporary entry for nonexistent users with invites to group
-
-
-        
-    }).then(function() {
-        res.success();
-    });
 
     var groupQuery = new Parse.Query(Group);
-    groupQuery.equalTo("urlName", req.params.groupUrl);
+    groupQuery.equalTo("urlName", req.params.group);
     groupQuery.find().then(function(groupResult) {
         var group = groupResult[0];
-        console.log("Group to add members to: " + JSON.stringify(group));
-        if (results[0] == null) {
+        if (group == null) {
             res.error("Group lookup failed.");
             return;
         }
-        
+        console.log("Group to add members to: " + JSON.stringify(group));
+
+        var userQuery = new Parse.Query(Parse.User);
+        userQuery.containedIn("email", req.params.users);
+        userQuery.select("email", "groups", "invites");
+        userQuery.find().then(function(userResults) {
+
+            // invite users who already exist in the system
+            var existingUsers = [];
+
+            for (var i in userResults) {
+                var user = userResults[i];
+
+                existingUsers.push(user.getEmail());
+
+                // Add an invite to this user's existing invites.
+                //user.addUnique("invites", group.id);
+                //user.set("parent", group);
+                var relation = user.relation("invites");
+                relation.add(group);
+
+                user.save();
+            }
+
+            // create Invitation entry for nonexistent users with invites to this group
+            var newUsers = _.difference(req.params.users, existingUsers);
+            console.log("newUsers in first function: " + newUsers);
+            Parse.Cloud.run("addInviteToInvitation", { users: newUsers, group: group.id },
+             { success: function() {} });
+
+        }).then(function() {
+            res.success();
+        });
+   
         // TODO (Changes to the global database):
         // 
-        // Add a field to the "User" object that is "OpenInvites", groups they've been invited to join.
-        //
-        // Create a new table "GroupInvitesForNewUsers", containing user email addresses (for users that don't exist)
-        // and groups they've been invited to join.
-
         // TODO (In this function):
         //
         // Foreach user to be added to this group
         //    If the user exists
-        //       Add this group to their list of OpenInvites
         //       Send them an email notification that they've received a group invitation.
         //
         //    If the user doesn't exist
-        //       Add this invite (user email address + group name) to the GroupInvitesForNewUsers
         //       Send them an email inviting them to sign up, notifying them that they've been invited to join a group
-
-        // TODO (On user account creation):
-        //
-        // If the new user has any listings in GroupInvitesForNewUsers that match their email address
-        //    Move that invite from GroupInvitesForNewUsers to OpenInvites in their User object
-
-        // go through list of newly added members
-        for (var i in req.params.users) {
-            var newUser = req.params.users[i];
-            console.log("got new member: " + newUser);
-
-            //save to DB
-
-            // add members who already exists in system
-            
-                // generate group offer token associated with an email addy to store in the DB
-                // on user welcome page, list groups they have been invited to join, with button to accept
-                // send email with new group invite notification
-
-            // add members who do not exist in system
-
-                // same as above, but different email text to sign up and join group
-        }
-
-
-        
 
     }, function(error) {
         res.error("Group lookup failed.");
-    });             
+    });  
 
+});
+
+Parse.Cloud.define("addInviteToInvitation", function(req, res) {
+
+    var group = new Group();
+    group.id = req.params.group;
+
+    var invitationQuery = new Parse.Query(Invitation);
+    invitationQuery.containedIn("email", req.params.users);
+    invitationQuery.select("email", "invites");
+
+    console.log("starting Invitation query");
+    invitationQuery.find().then(function(invitationResults) {
+
+        // user has previously been invited
+
+        console.log("GOt results: " + JSON.stringify(invitationResults));
+        var existingInvitations = [];
+
+        for (var i in invitationResults) {
+            var invite = invitationResults[i];
+
+            existingInvitations.push(invite.get("email"));
+
+            // Add an invite to this user's existing invites.
+            //invite.addUnique("invites", req.params.group);
+            var relation = invite.relation("invites");
+            relation.add(group);
+            invite.save();
+        }
+
+        // create Invitation entry for nonexistent users with invites to this group
+        var newInvitations = _.difference(req.params.users, existingInvitations);
+        console.log("New invitations array: " + newInvitations);
+
+        for (var i in newInvitations) {
+            var invite = newInvitations[i];
+
+            var invitation = new Invitation();
+            invitation.set("email", invite);
+            //invitation.set("invites", [req.params.group]);
+            var newRelation = invitation.relation("invites");
+            newRelation.add(group);
+            invitation.save();
+            console.log("Post save: " + JSON.stringify(invitation));
+        }    
+
+     
+
+    }).then( function() {
+       res.success();
+    }, function(error) {
+        console.log("Invitation query failed: " + error);
+    });
+           
 });
 
 
 /* Not currently in use */
-Parse.Cloud.define("addUsersToAdmin", function(req, res) {
+Parse.Cloud.define("addUserToAdmin", function(req, res) {
 
     Parse.Cloud.useMasterKey();
     var currentUser = req.user;

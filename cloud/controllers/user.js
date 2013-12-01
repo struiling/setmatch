@@ -19,34 +19,51 @@ exports.logout = function(req, res) {
 };
 
 exports.new = function(req, res) {
-	var user = new Parse.User();
+	var Invitation = new Parse.Object.extend("Invitation");
+	var query = new Parse.Query(Invitation);
+	query.equalTo("email", req.body.email.toLowerCase());
+	query.find().then( function(result) {
+		var invitation = result[0];
+		console.log("var invtation: " + JSON.stringify(invitation));
 
-	user.set("username", req.body.email);
-	user.set("password", req.body.password);
-	user.set("email", req.body.email);
-	user.set("fname", req.body.fname);
-	user.set("lname", req.body.lname);
-	 
-	// other fields can be set just like with Parse.Object
-	// user.set("phone", "415-392-0202");
-	 
-	user.signUp(null, {
-		success: function(user) {
-	    // Hooray! Let them use the app now.
-	    	res.flash('message', 'Thanks for signing up!');
-	    	res.redirect('/');
-		},
-		error: function(user, error) {
-	    // Show the error message somewhere and let the user try again.
-	    //res.send(500, "Error: " + error.code + " " + error.message);
-		    var errorMessage = undefined;
-		    errorMessage = "Oops! Something went wrong.";
+		var user = new Parse.User();
+		user.set("username", req.body.email.toLowerCase());
+		user.set("password", req.body.password);
+		user.set("email", req.body.email.toLowerCase());
+		user.set("fname", req.body.fname);
+		user.set("lname", req.body.lname);
 
-		    res.render('match/index', {
-		    	error: errorMessage,
-		    	errorParseMessage: error.code + ' ' + error.message
-		    });
+		//TODO: convert to relations
+		if (invitation !== null) {
+			//user.set("invites", invitation.get("invites"));
+			var userRelation = user.relation("invites");
+			var inviteRelation = invitation.relation("invites");
+			//inviteRelation.query().find().then()
+            userRelation.add(invitation.get("invites"));
+            console.log("List of relations? "+ invitation.relation("invites"));
 		}
+
+		user.signUp(null, {
+			success: function(user) {
+		    // Hooray! Let them use the app now.
+
+		    	invitation.destroy({ success: function() {} });
+
+		    	res.flash('message', 'Thanks for signing up!');
+		    	res.redirect('/');
+			},
+			error: function(user, error) {
+		    // Show the error message somewhere and let the user try again.
+		    //res.send(500, "Error: " + error.code + " " + error.message);
+			    var errorMessage = undefined;
+			    errorMessage = "Oops! Something went wrong.";
+
+			    res.render('match/index', {
+			    	error: errorMessage,
+			    	errorParseMessage: error.code + ' ' + error.message
+			    });
+			}
+		});
 	});
 };
 

@@ -109,7 +109,7 @@ exports.add = function(req, res) {
 	*/
 	var newMemberList = req.body.addMembers.replace(/\s/g, '').split(',');
 	console.log("New members list in JSON: " + JSON.stringify(newMemberList));
-	Parse.Cloud.run("addUsersToGroup", { users: newMemberList, groupUrl: req.params.urlName }, { success: function() {} });
+	Parse.Cloud.run("addInviteToUser", { users: newMemberList, group: req.params.urlName }, { success: function() {} });
 
 	res.redirect('/group/' + req.params.urlName + "/edit");
     //console.log("req.url: " + req.url);
