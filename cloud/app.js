@@ -32,6 +32,7 @@ app.use(express.cookieSession());
 app.use(flashify);
 app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
 
+app.locals._ = _;
 app.locals.copyrightDate = function(){
     return moment().format("YYYY");
 }

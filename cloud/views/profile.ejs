@@ -18,9 +18,16 @@
 <p>Email</p>
 <%- user.getEmail() %>
 
-<br />
 <p>Photo</p>
 var secureUrl = gravatar.url('emerleite@gmail.com', {s: '100', r: 'x', d: 'retro'}, true);
+
+
+<h3>You've been invited to these groups</h3>
+<% _.each(invites, function(invite, i) { %>
+	<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
+<% } ) %>
+
+<br />
 
 
 <p><a href="/profile/edit">Edit profile</a></p>

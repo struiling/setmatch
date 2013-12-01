@@ -24,7 +24,6 @@ exports.new = function(req, res) {
 	query.equalTo("email", req.body.email.toLowerCase());
 	query.find().then( function(result) {
 		var invitation = result[0];
-		console.log("var invtation: " + JSON.stringify(invitation));
 
 		var user = new Parse.User();
 		user.set("username", req.body.email.toLowerCase());
@@ -35,12 +34,7 @@ exports.new = function(req, res) {
 
 		//TODO: convert to relations
 		if (invitation !== null) {
-			//user.set("invites", invitation.get("invites"));
-			var userRelation = user.relation("invites");
-			var inviteRelation = invitation.relation("invites");
-			//inviteRelation.query().find().then()
-            userRelation.add(invitation.get("invites"));
-            console.log("List of relations? "+ invitation.relation("invites"));
+			user.set("invites", invitation.get("invites"));
 		}
 
 		user.signUp(null, {
