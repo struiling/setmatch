@@ -40,25 +40,25 @@ exports.view = function(req, res) {
 	//user.fetch();
 	console.log("user = " + JSON.stringify(user));
 
+	// TODO: get user's groups
+	if (user.get("groups")) {
+
+    }
+
 	if (user.get("invites")) {
 		console.log("invites: " +user.get("invites"));
-		var query = new Parse.Query(Group);
-		query.containedIn("objectId", user.get("invites"));
-		query.find().then( function(invites) {
-			console.log("group results: " + JSON.stringify(invites));
-
-			if (user.get("groups")) {
+		
+		Parse.Cloud.run("getInvites", { invites: user.get("invites")}, { 
+			success: function(groupsInvited) {
+				res.render("profile", { user: user, invites: groupsInvited });
+			},
+			error: function(error) {
 
 			}
+		});
 
-			res.render("profile", { user: user, invites: invites });
-		}).then( function() {		
-    		
-	    },
-	    function(error) {
-	    	// Render error page.
-	    	console.log("Problem retrieving user information");
-	    });
+	} else {
+		res.render("profile", { user: user });
 	}
 
 	/*}).then( function() {		

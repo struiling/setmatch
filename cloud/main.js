@@ -70,9 +70,25 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
 });
 */
 
+Parse.Cloud.define("getInvites", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    var user = req.user;
+
+    // query for groups where the group objectId matches the invite the user is accepting
+    var query = new Parse.Query(Group);
+    query.containedIn("objectId", user.get("invites"));
+    query.find().then( function(results) {
+        var groupsInvited = results;
+        console.log("group results: " + JSON.stringify(groupsInvited));
+        res.success(groupsInvited);
+        
+    })
+});
+
 Parse.Cloud.define("addInviteToUser", function(req, res) {
     Parse.Cloud.useMasterKey();
 
+    // TODO: eliminate this group query because we actually have the group ID we can pass in directly
     var groupQuery = new Parse.Query(Group);
     groupQuery.equalTo("urlName", req.params.group);
     groupQuery.find().then(function(groupResult) {

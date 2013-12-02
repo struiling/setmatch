@@ -19,20 +19,22 @@
         <input type="hidden" name="secretive" value="n" />
         <input name="secretive" id="secretive" type="checkbox" value="y"<% if (group.get("secretive") == "y") { %> checked="checked"<% } %>> 
 
-        <label for="secretive">Prevent members of this group to view other members (not recommended)</label>
+        <label for="secretive">Prevent members of this group from viewing other members (not recommended)</label>
         <br />
         <input type="hidden" name="_method" value="put" />
         <input class="button" type="submit" value="Save changes">
 	</fieldset>
 </form>
-<form method="post" action="<%- '/group/' + group.get('urlName') + '/add' %>">
+<form method="post" action="<%- '/group/' + group.get('urlName') + '/invite' %>">
     <fieldset>
-        <legend>Add members</legend>
-        <label for="addMembers">Enter email addresses separated by commas</label>
+        <legend>Invite members</legend>
+        <label for="inviteMembers">Enter email addresses separated by commas</label>
         <br />
-        <textarea name="addMembers" id="addMembers" rows="3"></textarea>
-        <input class="button" type="submit" value="Add members">
+        <textarea name="inviteMembers" id="inviteMembers" rows="3"></textarea>
+        <input class="button" type="submit" value="Send invitations">
     </fieldset>
 </form>
+<h3>Current members</h3>
+
 
 <p><a href="/group/<%- group.get("urlName") %>">View group</a></p>

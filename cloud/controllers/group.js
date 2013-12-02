@@ -1,48 +1,6 @@
 var _ = require('underscore');
 var Group = Parse.Object.extend('Group');
 
-exports.new = function(req, res) {
-	res.render('group-new');
-};
-
-exports.view = function(req, res) {
-	var query = new Parse.Query(Group);
-	query.equalTo("urlName", req.params.urlName);
-	query.find().then(function(results) {
-		console.log("Query for view: " + JSON.stringify(results[0]));
-    	if (results[0] != null) {
-			res.render('group', {
-		    	group: results[0]
-			});
-		} else {
-			res.flash("message", "You don't have permission to see this page.");
-			res.redirect("/");	
-		}
-    }, function(error) {
-		res.redirect(back);
-	});				
-};
-
-exports.edit = function(req, res) {
-	
-	var query = new Parse.Query(Group);
-	query.equalTo("urlName", req.params.urlName);
-	query.find().then(function(results) {
-		console.log("Query for edit: " + JSON.stringify(results[0]));
-		if (results[0] != null) {
-			res.render('group-edit', {
-		    	group: results[0]
-			});
-		} else {
-			res.flash("message", "You don't have permission to see this page.");
-			res.redirect("/");	
-		}
-    	
-    }, function(error) {
-		res.redirect(back);
-	});			
-};
-
 exports.create = function(req, res) {
 	//TODO: user creating group should automatically be an admin
 	//TODO: New groups should only be accessible to members
@@ -85,12 +43,80 @@ exports.create = function(req, res) {
 	});
 };
 
+exports.edit = function(req, res) {
+	
+	var query = new Parse.Query(Group);
+	query.equalTo("urlName", req.params.urlName);
+	query.find().then(function(results) {
+		console.log("Query for edit: " + JSON.stringify(results[0]));
+		if (results[0] != null) {
+			res.render('group-edit', {
+		    	group: results[0]
+			});
+		} else {
+			res.flash("message", "You don't have permission to see this page.");
+			res.redirect("/");	
+		}
+    	
+    }, function(error) {
+		res.redirect(back);
+	});			
+};
+
+exports.invite = function(req, res) {
+	// remove whitespace and split on comma
+	/*
+	var membersJSON = req.body.addMembers.replace(/\s/g, '').split(',').map(function(email) {
+        return {newMember: email};
+    });
+	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
+	*/
+	var inviteMemberList = req.body.inviteMembers.replace(/\s/g, '').split(',');
+	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
+	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.params.urlName }, { success: function() {} });
+
+	res.redirect('/group/' + req.params.urlName + "/edit");
+    //console.log("req.url: " + req.url);
+
+};
+
+exports.join = function(req, res) {
+	var user = Parse.User.current();
+
+	var groupQuery = new Parse.Query(Group);
+	groupQuery.equalTo("urlName", req.params.urlName);
+	groupQuery.first().then(function(result) {
+		var groupId = result.id;
+		var inviteMatch = _.find(user.get("invites"), function(invite) {
+			return invite == groupId;
+		});
+		user.remove("invites", groupId);
+		var relation = user.relation("groups");
+        relation.add(result);
+		user.save();
+		
+		//TODO: This needs to move to a Cloud Code function
+		var roleQuery = new Parse.Query(Parse.Role);
+		groupQuery.equalTo("name", groupId + "_member");
+		groupQuery.first().then(function(role) {
+			role.getUsers().add(user);		
+			role.save();
+		});
+
+	}).then( function() {
+		res.redirect('back');	
+	});
+	
+};
+
+exports.new = function(req, res) {
+	res.render('group-new');
+};
+
 exports.save = function(req, res) {
 	var query = new Parse.Query(Group);
-	query.equalTo("objectId", req.body.id);
-	query.find().then(function(results) {
-		console.log(results[0]);
-    	var group = results[0];
+	query.get(req.body.id).then(function(group) {
+		console.log("Group being saved: " + JSON.stringify(group));
     	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(object) {
     		res.redirect('/group/' + object.get("urlName"));	
     	}, function(error) {
@@ -99,19 +125,20 @@ exports.save = function(req, res) {
 	});
 };
 
-exports.add = function(req, res) {
-	// remove whitespace and split on comma
-	/*
-	var membersJSON = req.body.addMembers.replace(/\s/g, '').split(',').map(function(email) {
-        return {newMember: email};
-    });
-	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
-	*/
-	var newMemberList = req.body.addMembers.replace(/\s/g, '').split(',');
-	console.log("New members list in JSON: " + JSON.stringify(newMemberList));
-	Parse.Cloud.run("addInviteToUser", { users: newMemberList, group: req.params.urlName }, { success: function() {} });
-
-	res.redirect('/group/' + req.params.urlName + "/edit");
-    //console.log("req.url: " + req.url);
-
+exports.view = function(req, res) {
+	var query = new Parse.Query(Group);
+	query.equalTo("urlName", req.params.urlName);
+	query.first().then(function(results) {
+		console.log("Query for view: " + JSON.stringify(results));
+    	if (results != null) {
+			res.render('group', {
+		    	group: results
+			});
+		} else {
+			res.flash("message", "You don't have permission to see this page.");
+			res.redirect("/");	
+		}
+    }, function(error) {
+		res.redirect(back);
+	});				
 };
