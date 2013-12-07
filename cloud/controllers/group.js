@@ -84,8 +84,8 @@ exports.invite = function(req, res) {
 exports.join = function(req, res) {
 	var user = Parse.User.current();
 		
-	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( function(group) {
-		res.flash("message", "You've joined " + group);
+	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( function(message) {
+		res.flash("message", message);
 		res.redirect('back');
 	});
 		

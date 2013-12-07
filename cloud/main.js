@@ -113,7 +113,10 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
         var inviteMatch = _.find(user.get("invites"), function(invite) {
             return invite == groupId;
         });
+        if (inviteMatch != undefined) {
+        
         //TODO: check if inviteMatch is not undefined
+        // TODO: check if user is already a member of the group
         var relation = user.relation("groups");
         relation.add(group);
         user.remove("invites", groupId);
@@ -123,12 +126,17 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
         roleQuery.equalTo("name", group.id + "_member");
         
         return roleQuery.first();
+        } else {
+            return Parse.Promise.error("You haven't been invited to this group.");
+        }
     }).then( function(role) {
         role.getUsers().add(user);      
         role.save();
         
     }).then( function() {
-        res.success(groupName);
+        res.success("You've joined " + groupName);
+    }, function(error) {
+        res.success(error);
     });
 });
 
