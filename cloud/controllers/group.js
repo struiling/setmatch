@@ -73,7 +73,8 @@ exports.invite = function(req, res) {
 	*/
 	var inviteMemberList = req.body.inviteMembers.replace(/\s/g, '').split(',');
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
-	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.params.urlName }, { success: function() {} });
+	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.params.urlName }, { 
+		success: function() {} });
 
 	res.redirect('/group/' + req.params.urlName + "/edit");
     //console.log("req.url: " + req.url);
@@ -82,30 +83,12 @@ exports.invite = function(req, res) {
 
 exports.join = function(req, res) {
 	var user = Parse.User.current();
-
-	var groupQuery = new Parse.Query(Group);
-	groupQuery.equalTo("urlName", req.params.urlName);
-	groupQuery.first().then(function(result) {
-		var groupId = result.id;
-		var inviteMatch = _.find(user.get("invites"), function(invite) {
-			return invite == groupId;
-		});
-		user.remove("invites", groupId);
-		var relation = user.relation("groups");
-        relation.add(result);
-		user.save();
 		
-		//TODO: This needs to move to a Cloud Code function
-		var roleQuery = new Parse.Query(Parse.Role);
-		groupQuery.equalTo("name", groupId + "_member");
-		groupQuery.first().then(function(role) {
-			role.getUsers().add(user);		
-			role.save();
-		});
-
-	}).then( function() {
-		res.redirect('back');	
+	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( function(group) {
+		res.flash("message", "You've joined " + group);
+		res.redirect('back');
 	});
+		
 	
 };
 

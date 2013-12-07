@@ -38,7 +38,6 @@ exports.view = function(req, res) {
 
 	var user = Parse.User.current();
 	//user.fetch();
-	console.log("user = " + JSON.stringify(user));
 
 	// TODO: get user's groups
 	if (user.get("groups")) {
@@ -46,7 +45,7 @@ exports.view = function(req, res) {
     }
 
 	if (user.get("invites")) {
-		console.log("invites: " +user.get("invites"));
+		console.log("User's invites: " +user.get("invites"));
 		
 		Parse.Cloud.run("getInvites", { invites: user.get("invites")}, { 
 			success: function(groupsInvited) {
