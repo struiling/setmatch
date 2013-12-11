@@ -37,28 +37,46 @@ exports.save = function(req, res) {
 exports.view = function(req, res) {
 
 	var user = Parse.User.current();
+	var userGroups;
+	var userInvites;
 	//user.fetch();
+
+	//TODO: get user's profile info
 
 	// TODO: get user's groups
 	if (user.get("groups")) {
+		//var query = new Parse.Query(Parse.User);
+		var relation = user.relation("groups");
+		relation.query().find().then( function(results) {
+			console.log("group relation: " + JSON.stringify(results));
+			userGroups = results;
 
-    }
+			if (user.get("invites")) {
 
-	if (user.get("invites")) {
+				userInvites = Parse.Cloud.run("getInvites", { invites: user.get("invites") });
+			}
+			return userInvites;
+			
+		}).then( function(userInvites) {
+			res.render("profile", { user: user, groups: userGroups, invites: userInvites });
+		});
+    } else if (user.get("invites")) {
 		console.log("User's invites: " +user.get("invites"));
 		
 		Parse.Cloud.run("getInvites", { invites: user.get("invites")}, { 
-			success: function(groupsInvited) {
-				res.render("profile", { user: user, invites: groupsInvited });
+			success: function(userInvites) {
+				res.render("profile", { user: user, invites: userInvites });
 			},
 			error: function(error) {
 
 			}
 		});
-
 	} else {
 		res.render("profile", { user: user });
 	}
+
+	
+	
 
 	/*}).then( function() {		
     	

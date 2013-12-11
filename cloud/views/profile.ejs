@@ -21,11 +21,20 @@
 <p>Photo</p>
 var secureUrl = gravatar.url('emerleite@gmail.com', {s: '100', r: 'x', d: 'retro'}, true);
 
+<% if (typeof(invites) !== 'undefined' && invites.length > 0) { %>
+	<h3>You've been invited to these groups</h3>
+	<%= invites %>
+	<% _.each(invites, function(invite, i) { %>
+		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
+	<% } ) %>
+<% } %>
 
-<h3>You've been invited to these groups</h3>
-<% _.each(invites, function(invite, i) { %>
-	<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
-<% } ) %>
+<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
+	<h3>Your groups</h3>
+	<% _.each(groups, function(group, i) { %>
+		 <a href="/group/<%= groups[i].get("urlName") %>"><%= groups[i].get("name") %></a><br />
+	<% } ) %>
+<% } %>
 
 <br />
 

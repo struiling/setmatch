@@ -109,23 +109,23 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     groupQuery.first().then(function(group) {
         var groupId = group.id;
         groupName = group.get("name");
-        // check if there is an invite for this group
+        // check if an invite exists for this group
         var inviteMatch = _.find(user.get("invites"), function(invite) {
             return invite == groupId;
         });
         if (inviteMatch != undefined) {
-        
-        //TODO: check if inviteMatch is not undefined
-        // TODO: check if user is already a member of the group
-        var relation = user.relation("groups");
-        relation.add(group);
-        user.remove("invites", groupId);
-        user.save();
+            
+            // TODO: check if user is already a member of the group
+            var relation = user.relation("groups");
+            relation.add(group);
+            user.remove("invites", groupId);
+            user.save();
 
-        var roleQuery = new Parse.Query(Parse.Role);
-        roleQuery.equalTo("name", group.id + "_member");
-        
-        return roleQuery.first();
+            var roleQuery = new Parse.Query(Parse.Role);
+            roleQuery.equalTo("name", group.id + "_member");
+            
+            return roleQuery.first();
+
         } else {
             return Parse.Promise.error("You haven't been invited to this group.");
         }
@@ -178,7 +178,6 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
             // create Invitation entry for nonexistent users with invites to this group
             var newUsers = _.difference(req.params.users, existingUsers);
-            console.log("newUsers in first function: " + newUsers);
             Parse.Cloud.run("addInviteToInvitation", { users: newUsers, group: group.id },
              { success: function() {} });
 

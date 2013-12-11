@@ -88,8 +88,7 @@ exports.join = function(req, res) {
 		res.flash("message", message);
 		res.redirect('back');
 	});
-		
-	
+
 };
 
 exports.new = function(req, res) {
