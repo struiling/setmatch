@@ -85,6 +85,7 @@ exports.join = function(req, res) {
 	var user = Parse.User.current();
 		
 	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( function(message) {
+		// TODO: set user ACL to group members so members of the newly joined group can see the user
 		res.flash("message", message);
 		res.redirect('back');
 	});
