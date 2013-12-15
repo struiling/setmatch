@@ -2,9 +2,8 @@ var _ = require('underscore');
 var Group = Parse.Object.extend('Group');
 
 exports.create = function(req, res) {
-	//TODO: user creating group should automatically be an admin
-	//TODO: New groups should only be accessible to members
 
+	var user = Parse.User.current();
 	var group = new Group();
 
 	// Explicitly specify which fields to save to prevent bad input data
@@ -13,13 +12,14 @@ exports.create = function(req, res) {
 	    //create admin role
 	    var adminRoleACL = new Parse.ACL();
 	    var adminRole = new Parse.Role(groupId + "_admin", adminRoleACL);
-	    adminRole.getUsers().add(Parse.User.current());
+	    adminRole.getUsers().add(user);
 	    adminRoleACL.setPublicReadAccess(false);
 	    adminRoleACL.setPublicWriteAccess(false);
 	    adminRoleACL.setRoleReadAccess(groupId + "_admin", true);
 	    adminRoleACL.setRoleWriteAccess(groupId + "_admin", true);
 
 	    adminRole.save().then(function() {
+	    	//create user role
 	    	var userRoleACL = new Parse.ACL();
 		    var userRole = new Parse.Role(groupId + "_member", userRoleACL);
 		    userRoleACL.setPublicReadAccess(false);
@@ -32,12 +32,15 @@ exports.create = function(req, res) {
 
 		    object.setACL(userRoleACL);	
 	    	object.save();
-
-	    	res.redirect('/group/' + object.get("urlName"));
 		    
 	    });
 	    
 
+	}).then( function() {
+		user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
+        return user.save();
+	}).then( function (success) {
+    	res.redirect('/group/' + object.get("urlName"));
 	}, function(error) {
 		res.send(500, "Could not create group: " + error.message);
 	});
@@ -64,13 +67,15 @@ exports.edit = function(req, res) {
 };
 
 exports.invite = function(req, res) {
-	// remove whitespace and split on comma
+	
 	/*
 	var membersJSON = req.body.addMembers.replace(/\s/g, '').split(',').map(function(email) {
         return {newMember: email};
     });
 	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
 	*/
+
+	// remove whitespace and split on comma
 	var inviteMemberList = req.body.inviteMembers.replace(/\s/g, '').split(',');
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
 	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.params.urlName }, { 

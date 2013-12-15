@@ -6,14 +6,13 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
+<h2>Profile data</h2>
 
-<p>First name:</p>
-<%- user.get("fname") %>
+<%- JSON.stringify(profile) %>
 <br />
-
-<p>Last name:</p>
-<%- user.get("lname") %>
-<br />
+**<% _.each(_.keys(profile.attributes), function(key) { %>
+<%= key + ": " + profile.get(key) %>
+<% }) %>**
 
 <p>Email</p>
 <%- user.getEmail() %>
@@ -23,7 +22,7 @@ var secureUrl = gravatar.url('emerleite@gmail.com', {s: '100', r: 'x', d: 'retro
 
 <% if (typeof(invites) !== 'undefined' && invites.length > 0) { %>
 	<h3>You've been invited to these groups</h3>
-	<%= invites %>
+<%- JSON.stringify(invites) %>
 	<% _.each(invites, function(invite, i) { %>
 		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
 	<% } ) %>

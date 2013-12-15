@@ -27,9 +27,7 @@ exports.new = function(req, res) {
 	user.set("username", req.body.email.toLowerCase());
 	user.set("password", req.body.password);
 	user.set("email", req.body.email.toLowerCase());
-	user.set("fname", req.body.fname);
-	user.set("lname", req.body.lname);
-
+	
 	user.signUp().then( function(user) {
 		console.log("in signup function! " + JSON.stringify(user));
 
@@ -39,12 +37,17 @@ exports.new = function(req, res) {
 		return query.first();
 
 	}).then( function(invitation) {
+
+		// TODO: convert to Cloud Code and set invitations with ACL
 		if (invitation) {
 			console.log("invitation");
 			user.set("invites", invitation.get("invites"));
-			invitation.destroy({ success: function() {} });
+			invitation.destroy();
 		}
 		var profile = new Profile();
+		profile.set("fname", req.body.fname);
+		profile.set("lname", req.body.lname);
+
     	user.set("profile", profile);
     	return user.save();
 

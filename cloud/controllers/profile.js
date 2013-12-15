@@ -38,52 +38,21 @@ exports.view = function(req, res) {
 
 	var user = Parse.User.current();
 	var userGroups;
-	var userInvites;
+	var userProfile;
 	//user.fetch();
 
-	//TODO: get user's profile info
+	var query = new Parse.Query(Parse.User);
+	query.include("groups");
+	query.include("profile");
+	query.get(user.id);
+	query.first().then( function(result) {
+		userGroups = result.get("groups");
+		userProfile = result.get("profile");
 
-	// TODO: get user's groups
-	if (user.get("groups")) {
-		//var query = new Parse.Query(Parse.User);
-		var relation = user.relation("groups");
-		relation.query().find().then( function(results) {
-			console.log("group relation: " + JSON.stringify(results));
-			userGroups = results;
-
-			if (user.get("invites")) {
-
-				userInvites = Parse.Cloud.run("getInvites", { invites: user.get("invites") });
-			}
-			return userInvites;
-			
-		}).then( function(userInvites) {
-			res.render("profile", { user: user, groups: userGroups, invites: userInvites });
-		});
-    } else if (user.get("invites")) {
-		console.log("User's invites: " +user.get("invites"));
-		
-		Parse.Cloud.run("getInvites", { invites: user.get("invites")}, { 
-			success: function(userInvites) {
-				res.render("profile", { user: user, invites: userInvites });
-			},
-			error: function(error) {
-
-			}
-		});
-	} else {
-		res.render("profile", { user: user });
-	}
-
-	
-	
-
-	/*}).then( function() {		
-    	
-    },
-    function(error) {
-    	// Render error page.
-    	console.log("Problem retrieving user information");
-    });*/
+		return Parse.Cloud.run("getInvites", { invites: user.get("invites") });
+	}).then( function(userInvites) {
+		console.log("userProfile: "+ JSON.stringify(userProfile));
+		res.render("profile", { user: user, groups: userGroups, invites: userInvites, profile: userProfile });
+	});
 
 };
