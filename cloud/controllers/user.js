@@ -1,3 +1,4 @@
+var gravatar = require('cloud/lib/gravatar');
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
 
@@ -47,6 +48,7 @@ exports.new = function(req, res) {
 		var profile = new Profile();
 		profile.set("fname", req.body.fname);
 		profile.set("lname", req.body.lname);
+		profile.set("gravatar", gravatar.url(req.body.email, {}, true) );
 
     	user.set("profile", profile);
     	return user.save();

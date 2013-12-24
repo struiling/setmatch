@@ -17,21 +17,17 @@ exports.edit = function(req, res) {
 
 exports.save = function(req, res) {
 
-	Parse.Cloud.run("checkUser", {}, {
-		success: function(user) {
-			for (var key in req.body) {
-				user.set(key, req.body[key]);
-			}
-			user.set("username", req.body.email);
-			user.save();
+	for (var key in req.body) {
+		user.set(key, req.body[key]);
+	}
 
-			res.redirect("profile/edit");
-		},
-		error: function(error) {
-			res.redirect("/logout");
-		}
+	user.set("username", req.body.email);
+	user.save().then( function(success) {
+		res.redirect("profile/edit");
+	}, function(error) {
+		res.flash('message', 'Oops! There was a problem saving your profile.');
+		res.redirect("profile/edit");
 	});
-
 };
 
 exports.view = function(req, res) {
@@ -39,6 +35,7 @@ exports.view = function(req, res) {
 	var user = Parse.User.current();
 	var userGroups;
 	var userProfile;
+	var userInvites;
 	//user.fetch();
 
 	var query = new Parse.Query(Parse.User);
@@ -48,9 +45,14 @@ exports.view = function(req, res) {
 	query.first().then( function(result) {
 		userGroups = result.get("groups");
 		userProfile = result.get("profile");
+		userInvites = Parse.Cloud.run("getInvites", { invites: user.get("invites") });
 
-		return Parse.Cloud.run("getInvites", { invites: user.get("invites") });
-	}).then( function(userInvites) {
+		_.each(_.keys(userProfile.attributes), function(key) { 
+			key + ": " + userProfile.get(key)
+		})
+
+		
+	}).then( function() {
 		console.log("userProfile: "+ JSON.stringify(userProfile));
 		res.render("profile", { user: user, groups: userGroups, invites: userInvites, profile: userProfile });
 	});

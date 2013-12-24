@@ -8,17 +8,20 @@
 <% } %>
 <h2>Profile data</h2>
 
-<%- JSON.stringify(profile) %>
 <br />
 **<% _.each(_.keys(profile.attributes), function(key) { %>
-<%= key + ": " + profile.get(key) %>
+<%= key %>: <%= profile.get(key) %><br />
+
+<% if (key == "gravatar") { %>
+<img src="<%= profile.get(key) %>?s=100&r=pg&d=retro" />
+<% } %>
 <% }) %>**
 
 <p>Email</p>
 <%- user.getEmail() %>
 
 <p>Photo</p>
-var secureUrl = gravatar.url('emerleite@gmail.com', {s: '100', r: 'x', d: 'retro'}, true);
+
 
 <% if (typeof(invites) !== 'undefined' && invites.length > 0) { %>
 	<h3>You've been invited to these groups</h3>

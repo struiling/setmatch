@@ -2,7 +2,6 @@
 var express = require('express');
 var expressLayouts = require('cloud/lib/express-layouts');
 var flashify = require('cloud/lib/flashify');
-var gravatar = require('cloud/lib/gravatar');
 var parseExpressHttpsRedirect = require('parse-express-https-redirect');
 var parseExpressCookieSession = require('parse-express-cookie-session');
 var Image = require("parse-image");
@@ -80,7 +79,7 @@ app.get('/profile/edit', requireUser, profileController.edit);
 app.get('/profile', requireUser, profileController.view);
 
 app.get('/profile/save', requireUser, profileController.view);
-app.post('/profile/save', requireUser, requireUser, profileController.save);
+app.post('/profile/save', requireUser, profileController.save);
 
 app.get('/group/new', requireUser, groupController.new);
 app.post('/group/create', requireUser, groupController.create);
