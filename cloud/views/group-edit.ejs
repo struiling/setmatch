@@ -3,7 +3,7 @@
 
 <form method="post" action="<%- '/group/' + group.get('urlName') %>">
 	<fieldset>
-		<legend>Edit group</legend>
+		<legend>Edit group info</legend>
 
 		<label for="name">Name</label>
         <input name="name" id="name" type="text" placeholder="Name" value="<%- group.get("name") %>">
@@ -24,6 +24,34 @@
         <input type="hidden" name="_method" value="put" />
         <input class="button" type="submit" value="Save changes">
 	</fieldset>
+</form>
+<form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">
+    <fieldset>
+        <legend>Add a new group custom trait</legend>
+
+        <label for="name">Name</label>
+        <input name="name" id="name" type="text" placeholder="Name" value="">
+        
+        <input type="hidden" name="id" value="<%- group.id %>" />
+        <br />
+        
+        <input type="hidden" name="_method" value="put" />
+        <input class="button" type="submit" value="Save changes">
+    </fieldset>
+</form>
+<form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">
+    <fieldset>
+        <legend>Edit group traits</legend>
+
+        <label for="name">Name</label>
+        <input name="name" id="name" type="text" placeholder="Name" value="<%- group.get("name") %>">
+        
+        <input type="hidden" name="id" value="<%- group.id %>" />
+        <br />
+        
+        <input type="hidden" name="_method" value="put" />
+        <input class="button" type="submit" value="Save changes">
+    </fieldset>
 </form>
 <form method="post" action="<%- '/group/' + group.get('urlName') + '/invite' %>">
     <fieldset>

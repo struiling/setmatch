@@ -16,7 +16,7 @@ exports.edit = function(req, res) {
 };
 
 exports.save = function(req, res) {
-
+	var user = Parse.User.current();
 	for (var key in req.body) {
 		user.set(key, req.body[key]);
 	}
@@ -33,9 +33,9 @@ exports.save = function(req, res) {
 exports.view = function(req, res) {
 
 	var user = Parse.User.current();
-	var userGroups;
-	var userProfile;
-	var userInvites;
+	//var userGroups;
+	//var userProfile;
+	//var userInvites;
 	//user.fetch();
 
 	var query = new Parse.Query(Parse.User);
@@ -43,18 +43,17 @@ exports.view = function(req, res) {
 	query.include("profile");
 	query.get(user.id);
 	query.first().then( function(result) {
-		userGroups = result.get("groups");
-		userProfile = result.get("profile");
-		userInvites = Parse.Cloud.run("getInvites", { invites: user.get("invites") });
-
-		_.each(_.keys(userProfile.attributes), function(key) { 
-			key + ": " + userProfile.get(key)
-		})
-
-		
-	}).then( function() {
-		console.log("userProfile: "+ JSON.stringify(userProfile));
-		res.render("profile", { user: user, groups: userGroups, invites: userInvites, profile: userProfile });
+		var userGroups = result.get("groups");
+		var userProfile = result.get("profile");
+		Parse.Cloud.run("getInvites", { invites: user.get("invites") }).then( function(userInvites) {
+			console.log("userInvites: " + JSON.stringify(userInvites));	
+			return {groups: userGroups, profile: userProfile, invites: userInvites};
+		}).then( function(userData) {
+		    res.render("profile", { user: user, groups: userData.groups, invites: userData.invites, profile: userData.profile });
+	    }, function(error) {
+		    res.redirect("logout");
+	    });
+	}, function(error) {
+		res.redirect("logout");
 	});
-
 };

@@ -2,7 +2,6 @@
 
 module.exports = function(req, res, next) {
 	if (Parse.User.current()) {
-		
 		// actually get current user fields
 		Parse.User.current().fetch().then(function(user) {
 	        res.locals.basicUser = user;
@@ -11,7 +10,7 @@ module.exports = function(req, res, next) {
         },
         function(error) {
         	// Render error page.
-        	Parse.User.logOut();
+        	res.redirect("logout");
         });
 
 	} else {

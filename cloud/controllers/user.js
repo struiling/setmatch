@@ -69,19 +69,6 @@ exports.new = function(req, res) {
 	});
 };
 
-exports.welcome = function(req, res) {
-
-	Parse.Cloud.run("checkUser", {}, {
-		success: function(user) {
-			res.render("welcome", { username: "Your username here: " + user });			
-		},
-		error: function(error) {
-			res.redirect("/logout");
-		}
-	});
-
-};
-
 exports.reset = function(req, res) {
 
 	Parse.User.requestPasswordReset(req.body.email, {
@@ -98,15 +85,15 @@ exports.reset = function(req, res) {
 
 exports.fb = function(req, res) {
 	Parse.FacebookUtils.logIn(null, {
-	success: function(user) {
-		if (!user.existed()) {
-			alert("User signed up and logged in through Facebook!");
-		} else {
-			alert("User logged in through Facebook!");
+		success: function(user) {
+			if (!user.existed()) {
+				alert("User signed up and logged in through Facebook!");
+			} else {
+				alert("User logged in through Facebook!");
+			}
+		},
+		error: function(user, error) {
+			alert("User cancelled the Facebook login or did not fully authorize.");
 		}
-	},
-	error: function(user, error) {
-		alert("User cancelled the Facebook login or did not fully authorize.");
-	}
-});
-}
+	});
+};

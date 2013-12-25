@@ -7,8 +7,8 @@ exports.create = function(req, res) {
 	var group = new Group();
 
 	// Explicitly specify which fields to save to prevent bad input data
-	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(object) {
-	    var groupId = object.id;
+	var groupPromise = group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(group) {
+	    var groupId = group.id;
 	    //create admin role
 	    var adminRoleACL = new Parse.ACL();
 	    var adminRole = new Parse.Role(groupId + "_admin", adminRoleACL);
@@ -17,8 +17,11 @@ exports.create = function(req, res) {
 	    adminRoleACL.setPublicWriteAccess(false);
 	    adminRoleACL.setRoleReadAccess(groupId + "_admin", true);
 	    adminRoleACL.setRoleWriteAccess(groupId + "_admin", true);
+	    console.log("Im here 1");
 
-	    adminRole.save().then(function() {
+//	    return {saved: adminRole.save(), adminRole: adminRole, adminRoleACL: adminRoleACL, group: group};
+		var adminPromise = adminRole.save().then(function() {
+	//		var groupId = adminRole.group.id;
 	    	//create user role
 	    	var userRoleACL = new Parse.ACL();
 		    var userRole = new Parse.Role(groupId + "_member", userRoleACL);
@@ -26,24 +29,30 @@ exports.create = function(req, res) {
 		    userRoleACL.setPublicWriteAccess(false);
 		    userRoleACL.setRoleReadAccess(groupId + "_member", true);
 		    userRoleACL.setRoleWriteAccess(groupId + "_admin", true);
-	    
+	    	
+	    	console.log("Admin role: " + JSON.stringify(adminRole));
 	    	userRole.getRoles().add(adminRole);
-		    userRole.save();
-
-		    object.setACL(userRoleACL);	
-	    	object.save();
-		    
-	    });
-	    
-
-	}).then( function() {
-		user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-        return user.save();
-	}).then( function (success) {
-    	res.redirect('/group/' + object.get("urlName"));
-	}, function(error) {
-		res.send(500, "Could not create group: " + error.message);
+	    	console.log("Im here 2");
+		    var userPromise = userRole.save().then(function() {
+				group.setACL(userRoleACL);	
+				console.log("Im here 3");
+		    	return group.save();
+			}).then( function() {
+				user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
+				console.log("Im here 4");
+		        return user.save();
+			}).then( function () {
+				console.log("Im here 5");
+		    	res.redirect('/group/' + group.get("urlName"));
+			}, function(error) {
+				res.send(500, "Could not create group: " + error.message);
+			});
+			return userPromise;
+		});
+		return adminPromise;
 	});
+	console.log("Im here 6");
+	return groupPromise;
 };
 
 exports.edit = function(req, res) {

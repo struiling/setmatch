@@ -6,9 +6,39 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
-<h3>You have been invited to join the following groups</h3>
-<ul>
-		<li>Group name <a href="#">Join</a></li>
-</ul>
-<p><a href="/profile/edit">Edit your profile</a></p>
-<p><a href="/group/new">Create a new group</a></p>
+<h2>Profile data</h2>
+
+<br />
+**<% _.each(_.keys(profile.attributes), function(key) { %>
+<%= key %>: <%= profile.get(key) %><br />
+
+<% if (key == "gravatar") { %>
+<img src="<%= profile.get(key) %>?s=100&r=pg&d=retro" />
+<% } %>
+<% }) %>**
+
+<p>Email</p>
+<%- user.getEmail() %>
+
+<p>Photo</p>
+
+
+<% if (typeof(invites) !== 'undefined' && invites.length > 0) { %>
+	<h3>You've been invited to these groups</h3>
+<%- JSON.stringify(invites) %>
+	<% _.each(invites, function(invite, i) { %>
+		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
+	<% } ) %>
+<% } %>
+
+<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
+	<h3>Your groups</h3>
+	<% _.each(groups, function(group, i) { %>
+		 <a href="/group/<%= groups[i].get("urlName") %>"><%= groups[i].get("name") %></a><br />
+	<% } ) %>
+<% } %>
+
+<br />
+
+
+<p><a href="/profile/edit">Edit profile</a></p>

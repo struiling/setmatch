@@ -10,9 +10,10 @@ var _ = require('underscore');
 
 /* stuff I wrote */
 var requireUser = require('cloud/require-user');
-var userController = require('cloud/controllers/user.js');
-var profileController = require('cloud/controllers/profile.js');
 var groupController = require('cloud/controllers/group.js');
+var profileController = require('cloud/controllers/profile.js');
+var traitController = require('cloud/controllers/trait.js');
+var userController = require('cloud/controllers/user.js');
 
 
 // Required for initializing Express app in Cloud Code.
@@ -55,7 +56,27 @@ function checkAuth(req, res, next) {
 
 // Routes routes routes
 app.get('/', requireUser, function(req, res) {
-    res.render('match/index', { message: "You're logged in!" });
+    var user = Parse.User.current();
+    var userGroups;
+    var userProfile;
+    var userInvites;
+    //user.fetch();
+
+    var query = new Parse.Query(Parse.User);
+    query.include("groups");
+    query.include("profile");
+    query.get(user.id);
+    query.first().then( function(result) {
+        userGroups = result.get("groups");
+        userProfile = result.get("profile");
+        userInvites = Parse.Cloud.run("getInvites", { invites: user.get("invites") });
+        
+    }).then( function() {
+        console.log("userProfile: "+ JSON.stringify(userProfile));
+        res.render("profile", { user: user, groups: userGroups, invites: userInvites, profile: userProfile }); 
+    }, function(error) {
+        res.redirect("logout");
+    });
 });
 
 app.get('/login', function(req, res) {
@@ -81,34 +102,30 @@ app.get('/profile', requireUser, profileController.view);
 app.get('/profile/save', requireUser, profileController.view);
 app.post('/profile/save', requireUser, profileController.save);
 
+// view group creation form
 app.get('/group/new', requireUser, groupController.new);
+// save new group (create)
 app.post('/group/create', requireUser, groupController.create);
-app.post('/group/save', requireUser, groupController.save);
+// save edits to group (is this being used?)
+// app.post('/group/save', requireUser, groupController.save);
 
+// view group info
 app.get('/group/:urlName', requireUser, groupController.view);
+// view group edit form
 app.get('/group/:urlName/edit', requireUser, groupController.edit);
+// save edits to group info
 app.put('/group/:urlName', requireUser, groupController.save);
+
+// invite another user to the group
 app.post('/group/:urlName/invite', requireUser, groupController.invite);
+// accept invitation to a group
 app.get('/group/:urlName/join', requireUser, groupController.join);
 
-app.get('/welcome', function(req, res) {
-    // Display the user profile if user is logged in.
-    if (Parse.User.current()) {
-        // We need to fetch because we need to show fields on the user object.
-        Parse.User.current().fetch().then(function(user) {
-        // Render the user profile information (e.g. email, phone, etc).
-		res.render('profile', { message: user.get("username") });
-        // to try 
-        //user.get("username")
-        },
-        function(error) {
-            // Render error page.
-        });
-    } else {
-        // User not logged in, redirect to login form.
-        res.redirect('/');
-    }
-});
+// create new group trait (custom field)
+app.post('/group/:urlName/trait', requireUser, traitController.create);
+// save edits group trait (custom field) definition
+app.put('/group/:urlName/trait', requireUser, traitController.save);
+
 
 // // Example reading from the request query string of an HTTP get request.
 // app.get('/test', function(req, res) {

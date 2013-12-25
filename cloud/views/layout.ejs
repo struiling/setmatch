@@ -11,6 +11,13 @@
                 Email: <%= basicUser.getEmail() %>
                 Name: <%= basicUser.get("fname") %> <%= basicUser.get("lname") %>
             <% } %>
+            <% if (Parse.User.current()) { %>
+            <nav>
+                <ul>
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </nav>
+            <% } %>
   		</header>
 
         <% include flashify %>
