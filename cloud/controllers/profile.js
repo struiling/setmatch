@@ -45,15 +45,19 @@ exports.view = function(req, res) {
 	query.first().then( function(result) {
 		var userGroups = result.get("groups");
 		var userProfile = result.get("profile");
-		Parse.Cloud.run("getInvites", { invites: user.get("invites") }).then( function(userInvites) {
-			console.log("userInvites: " + JSON.stringify(userInvites));	
-			return {groups: userGroups, profile: userProfile, invites: userInvites};
-		}).then( function(userData) {
-		    res.render("profile", { user: user, groups: userData.groups, invites: userData.invites, profile: userData.profile });
-	    }, function(error) {
-		    res.redirect("logout");
-	    });
+		Parse.Cloud.run("getInvites", { invites: user.get("invites") }).then( function(invites) {
+		    res.render("profile", { user: user, groups: userGroups, invites: invites, profile: userProfile });
+		});
 	}, function(error) {
 		res.redirect("logout");
 	});
+/*	}).then( function(userInvites) {
+		console.log("userInvites: " + JSON.stringify(userInvites));	
+		return {groups: userGroups, profile: userProfile, invites: userInvites};
+	}).then( function(userData) {
+		console.log("userData.invites: " + JSON.stringify(userData.invites));
+	    res.render("profile", { user: user, groups: userData.groups, invites: userData.invites, profile: userData.profile });
+	}, function(error) {
+		res.redirect("logout");
+	});*/
 };

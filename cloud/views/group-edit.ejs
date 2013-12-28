@@ -5,38 +5,47 @@
 	<fieldset>
 		<legend>Edit group info</legend>
 
-		<label for="name">Name</label>
-        <input name="name" id="name" type="text" placeholder="Name" value="<%- group.get("name") %>">
+		<label for="group-name">Name</label>
+        <input name="name" id="group-name" type="text" placeholder="Name" value="<%- group.get("name") %>">
         
-        <label for="urlName">URL</label>
-        <input name="urlName" id="urlName" type="text" placeholder="URL" value="<%- group.get("urlName") %>">
+        <label for="group-urlName">URL</label>
+        <input name="urlName" id="group-urlName" type="text" placeholder="URL" value="<%- group.get("urlName") %>">
         
         <label for="description">Description</label>
         <input name="description" id="description" type="textarea" placeholder="Description" value="<%- group.get("description") %>">
 
         <input type="hidden" name="id" value="<%- group.id %>" />
         <br />
-        <input type="hidden" name="secretive" value="n" />
+        <!--<input type="hidden" name="secretive" value="n" />
         <input name="secretive" id="secretive" type="checkbox" value="y"<% if (group.get("secretive") == "y") { %> checked="checked"<% } %>> 
 
         <label for="secretive">Prevent members of this group from viewing other members (not recommended)</label>
-        <br />
+        <br />-->
         <input type="hidden" name="_method" value="put" />
         <input class="button" type="submit" value="Save changes">
 	</fieldset>
 </form>
-<form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">
+<form method="post" action="<%- '/group/' + group.get('urlName') + '/trait' %>">
     <fieldset>
         <legend>Add a new group custom trait</legend>
 
         <label for="name">Name</label>
         <input name="name" id="name" type="text" placeholder="Name" value="">
         
-        <input type="hidden" name="id" value="<%- group.id %>" />
+        <br />
+        <label for="type">Type</label>
+        <select name="type" id="type">
+            <option value="text">Text</option>
+            <option value="date">Date</option>
+            <option value="location">Location</option>
+            <option value="list">Multiple choice</option>
+            <option value="list">Checkboxes</option>
+        </select>
+
+        <input type="hidden" name="group" value="<%- group.id %>" />
         <br />
         
-        <input type="hidden" name="_method" value="put" />
-        <input class="button" type="submit" value="Save changes">
+        <input class="button" type="submit" value="Create new field">
     </fieldset>
 </form>
 <form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">

@@ -12,13 +12,17 @@ Parse.Cloud.define("checkUser", function(req, res) {
     	res.error("User not found");	
     }
 });
-
+/*
 Parse.Cloud.beforeSave("Group", function(req, res) {
+    Parse.Cloud.useMasterKey();
+
     //TODO: strip spaces and bad characters from urlName (only alphanumeric and - and _)
-    var urlName = req.object.get("urlName").toLowerCase();
-	if (!req.object.get("urlName")) {
+    console.log('req.object.get("urlName"): ' + req.object.get("urlName"));
+    console.log('req.object: ' + JSON.stringify(req.object));
+	if (!req.object.get("urlName") && req.object.isNew()) {
     	res.error("A URL is required.");
 	} else {
+        var urlName = req.object.get("urlName").toLowerCase();
 	    var query = new Parse.Query(Group);
 
         // check if another group has this URL, and is not the one you're saving
@@ -39,6 +43,7 @@ Parse.Cloud.beforeSave("Group", function(req, res) {
 	    });
   	}
 });
+*/
 
 /* TODO: Figure out why this function stops addInviteToUser, below, from saving a user change.
 Parse.Cloud.beforeSave(Parse.User, function(req, res) {

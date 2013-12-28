@@ -1,58 +1,46 @@
 var _ = require('underscore');
 var Group = Parse.Object.extend('Group');
-
 exports.create = function(req, res) {
 
-	var user = Parse.User.current();
-	var group = new Group();
+    var user = Parse.User.current();
+    var group = new Group();
 
-	// Explicitly specify which fields to save to prevent bad input data
-	var groupPromise = group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(group) {
-	    var groupId = group.id;
-	    //create admin role
-	    var adminRoleACL = new Parse.ACL();
-	    var adminRole = new Parse.Role(groupId + "_admin", adminRoleACL);
-	    adminRole.getUsers().add(user);
-	    adminRoleACL.setPublicReadAccess(false);
+    // Explicitly specify which fields to save to prevent bad input data
+    group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then( function(object) {
+        console.log("group id: " + group.id);
+        //create admin role
+        var adminRoleACL = new Parse.ACL();
+        var adminRole = new Parse.Role(group.id + "_admin", adminRoleACL);
+        adminRole.getUsers().add(user);
+        adminRoleACL.setPublicReadAccess(false);
 	    adminRoleACL.setPublicWriteAccess(false);
-	    adminRoleACL.setRoleReadAccess(groupId + "_admin", true);
-	    adminRoleACL.setRoleWriteAccess(groupId + "_admin", true);
-	    console.log("Im here 1");
+        adminRoleACL.setRoleReadAccess(group.id + "_admin", true);
+        adminRoleACL.setRoleWriteAccess(group.id + "_admin", true);
+        return adminRole.save();
+    }).then(function(adminRole) {
+        // create user role
+        var userRoleACL = new Parse.ACL();
+        var userRole = new Parse.Role(group.id + "_member", userRoleACL);
+        userRoleACL.setPublicReadAccess(false);
+	    userRoleACL.setPublicWriteAccess(false);
+        userRoleACL.setRoleReadAccess(group.id + "_member", true);
+        // admins can modify user ACL
+        userRoleACL.setRoleWriteAccess(group.id + "_admin", true);
 
-//	    return {saved: adminRole.save(), adminRole: adminRole, adminRoleACL: adminRoleACL, group: group};
-		var adminPromise = adminRole.save().then(function() {
-	//		var groupId = adminRole.group.id;
-	    	//create user role
-	    	var userRoleACL = new Parse.ACL();
-		    var userRole = new Parse.Role(groupId + "_member", userRoleACL);
-		    userRoleACL.setPublicReadAccess(false);
-		    userRoleACL.setPublicWriteAccess(false);
-		    userRoleACL.setRoleReadAccess(groupId + "_member", true);
-		    userRoleACL.setRoleWriteAccess(groupId + "_admin", true);
-	    	
-	    	console.log("Admin role: " + JSON.stringify(adminRole));
-	    	userRole.getRoles().add(adminRole);
-	    	console.log("Im here 2");
-		    var userPromise = userRole.save().then(function() {
-				group.setACL(userRoleACL);	
-				console.log("Im here 3");
-		    	return group.save();
-			}).then( function() {
-				user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-				console.log("Im here 4");
-		        return user.save();
-			}).then( function () {
-				console.log("Im here 5");
-		    	res.redirect('/group/' + group.get("urlName"));
-			}, function(error) {
-				res.send(500, "Could not create group: " + error.message);
-			});
-			return userPromise;
-		});
-		return adminPromise;
-	});
-	console.log("Im here 6");
-	return groupPromise;
+        // set admin role hierarchy
+        userRole.getRoles().add(adminRole);
+
+        // group permissions
+        group.setACL(userRoleACL);        
+        
+        user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+        return Parse.Object.saveAll([userRole, user, group]);
+        
+    }).then( function () {
+        res.redirect('/group/' + group.get("urlName"));
+    }, function(error) {
+        res.send(500, "Could not create group: " + error.message);
+    });
 };
 
 exports.edit = function(req, res) {
