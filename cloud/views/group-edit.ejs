@@ -22,7 +22,7 @@
         <label for="secretive">Prevent members of this group from viewing other members (not recommended)</label>
         <br />-->
         <input type="hidden" name="_method" value="put" />
-        <input class="button" type="submit" value="Save changes">
+        <input class="button" type="submit" value="Save changes" />
 	</fieldset>
 </form>
 <form method="post" action="<%- '/group/' + group.get('urlName') + '/trait' %>">
@@ -41,11 +41,13 @@
             <option value="list">Multiple choice</option>
             <option value="list">Checkboxes</option>
         </select>
+        <input type="text" name="listoption[]" value="" /> <br />
+        <input type="text" name="listoption[]" value="" /> <br />
 
         <input type="hidden" name="group" value="<%- group.id %>" />
         <br />
         
-        <input class="button" type="submit" value="Create new field">
+        <input class="button" type="submit" value="Create group trait" />
     </fieldset>
 </form>
 <form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">
@@ -68,7 +70,7 @@
         <label for="inviteMembers">Enter email addresses separated by commas</label>
         <br />
         <textarea name="inviteMembers" id="inviteMembers" rows="3"></textarea>
-        <input class="button" type="submit" value="Send invitations">
+        <input class="button" type="submit" value="Send invitations" />
     </fieldset>
 </form>
 <h3>Current members</h3>

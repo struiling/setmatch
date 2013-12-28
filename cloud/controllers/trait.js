@@ -10,7 +10,25 @@ exports.create = function(req, res) {
 	var trait = new Trait();
 	for (var key in req.body) {
 		trait.set(key, req.body[key]);
+		console.log("trait values: " + key + ": " + req.body[key]);
 	}
+	
+    var adminRoleACL = new Parse.ACL();
+    adminRoleACL.setPublicReadAccess(false);
+    adminRoleACL.setPublicWriteAccess(false);
+    adminRoleACL.setRoleReadAccess(group.id + "_admin", true);
+    adminRoleACL.setRoleWriteAccess(group.id + "_admin", true);
+
+    var userRoleACL = new Parse.ACL();
+    userRoleACL.setPublicReadAccess(false);
+    userRoleACL.setPublicWriteAccess(false);
+    userRoleACL.setRoleReadAccess(group.id + "_member", true);
+    // admins can modify user ACL
+    userRoleACL.setRoleWriteAccess(group.id + "_admin", true);
+
+    // group permissions
+    trait.setACL(userRoleACL);        
+    
 	trait.set("group", group);
 	trait.save().then( function (success) {
     	res.redirect('/group/' + req.params.urlName + '/edit');
