@@ -1,12 +1,13 @@
 var _ = require('underscore');
 var Group = Parse.Object.extend('Group');
+
 exports.create = function(req, res) {
 
     var user = Parse.User.current();
     var group = new Group();
 
     // Explicitly specify which fields to save to prevent bad input data
-    group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then( function(object) {
+    group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then( function() {
         console.log("group id: " + group.id);
         //create admin role
         var adminRoleACL = new Parse.ACL();
@@ -44,25 +45,74 @@ exports.create = function(req, res) {
 };
 
 exports.edit = function(req, res) {
-	
+	var group;
+
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
-	query.find().then(function(results) {
-		console.log("Query for edit: " + JSON.stringify(results[0]));
-		if (results[0] != null) {
-			res.render('group-edit', {
-		    	group: results[0]
-			});
-		} else {
-			res.flash("message", "You don't have permission to see this page.");
+	query.first().then(
+		function(result) {
+			group = result;
+			console.log("Query for edit: " + JSON.stringify(group));
+			var queryRole = new Parse.Query(Parse.Role);
+			queryRole.equalTo("name", group.id + "_admin");
+			return queryRole.first();
+		}
+	).then(
+		function(role) {
+			if (role == undefined) {
+				res.flash("message", "You don't have access to this page.");
+				res.redirect("/");	
+//				return Parse.Promise.error("You don't have access to this page.");
+			} else {
+				console.log("role: " + JSON.stringify(role));
+
+				res.render('group-edit', {
+			    	group: group
+				});
+			}
+	    },
+	    function(error) {
 			res.redirect("/");	
 		}
-    	
-    }, function(error) {
-		res.redirect(back);
-	});			
+	);			
 };
 
+	/*
+	var queryRole = new Parse.Query(Parse.Role);
+	queryRole.equalTo("name", groupId + "_admin");
+	queryRole.first({
+	    success: function(role) { // Role Object
+	    	console.log("role: " + JSON.stringify(role));
+	    	console.log("groupId: " + groupId);
+	    	if (role != null) {
+	    		var adminRelation = new Parse.Relation(role, 'users');
+		        var queryAdmins = adminRelation.query();
+		        queryAdmins.equalTo('objectId', Parse.User.current().id);
+		        queryAdmins.first({
+		            success: function(result) {    // User Object
+		                var user = result;
+		                user ? console.log('USER : ' + JSON.stringify(user)) : console.log('User not Administrator!');
+		                if (group != null) {
+							res.render('group-edit', {
+						    	group: group
+							});
+						} else {
+							res.flash("message", error);
+							res.redirect("/");	
+						}
+				    	
+		            }
+		        });
+	    	} else {
+	    		console.log("No role found");
+	    	}
+	        
+	    },
+	    error: function(error) {
+	    	res.redirect(back);
+	    }
+	});*/
+		
 exports.invite = function(req, res) {
 	
 	/*
