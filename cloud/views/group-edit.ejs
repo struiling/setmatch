@@ -50,20 +50,36 @@
         <input class="button" type="submit" value="Create group trait" />
     </fieldset>
 </form>
-<form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">
-    <fieldset>
-        <legend>Edit group traits</legend>
 
-        <label for="name">Name</label>
-        <input name="name" id="name" type="text" placeholder="Name" value="<%- group.get("name") %>">
-        
-        <input type="hidden" name="id" value="<%- group.id %>" />
-        <br />
-        
-        <input type="hidden" name="_method" value="put" />
-        <input class="button" type="submit" value="Save changes">
-    </fieldset>
-</form>
+<% if (typeof(traits) !== 'undefined' && traits.length > 0) { %>
+
+    <form method="post" action="<%- '/group/' + group.get('urlName') + 'trait' %>">
+        <fieldset>
+            <legend>Edit group traits</legend>
+            <% _.each(traits, function(trait, i) { %>
+                <label for="name">Name</label>
+                <input name="name" id="name" type="text" placeholder="Name" value="<%= traits[i].get("name") %>">
+                <br />
+                <label for="type">Type</label>
+                <%= traits[i].get("type") %>
+                <select name="type" id="type">
+                    <option value="text">Text</option>
+                    <option value="date">Date</option>
+                    <option value="location">Location</option>
+                    <option value="list">Multiple choice</option>
+                    <option value="list">Checkboxes</option>
+                </select>
+                <br />
+                <input type="hidden" name="id" value="<%= traits[i].id %>" />
+            <% } ) %>
+
+            <br />
+            
+            <input type="hidden" name="_method" value="put" />
+            <input class="button" type="submit" value="Save changes">
+        </fieldset>
+    </form>
+<% } %>
 <form method="post" action="<%- '/group/' + group.get('urlName') + '/invite' %>">
     <fieldset>
         <legend>Invite members</legend>

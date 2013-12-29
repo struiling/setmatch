@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var Group = Parse.Object.extend('Group');
+var Trait = Parse.Object.extend('Trait');
 
 exports.create = function(req, res) {
 
@@ -47,25 +48,38 @@ exports.create = function(req, res) {
 exports.edit = function(req, res) {
 	var group;
 
-	var query = new Parse.Query(Group);
-	query.equalTo("urlName", req.params.urlName);
-	query.first().then(
+	var groupQuery = new Parse.Query(Group);
+	groupQuery.equalTo("urlName", req.params.urlName);
+	groupQuery.first().then(
 		function(result) {
 			group = result;
 			console.log("Query for edit: " + JSON.stringify(group));
-			var queryRole = new Parse.Query(Parse.Role);
-			queryRole.equalTo("name", group.id + "_admin");
-			return queryRole.first();
+			var roleQuery = new Parse.Query(Parse.Role);
+			roleQuery.equalTo("name", group.id + "_admin");
+			return roleQuery.first();
 		}
 	).then(
 		function(role) {
 			if (role == undefined) {
-				res.flash("message", "You don't have access to this page.");
-				res.redirect("/");	
-//				return Parse.Promise.error("You don't have access to this page.");
+				return Parse.Promise.error("You don't have access to this page.");
 			} else {
 				console.log("role: " + JSON.stringify(role));
 
+				var traitQuery = new Parse.Query("Trait");
+				traitQuery.include("group");
+				traitQuery.equalTo("group", group);
+				return traitQuery.find();
+			}
+	    }
+	).then( // TODO: reformat ALL the promises to follow this indentation
+		function(traits) {
+			console.log("traits: " + JSON.stringify(traits));
+			if (traits.length != 0) {
+				res.render('group-edit', {
+			    	group: group,
+			    	traits: traits
+				});
+			} else {
 				res.render('group-edit', {
 			    	group: group
 				});
@@ -76,42 +90,6 @@ exports.edit = function(req, res) {
 		}
 	);			
 };
-
-	/*
-	var queryRole = new Parse.Query(Parse.Role);
-	queryRole.equalTo("name", groupId + "_admin");
-	queryRole.first({
-	    success: function(role) { // Role Object
-	    	console.log("role: " + JSON.stringify(role));
-	    	console.log("groupId: " + groupId);
-	    	if (role != null) {
-	    		var adminRelation = new Parse.Relation(role, 'users');
-		        var queryAdmins = adminRelation.query();
-		        queryAdmins.equalTo('objectId', Parse.User.current().id);
-		        queryAdmins.first({
-		            success: function(result) {    // User Object
-		                var user = result;
-		                user ? console.log('USER : ' + JSON.stringify(user)) : console.log('User not Administrator!');
-		                if (group != null) {
-							res.render('group-edit', {
-						    	group: group
-							});
-						} else {
-							res.flash("message", error);
-							res.redirect("/");	
-						}
-				    	
-		            }
-		        });
-	    	} else {
-	    		console.log("No role found");
-	    	}
-	        
-	    },
-	    error: function(error) {
-	    	res.redirect(back);
-	    }
-	});*/
 		
 exports.invite = function(req, res) {
 	
@@ -137,7 +115,7 @@ exports.join = function(req, res) {
 	var user = Parse.User.current();
 		
 	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( function(message) {
-		// TODO: set user ACL to group members so members of the newly joined group can see the user
+		// TODO: set user ACL to group members so other members of the newly joined group can see the user
 		res.flash("message", message);
 		res.redirect('back');
 	});
