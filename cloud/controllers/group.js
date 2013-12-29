@@ -47,12 +47,16 @@ exports.create = function(req, res) {
 
 exports.edit = function(req, res) {
 	var group;
+	var groupTraits;
 
 	var groupQuery = new Parse.Query(Group);
 	groupQuery.equalTo("urlName", req.params.urlName);
+	groupQuery.include("traits");
+	// TODO: reformat ALL the promises to follow this indentation
 	groupQuery.first().then(
 		function(result) {
 			group = result;
+			groupTraits = group.get("traits");
 			console.log("Query for edit: " + JSON.stringify(group));
 			var roleQuery = new Parse.Query(Parse.Role);
 			roleQuery.equalTo("name", group.id + "_admin");
@@ -61,28 +65,22 @@ exports.edit = function(req, res) {
 	).then(
 		function(role) {
 			if (role == undefined) {
+				// If you can't see the role, you're not an admin
 				return Parse.Promise.error("You don't have access to this page.");
 			} else {
 				console.log("role: " + JSON.stringify(role));
-
-				var traitQuery = new Parse.Query("Trait");
-				traitQuery.include("group");
-				traitQuery.equalTo("group", group);
-				return traitQuery.find();
-			}
-	    }
-	).then( // TODO: reformat ALL the promises to follow this indentation
-		function(traits) {
-			console.log("traits: " + JSON.stringify(traits));
-			if (traits.length != 0) {
-				res.render('group-edit', {
-			    	group: group,
-			    	traits: traits
-				});
-			} else {
-				res.render('group-edit', {
-			    	group: group
-				});
+				console.log("traits: " + JSON.stringify(groupTraits));
+				
+				if (groupTraits.length != 0) {
+					res.render('group-edit', {
+				    	group: group,
+				    	traits: groupTraits
+					});
+				} else {
+					res.render('group-edit', {
+				    	group: group
+					});
+				}
 			}
 	    },
 	    function(error) {

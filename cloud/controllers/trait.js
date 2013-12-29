@@ -9,8 +9,10 @@ exports.create = function(req, res) {
 	group.id = req.body.group;
 	var trait = new Trait();
 	for (var key in req.body) {
-		trait.set(key, req.body[key]);
-		console.log("trait values: " + key + ": " + req.body[key]);
+		if (key != "group") {
+			trait.set(key, req.body[key]);
+			console.log("trait values: " + key + ": " + req.body[key]);
+		}
 	}
 	
     var adminRoleACL = new Parse.ACL();
@@ -29,13 +31,21 @@ exports.create = function(req, res) {
     // group permissions
     trait.setACL(userRoleACL);        
     
-	trait.set("group", group);
-	trait.save().then( function (success) {
-    	res.redirect('/group/' + req.params.urlName + '/edit');
-	}, function(error) {
-		res.send(500, "Could not create trait: " + error.message);
-	});
-
+	//trait.set("group", group);
+	trait.save().then( 
+		function (trait) {
+			console.log("trait ID: "+ trait.id);
+			group.addUnique("traits", {"__type":"Pointer","className":"Trait","objectId":trait.id});
+			return group.save();
+		}
+	).then(
+		function () {
+    		res.redirect('/group/' + req.params.urlName + '/edit');
+		}, 
+		function(error) {
+			res.send(500, "Could not create trait: " + error.message);
+		}
+	);
 };
 
 exports.save = function(req, res) {

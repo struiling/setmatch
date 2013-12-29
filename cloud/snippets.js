@@ -16,3 +16,10 @@ relation.query().find().then( function(results) {
 	}
 	return userInvites;
 });
+
+
+/* Query for traits that have a pointer to a Group, in the "group" column */
+var traitQuery = new Parse.Query("Trait");
+traitQuery.include("group");
+traitQuery.equalTo("group", group);
+return traitQuery.find();

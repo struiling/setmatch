@@ -1,22 +1,36 @@
 
 <% if (typeof(error) !== 'undefined') { %>
-	<p><%= error %></p>
-	<p><%= errorParseMessage %></p>
+	<p>Error: <%= error %></p>
+	<p>Error Parse Message<%= errorParseMessage %></p>
 <% } %>
 <% if (typeof(message) !== 'undefined') { %>
-	<p><%= message %></p>
+	<p>Message <%= message %></p>
 <% } %>
 
 <form method="post" action="/profile/save">
 	<fieldset>
-		<legend>Edit Profile</legend>
+		<legend>General profile</legend>
 		<label for="fname">First name</label>
-        <input name="fname" type="text" placeholder="First Name" value="<%- user.get("fname") %>">
+        <input name="fname" type="text" placeholder="First Name" value="<%- user.get("fname") %>" />
         <label for="lname">Last name</label>
-        <input name="lname" type="text" placeholder="Last Name" value="<%- user.get("lname") %>">
+        <input name="lname" type="text" placeholder="Last Name" value="<%- user.get("lname") %>" />
         <label for="email">Email</label>
-        <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>">
+        <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>" />
         <input name="password" type="password" placeholder="Password">
-        <input class="button" type="submit" value="Save profile info">
+
+		<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
+		<h3>Group-specific profiles</h3>
+			<% _.each(groups, function(group) { %>
+				<h4><%= group.get("name") %></h4>
+				<% _.each(group.get("traits"), function(trait) { %>
+					<%= trait.get("name") %> <br />
+						<% if (trait.get("type") == "text") { %>
+							<input name="<%= trait.id %>" type="text" value="<%- profile.get(trait.id) %>" />
+						<% } %>
+				<% });
+			});
+		} %>
+
+	<input class="button" type="submit" value="Save profile info">
 	</fieldset>
 </form>

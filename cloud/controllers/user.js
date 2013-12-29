@@ -46,6 +46,7 @@ exports.new = function(req, res) {
 			invitation.destroy();
 		}
 		var profile = new Profile();
+		// TODO: Add user to global group on signup
 		profile.set("fname", req.body.fname);
 		profile.set("lname", req.body.lname);
 		profile.set("gravatar", gravatar.url(req.body.email, {}, true) );
