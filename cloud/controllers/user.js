@@ -2,18 +2,37 @@ var gravatar = require('cloud/lib/gravatar');
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
 
+exports.delete = function(req, res) {
+	// TODO: create deactivate feature that makes user invisible and restricts their view of others 
+    var user = Parse.User.current();
+    var profile = new Profile();
+    profile = user.get("profile");
+    profile.destroy().then(
+    	function() {
+    		return user.destroy();
+    	}
+	).then(
+		function() {
+			Parse.User.logOut();
+			res.flash('message', 'Your account has been deleted.');
+		    res.redirect('/');		
+		}
+	);
+};
+
 exports.login = function(req, res) {
-	Parse.User.logIn(req.body.email, req.body.password).then(function() {
-	    // Do stuff after successful login.
-	    res.redirect('/');
-	}, function(error) {
-	    // The login failed. Check error to see why.
-	    //var errorMessage = "Oops! Something went wrong.";
+	Parse.User.logIn(req.body.email, req.body.password).then(
+		function() {
+		    // Do stuff after successful login.
+		    res.redirect('/');
+		}, 
+		function(error) {
+		    // The login failed. Check error to see why.
 
-	    res.flash('message', 'Ruh roh! Something went wrong. ' + error.code + ' ' + error.message);
-
-	    res.render('match/index');
-	});
+		    res.flash('message', 'Ruh roh! Something went wrong. ' + error.code + ' ' + error.message);
+		    res.redirect('/');
+		}
+	);
 };
 
 exports.logout = function(req, res) {

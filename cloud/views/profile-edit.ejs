@@ -16,17 +16,46 @@
         <input name="lname" type="text" placeholder="Last Name" value="<%- user.get("lname") %>" />
         <label for="email">Email</label>
         <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>" />
-        <input name="password" type="password" placeholder="Password">
+        <label for="password">Password</label>
+        <input name="password" type="password" placeholder="Leave blank to keep your password the same">
 
 		<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
 		<h3>Group-specific profiles</h3>
 			<% _.each(groups, function(group) { %>
 				<h4><%= group.get("name") %></h4>
 				<% _.each(group.get("traits"), function(trait) { %>
-					<%= trait.get("name") %> <br />
+					<label for="t_<%= trait.id %>"><%= trait.get("name") %></label> <br />
 						<% if (trait.get("type") == "text") { %>
-							<input name="<%= trait.id %>" type="text" value="<%- profile.get(trait.id) %>" />
+							<input name="t_<%= trait.id %>" id="t_<%= trait.id %>" type="text" value="<%- profile.get("t_" + trait.id) %>" />
 						<% } %>
+						<% if (trait.get("type") == "date") { %>
+						<!-- // TODO: change to three dropdowns and a hidden date string input -->
+							<input name="t_<%= trait.id %>" id="t_<%= trait.id %>" type="date" value="<%- profile.get(trait.id) %>" />
+						<% } %>
+						<% if (trait.get("type") == "radio") { 
+							_.each(trait.get("listoption"), function(option) { %>
+								<input name="t_<%= trait.id %>" type="radio" value="<%= option %>"
+								<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %> />
+								<%= option %>
+								<br />
+							<% });
+						} %>
+						<% if (trait.get("type") == "checkbox") { 
+							_.each(trait.get("listoption"), function(option) { %>
+								<input name="t_<%= trait.id %>[]" type="checkbox" value="<%= option %>"
+								<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %> />
+								<%= option %>
+								<br />
+							<% });
+						} %>
+						Type: 
+						<% if (trait.get("type") == "text") { %> Text<% } %>
+	                    <% if (trait.get("type") == "date") { %> Date<% } %>
+	                    <% if (trait.get("type") == "radio") { %> Radio<% } %>
+	                    <% if (trait.get("type") == "select") { %> Select<% } %>
+	                    <% if (trait.get("type") == "checkbox") { %> Checkbox<% } %>
+		                    
+		                <br /><br />
 				<% });
 			});
 		} %>
@@ -34,3 +63,5 @@
 	<input class="button" type="submit" value="Save profile info">
 	</fieldset>
 </form>
+
+<p><a href="/delete">Delete account (no undo)</a></p>

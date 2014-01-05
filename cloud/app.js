@@ -89,9 +89,12 @@ app.get('/signup', function(req, res) {
 });
 app.post('/signup', userController.new);
 app.get('/forgot', function(req, res) {
+    // view forgot password form
     res.render("forgot");
 });
-app.get('/fb', userController.fb);
+app.get('/delete', requireUser, userController.delete);
+
+// app.get('/fb', userController.fb);
 app.post('/reset', userController.reset);
 
 app.get('/logout', userController.logout);
