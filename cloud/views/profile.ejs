@@ -9,13 +9,15 @@
 <h2>Profile data</h2>
 
 <br />
-**<% _.each(_.keys(profile.attributes), function(key) { %>
+<% _.each(_.keys(profile.attributes), function(key) { %>
+	<% if (key == "gravatar") { %>
+		<img src="<%= profile.get(key) %>?s=100&r=pg&d=identicon" />
+	<% return;
+	} %>
+
 <%= key %>: <%= profile.get(key) %><br />
 
-<% if (key == "gravatar") { %>
-<img src="<%= profile.get(key) %>?s=100&r=pg&d=retro" />
-<% } %>
-<% }) %>**
+<% }) %>
 
 <p>Email</p>
 <%- user.getEmail() %>

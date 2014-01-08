@@ -13,9 +13,8 @@
 <%= key %>: <%= profile.get(key) %><br />
 
 <% if (key == "gravatar") { %>
-<img src="<%= profile.get(key) %>?s=100&r=pg&d=retro" />
-<% 
-	continue;
+	<img src="<%= profile.get(key) %>?s=100&r=pg&d=identicon" />
+	<% continue;
 } %>
 <% }) %>**
 

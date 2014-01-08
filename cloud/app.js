@@ -55,29 +55,7 @@ function checkAuth(req, res, next) {
 
 
 // Routes routes routes
-app.get('/', requireUser, function(req, res) {
-    var user = Parse.User.current();
-    var userGroups;
-    var userProfile;
-    var userInvites;
-    //user.fetch();
-
-    var query = new Parse.Query(Parse.User);
-    query.include("groups");
-    query.include("profile");
-    query.get(user.id);
-    query.first().then( function(result) {
-        userGroups = result.get("groups");
-        userProfile = result.get("profile");
-        userInvites = Parse.Cloud.run("getInvites", { invites: user.get("invites") });
-        
-    }).then( function() {
-        console.log("userProfile: "+ JSON.stringify(userProfile));
-        res.render("profile", { user: user, groups: userGroups, invites: userInvites, profile: userProfile }); 
-    }, function(error) {
-        res.redirect("logout");
-    });
-});
+app.get('/', requireUser, profileController.view);
 
 app.get('/login', function(req, res) {
     res.redirect('/');

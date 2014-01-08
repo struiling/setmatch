@@ -70,8 +70,8 @@ exports.edit = function(req, res) {
 			} else {
 				console.log("role: " + JSON.stringify(role));
 				console.log("traits: " + JSON.stringify(groupTraits));
-				
-				if (groupTraits.length != 0) {
+
+				if (groupTraits) {
 					res.render('group-edit', {
 				    	group: group,
 				    	traits: groupTraits
