@@ -53,10 +53,11 @@
 
 <% if (typeof(traits) !== 'undefined' && traits.length > 0) { %>
 
-    <form method="post" action="<%- '/group/' + group.get('urlName') + '/trait' %>">
-        <fieldset>
-            <legend>Edit group traits</legend>
-            <% _.each(traits, function(trait) { %>
+    
+    <h3>Edit group traits</h3>
+    <% _.each(traits, function(trait) { %>
+        <form method="post" action="<%- '/group/' + group.get('urlName') + '/trait' %>">
+            <fieldset>
                 <label for="name">Name</label>
                 <input name="name" id="name" type="text" placeholder="Name" value="<%= trait.get("name") %>">
                 <br />
@@ -79,14 +80,14 @@
                 } %>
                 <br />
                 <input type="hidden" name="id" value="<%= trait.id %>" />
-            <% } ) %>
+                <input type="hidden" name="_method" value="put" />
+                <input class="button" type="submit" value="Save changes">
+            </fieldset>
+        </form>
+    <% } ) %>
 
-            <br />
+    <br />
             
-            <input type="hidden" name="_method" value="put" />
-            <input class="button" type="submit" value="Save changes">
-        </fieldset>
-    </form>
 <% } %>
 <form method="post" action="<%- '/group/' + group.get('urlName') + '/invite' %>">
     <fieldset>

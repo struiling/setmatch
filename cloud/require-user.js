@@ -1,3 +1,5 @@
+var Profile = Parse.Object.extend("Profile");
+
 // Use this middleware to require that a user is logged in
 
 module.exports = function(req, res, next) {
@@ -5,6 +7,11 @@ module.exports = function(req, res, next) {
 		// actually get current user fields
 		Parse.User.current().fetch().then(function(user) {
 	        res.locals.basicUser = user;
+	        var profile = new Profile();
+			profile.id = user.get("profile").id;
+			profile.fetch();
+	        res.locals.basicProfile = profile;
+	        console.log("profile: " + JSON.stringify(res.locals.basicProfile));
         }).then(function() {
 			next();
         },
