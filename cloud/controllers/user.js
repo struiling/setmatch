@@ -47,6 +47,7 @@ exports.new = function(req, res) {
 	user.set("username", req.body.email.toLowerCase());
 	user.set("password", req.body.password);
 	user.set("email", req.body.email.toLowerCase());
+	user.set("gravatar", gravatar.url(req.body.email, {}, true) );
 	
 	user.signUp().then( function(user) {
 		console.log("in signup function! " + JSON.stringify(user));
@@ -66,9 +67,9 @@ exports.new = function(req, res) {
 		}
 		var profile = new Profile();
 		// TODO: Add user to global group on signup
-		profile.set("fname", req.body.fname);
-		profile.set("lname", req.body.lname);
-		profile.set("gravatar", gravatar.url(req.body.email, {}, true) );
+		// TODO: Global variable-ize
+		profile.set("t_KkuUBNivsq", req.body.fname);
+		profile.set("t_OrKo4Sq2qu", req.body.lname);
 
     	user.set("profile", profile);
     	return user.save();

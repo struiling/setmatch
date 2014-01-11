@@ -14,6 +14,10 @@ This group is <% if (group.get("secretive") != "y") { %> not<% } %> secretive.
 
 <h3>Members</h3>
 
-
+<ul>
+	<% _.each(members, function(member, i) { %>
+		<li><a href="/group/#"><%= member.get("profile").get("t_KkuUBNivsq") %> <%= member.get("profile").get("t_OrKo4Sq2qu") %></a><br /></li>
+	<% } ) %>
+</ul>
 
 <p><a href="/group/<%- group.get("urlName") %>/edit">Edit group info</a></p>

@@ -6,23 +6,42 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/css/foundation.min.css" />
+        <script src="/js/modernizr.js"></script>
   	</head>
   	<body>
-  		<header >
-  			<h1>SetMatch</h1>
-            <% if (typeof(basicUser) !== 'undefined') { %>
-                Email: <%= basicUser.getEmail() %>
-                Name: <%= basicProfile.get("t_k6Yvd0KigQ") %> <%= basicProfile.get("t_muYKFBATSO") %>
-                <img src="" />
-            <% } %>
-            <% if (Parse.User.current()) { %>
-            <nav>
-                <ul>
-                    <li><a href="/logout">Logout</a></li>
+  		<nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <li class="name">
+                  <h1><a href="/">SetMatch</a></h1>
+                </li>
+                <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    
+                    <% if (Parse.User.current()) { %>
+                    <li class="has-dropdown">
+                        <a href="/groups">Groups</a>
+                        <ul class="dropdown">
+                            <% _.each(basicGroups, function(group, i) { %>
+                                <li><a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a></li>
+                            <% } ) %>
+                            <li><a href="/group/new">+ new group</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-dropdown">
+                        <!-- TODO: Global variable-ize -->
+                        <a href="/profile/edit"><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" /> <%= basicProfile.get("t_KkuUBNivsq") %> <%= basicProfile.get("t_OrKo4Sq2qu") %></a>
+                        <ul class="dropdown">
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                    <% } %>
                 </ul>
-            </nav>
-            <% } %>
-  		</header>
+
+            </section>
+        </nav>
 
         <% include flashify %>
 
@@ -32,7 +51,29 @@
 			<p>&copy; <%= copyrightDate() %></p>
 		</footer>
 
-		<script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
-        <script src="/js/foundation.min.js"></script>
+        <script>
+            Modernizr.load([
+                { 
+                    load: '//code.jquery.com/jquery-1.10.1.min.js',
+                    complete: function () {
+                        if ( !window.jQuery ) {
+                            Modernizr.load('/js/vendor/jquery.js');
+                        }
+                    }
+                },
+                {
+                    load: '/js/foundation.min.js'
+                },
+                {
+                    load: '/js/setmatch.js'
+                },
+                { 
+                    test: Modernizr.touch,
+                    yep: '/js/vendor/fastclick.js',
+                    callback: function(){FastClick.attach(document.body);}
+                }
+            ]);
+        </script>
+
   	</body>
 </html>

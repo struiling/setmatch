@@ -1,4 +1,5 @@
 var Profile = Parse.Object.extend("Profile");
+var Group = Parse.Object.extend("Group");
 
 // Use this middleware to require that a user is logged in
 
@@ -11,7 +12,17 @@ module.exports = function(req, res, next) {
 			profile.id = user.get("profile").id;
 			profile.fetch();
 	        res.locals.basicProfile = profile;
-	        console.log("profile: " + JSON.stringify(res.locals.basicProfile));
+
+	        var group = new Group();
+	        var groups = []
+	        for (var i in user.get("groups")) {
+	        	group = user.get("groups")[i];
+	        	group.fetch();
+				groups.push(group);
+			}
+
+	        res.locals.basicGroups = groups;
+	        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
         }).then(function() {
 			next();
         },

@@ -66,7 +66,7 @@ exports.edit = function(req, res) {
 		function(role) {
 			if (role == undefined) {
 				// If you can't see the role, you're not an admin
-				return Parse.Promise.error("You don't have access to this page.");
+				res.redirect("/");	
 			} else {
 				console.log("role: " + JSON.stringify(role));
 				console.log("traits: " + JSON.stringify(groupTraits));
@@ -137,19 +137,37 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {
+	var group;
+
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
-	query.first().then(function(results) {
-		console.log("Query for view: " + JSON.stringify(results));
-    	if (results != null) {
+	query.first().then(
+		function(groupResult) {
+			console.log("Query for view: " + JSON.stringify(groupResult));
+	    	if (groupResult != null) {
+	    		group = groupResult;
+	    		var memberQuery = new Parse.Query(Parse.User);
+				memberQuery.equalTo("groups", group);
+				memberQuery.include("profile")
+				return memberQuery.find();
+			} else {
+				return Parse.Promise.error();
+			}
+		}
+	).then( 
+		function(members) {
+			console.log("Group members: " + JSON.stringify(members));
+			console.log("Group members profile: " + JSON.stringify(members));
 			res.render('group', {
-		    	group: results
+		    	group: group,
+		    	members: members
 			});
-		} else {
+
+	    },
+    	function(error) {
 			res.flash("message", "You don't have permission to see this page.");
 			res.redirect("/");	
 		}
-    }, function(error) {
-		res.redirect(back);
-	});				
+	);				
+
 };

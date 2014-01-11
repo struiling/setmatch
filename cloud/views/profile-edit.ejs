@@ -10,10 +10,9 @@
 <form method="post" action="/profile/save">
 	<fieldset>
 		<legend>General profile</legend>
-		<label for="fname">First name</label>
-        <input name="fname" type="text" placeholder="First Name" value="<%- user.get("fname") %>" />
-        <label for="lname">Last name</label>
-        <input name="lname" type="text" placeholder="Last Name" value="<%- user.get("lname") %>" />
+		
+		<!-- TODO: Global group should be separate -->
+        
         <label for="email">Email</label>
         <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>" />
         <label for="password">Password</label>
