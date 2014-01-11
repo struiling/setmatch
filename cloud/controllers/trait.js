@@ -49,6 +49,13 @@ exports.create = function(req, res) {
 	);
 };
 
+exports.delete = function(req, res) {
+	// TODO: remove pointer from traits array in Group
+	// TODO: clear all data that column in Profile
+	// TODO: delete column in Profile table (not currently possible)
+	// TODO: destroy() row in Trait
+};
+
 exports.save = function(req, res) {
 // TODO: this function
 	var user = Parse.User.current();
