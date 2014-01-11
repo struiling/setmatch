@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "SetMatch": {
+            "applicationId": "f56cAPQefqsbvXThZfwOjRD121Q2L7sLYL37ktA8", 
+            "masterKey": "irvaL7cQ1y3OlgEamnYEVb7UJiGr0ATK3FskfyGS"
+        }, 
+        "_default": {
+            "link": "SetMatch"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.9"
+    }
+}
