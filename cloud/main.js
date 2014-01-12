@@ -184,6 +184,11 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
             Parse.Cloud.run("addInviteToInvitation", { users: newUsers, group: group.id },
              { success: function() {} });
 
+            // send email invite to users
+
+            Parse.Cloud.run("emailInvites", { existingUsers: existingUsers, newUsers: newUsers, group: group.get("name")  },
+                { success: function() {} });
+
         }).then(function() {
             res.success();
         });
@@ -201,6 +206,51 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
         res.error("Group lookup failed.");
     });  
 
+});
+Parse.Cloud.define("emailInvites", function(req, res) {
+    var Mandrill = require('mandrill');
+    Mandrill.initialize('cHThIIVKJFLq30kpDSYiHw');
+
+    var sendEmail = function(to, subject, message) {
+        Mandrill.sendEmail({
+            message: {
+                text: message,
+                subject: subject,
+                from_email: "admin@setmatch.es",
+                from_name: "SetMatch",
+                to: [
+                    {
+                    email: to
+                    }
+                ]
+            },
+                async: true
+            },{
+                success: function(httpResponse) {
+                console.log(httpResponse);
+                //response.success("Email sent!");
+            },
+                error: function(httpResponse) {
+                console.error(httpResponse);
+                //response.error("Uh oh, something went wrong");
+            }
+        });
+    }
+
+    for (var i in req.params.existingUsers) {
+        var email = req.params.existingUsers[i];
+        sendEmail(email, "You've been invited to a new SetMatch group!", 
+            "Woohoo, you've been invited to the " + req.params.group +
+            " group. To accept, log in at https://www.setmatch.es");
+    }
+    for (var i in req.params.newUsers) {
+        var email = req.params.newUsers[i];
+        sendEmail(email, "You've been invited to SetMatch!", 
+            "Hey! You've been invited to the " + req.params.group +
+            " group on SetMatch. To accept, create an account at https://www.setmatch.es");
+    }
+
+    res.success();
 });
 
 Parse.Cloud.define("addInviteToInvitation", function(req, res) {
