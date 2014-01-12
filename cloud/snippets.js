@@ -23,3 +23,23 @@ var traitQuery = new Parse.Query("Trait");
 traitQuery.include("group");
 traitQuery.equalTo("group", group);
 return traitQuery.find();
+
+
+/* Check if requested by AJAX */
+if ( req.headers["HTTP_X_REQUESTED_WITH"] === "XMLHttpRequest" ) {
+  res.send(document);
+} else {
+  res.render(...);
+}
+
+
+/* Promises with saveAll() */
+var promise = new Parse.Promise();
+Parse.Object.saveAll(modifiedInvitationObjects, function (list, error) {
+    if (list) {
+        promise.resolve(list);
+    } else {
+        promise.reject(error);
+    }
+});
+return promise;

@@ -101,10 +101,13 @@ exports.invite = function(req, res) {
 	// remove whitespace and split on comma
 	var inviteMemberList = req.body.inviteMembers.replace(/\s/g, '').split(',');
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
-	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.params.urlName }, { 
-		success: function() {} });
+	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.body.group }).then(
+		function() {
+			res.redirect('/group/' + req.params.urlName + "/edit");		
+		}
+	);
 
-	res.redirect('/group/' + req.params.urlName + "/edit");
+	
     //console.log("req.url: " + req.url);
 
 };
