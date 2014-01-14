@@ -52,3 +52,26 @@ if (request.object.existed()) {
 } else { 
     // it is new 
 }
+
+/* shorthand for exporting out of a js file, like require-user.js or settings.js */
+/* in module file */
+exports.my_password = 'value'
+/* in app.js or other */
+settings.my_password // 'value'
+
+
+/* chained/nested promises */
+object.save().then(function (savedObject) {
+
+	return someOtherObject.save().then(
+		function (someOtherSavedObject) {
+    		// do stuff
+		}
+	).then(
+		function () {
+	    	// do more stuff ?
+		}
+	);
+}).then(function () { 
+	// this here will not execute until the returned promise from the previous then completes including all its chained "then"s 
+});

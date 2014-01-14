@@ -6,6 +6,7 @@ var parseExpressHttpsRedirect = require('parse-express-https-redirect');
 var parseExpressCookieSession = require('parse-express-cookie-session');
 var Image = require("parse-image");
 var moment = require('moment');
+
 var _ = require('underscore');
 
 /* stuff I wrote */
@@ -32,27 +33,14 @@ app.use(express.cookieSession());
 app.use(flashify);
 app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
 
+// Globals in EJS templates
 app.locals._ = _;
 app.locals.copyrightDate = function(){
     return moment().format("YYYY");
 }
+app.locals.settings = require('cloud/settings');
 
 app.use(app.router);				// Explicitly user route handlers, even though Express would add it otherwise
-
-/* if this can be used, it should be converted to a cloud code module. Currently not doing anything */
-/*
-function checkAuth(req, res, next) {
-  Parse.Cloud.run("checkUser", {}, {
-		success: function(user) {
-			next();
-		},
-		error: function(error) {
-			res.redirect("/");
-		}
-	});
-}
-*/
-
 
 // Routes routes routes
 app.get('/', requireUser, profileController.view);
@@ -96,6 +84,7 @@ app.get('/group/:urlName', requireUser, groupController.view);
 app.get('/group/:urlName/edit', requireUser, groupController.edit);
 // save edits to group info
 app.put('/group/:urlName', requireUser, groupController.save);
+//app.get('/group/:urlName/delete', requireUser, groupController.delete);
 
 // invite another user to the group
 app.post('/group/:urlName/invite', requireUser, groupController.invite);
@@ -106,6 +95,8 @@ app.get('/group/:urlName/join', requireUser, groupController.join);
 app.post('/group/:urlName/trait', requireUser, traitController.create);
 // save edits group trait (custom field) definition
 app.put('/group/:urlName/trait', requireUser, traitController.save);
+
+app.get('/trait/:traitId/delete', requireUser, traitController.save);
 
 
 // // Example reading from the request query string of an HTTP get request.

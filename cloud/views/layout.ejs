@@ -32,8 +32,11 @@
                     </li>
                     <li class="has-dropdown">
                         <!-- TODO: Global variable-ize -->
-                        <a href="/profile/edit"><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" /> <%= basicProfile.get("t_KkuUBNivsq") %> <%= basicProfile.get("t_OrKo4Sq2qu") %></a>
+                        <a href="/profile/"><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" />
+                            <%= basicProfile.get(settings.global.fname) %> 
+                            <%= basicProfile.get(settings.global.lname) %></a>
                         <ul class="dropdown">
+                            <li><a href="/profile/edit">Edt profile</a></li>
                             <li><a href="/logout">Logout</a></li>
                         </ul>
                     </li>

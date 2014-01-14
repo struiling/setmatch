@@ -1,3 +1,4 @@
+var settings = require('cloud/settings');
 var gravatar = require('cloud/lib/gravatar');
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
@@ -45,41 +46,46 @@ exports.new = function(req, res) {
 
 	var user = new Parse.User();
 	user.set("username", req.body.email.toLowerCase());
-	user.set("password", req.body.password);
 	user.set("email", req.body.email.toLowerCase());
+	user.set("password", req.body.password);
 	user.set("gravatar", gravatar.url(req.body.email, {}, true) );
 	
-	user.signUp().then( function(user) {
-		console.log("in signup function! " + JSON.stringify(user));
+	user.signUp().then( 
+		function(user) {
+			console.log("in signup function! " + JSON.stringify(user));
 
-		var query = new Parse.Query(Invitation);
-		query.equalTo("email", req.body.email.toLowerCase());
-		console.log("query.first(): " + JSON.stringify(query.first()));
-		return query.first();
+			var query = new Parse.Query(Invitation);
+			query.equalTo("email", req.body.email.toLowerCase());
+			console.log("query.first(): " + JSON.stringify(query.first()));
+			return query.first();
 
-	}).then( function(invitation) {
-
-		// TODO: convert to Cloud Code and set invitations with ACL
-		if (invitation) {
-			console.log("invitation");
-			user.set("invites", invitation.get("invites"));
-			invitation.destroy();
 		}
-		var profile = new Profile();
-		// TODO: Add user to global group on signup
-		// TODO: Global variable-ize
-		profile.set("t_KkuUBNivsq", req.body.fname);
-		profile.set("t_OrKo4Sq2qu", req.body.lname);
+	).then( 
+		function(invitation) {
 
-    	user.set("profile", profile);
-    	return user.save();
+			// TODO: convert to Cloud Code and set invitations with ACL
+			if (invitation) {
+				console.log("invitation");
+				user.set("invites", invitation.get("invites"));
+				invitation.destroy();
+			}
+			var profile = new Profile();
+			// TODO: Add user to global group on signup
+			profile.set(settings.global.fname, req.body.fname);
+			profile.set(settings.global.lname, req.body.lname);
 
-	}).then( function(success) {
-		res.flash('message', 'Thanks for signing up!');
-    	res.redirect('/');
-	}, function(error) {
-		// Show the error message somewhere and let the user try again.
-	    //res.send(500, "Error: " + error.code + " " + error.message);
+	    	user.set("profile", profile);
+	    	return user.save();
+
+		}
+	).then(
+		function(success) {
+			res.flash('message', 'Thanks for signing up!');
+	    	res.redirect('/');
+		}, 
+		function(error) {
+			// Show the error message somewhere and let the user try again.
+		    //res.send(500, "Error: " + error.code + " " + error.message);
 		    var errorMessage = undefined;
 		    errorMessage = "Oops! Something went wrong.";
 
@@ -87,7 +93,8 @@ exports.new = function(req, res) {
 		    	error: errorMessage,
 		    	errorParseMessage: error.code + ' ' + error.message
 		    });
-	});
+		}
+	);
 };
 
 exports.reset = function(req, res) {

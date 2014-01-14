@@ -16,7 +16,7 @@ This group is <% if (group.get("secretive") != "y") { %> not<% } %> secretive.
 
 <ul>
 	<% _.each(members, function(member, i) { %>
-		<li><a href="/group/#"><%= member.get("profile").get("t_KkuUBNivsq") %> <%= member.get("profile").get("t_OrKo4Sq2qu") %></a><br /></li>
+		<li><a href="/group/#"><%= member.get("profile").get(settings.global.fname) %> <%= member.get("profile").get(settings.global.lname) %></a><br /></li>
 	<% } ) %>
 </ul>
 

@@ -1,17 +1,11 @@
 require('cloud/app.js');
+
 var _ = require('underscore');
+var settings = require('cloud/settings');
 var Group = Parse.Object.extend("Group");
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
 
-Parse.Cloud.define("checkUser", function(req, res) {
-    var user = req.user;
-    if (user) {
-    	res.success(user);	
-    } else {
-    	res.error("User not found");	
-    }
-});
 /*
 Parse.Cloud.beforeSave("Group", function(req, res) {
     Parse.Cloud.useMasterKey();
@@ -179,8 +173,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
                     existingUserRecipients.push( { 
                         'email': user.get("email"),
-                        'name': user.get("profile").get("t_KkuUBNivsq") +
-                        " " + user.get("profile").get("t_OrKo4Sq2qu") 
+                        'name': user.get("profile").get(settings.traits.fname)
                     } );
 
                     // Add an invite to this user's existing invites.
