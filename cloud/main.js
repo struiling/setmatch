@@ -146,6 +146,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
 });
 
 Parse.Cloud.define("addInviteToUser", function(req, res) {
+
     Parse.Cloud.useMasterKey();
     var existingUsers = [];
     var newUsers = [];
@@ -164,20 +165,18 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
     userQuery.find().then(
         function(userResults) {
             if (userResults.length > 0) {
-                var modifiedUserObjects = [];
 
                 // invite users who already exist in the system
                 for (var i in userResults) {
                     var user = userResults[i];
                     existingUsers.push(user.getEmail());
-                    modifiedUserObjects.push(user);
 
                     // Add an invite to this user's existing invites.
                     user.addUnique("invites", group.id);
                 }
                 console.log("group.id " + group.id);
                 var promise = new Parse.Promise();
-                Parse.Object.saveAll(modifiedUserObjects, function (list, error) {
+                Parse.Object.saveAll(userResults, function (list, error) {
                     if (list) {
                         promise.resolve(list);
                     } else {
@@ -289,104 +288,44 @@ Parse.Cloud.define("emailInvites", function(req, res) {
                 subject: subject,
                 from_email: "admin@setmatch.es",
                 from_name: "SetMatch",
-                to: [
-                    {
-                    email: to
-                    }
-                ]
+                to: to
             },
                 async: true
-            },{
-                success: function(httpResponse) {
-                console.log(httpResponse);
-                //response.success("Email sent!");
             },
+            {
+                success: function(httpResponse) {
+                    console.log(httpResponse);
+                    //response.success("Email sent!");
+                },
                 error: function(httpResponse) {
-                console.error(httpResponse);
-                //response.error("Uh oh, something went wrong");
+                    console.error(httpResponse);
+                    //response.error("Uh oh, something went wrong");
+                }
             }
-        });
+        );
     }
-
-    for (var i in req.params.existingUsers) {
-        var email = req.params.existingUsers[i];
-        sendEmail(email, "You've been invited to a new SetMatch group!", 
+    if (req.params.existingUsers.length > 0) {
+        var existingUsers = [];
+        for (var i in req.params.existingUsers) {
+            existingUsers.push( { 'email': req.params.existingUsers[i] } );
+        }
+        console.log("existingUsers: " + JSON.stringify(existingUsers));
+        sendEmail(existingUsers, "You've been invited to join a SetMatch group!", 
             "Woohoo, you've been invited to the " + req.params.group +
-            " group. To accept, log in at https://www.setmatch.es");
+            'group. To accept, log in at <a href="https://www.setmatch.es">https://www.setmatch.es</a>');
     }
-    for (var i in req.params.newUsers) {
-        var email = req.params.newUsers[i];
-        sendEmail(email, "You've been invited to SetMatch!", 
+    if (req.params.newUsers.length > 0) {
+        var newUsers = [];
+        for (var i in req.params.newUsers) {
+            newUsers.push( { 'email': req.params.newUsers[i] } );
+        }
+        sendEmail(newUsers, "You've been invited to SetMatch!", 
             "Hey! You've been invited to the " + req.params.group +
             " group on SetMatch. To accept, create an account at https://www.setmatch.es");
     }
 
     res.success();
 });
-
-Parse.Cloud.define("addInviteToInvitation", function(req, res) {
-
-    var group = new Group();
-    group.id = req.params.group;
-
-    var invitationQuery = new Parse.Query(Invitation);
-    invitationQuery.containedIn("email", req.params.users);
-    invitationQuery.select("email", "invites");
-
-    console.log("starting Invitation query");
-    invitationQuery.find().then(function(invitationResults) {
-
-        // user has previously been invited
-
-        console.log("Got invitation results: " + JSON.stringify(invitationResults));
-        var existingInvitations = [];
-
-        for (var i in invitationResults) {
-            var invite = invitationResults[i];
-
-            existingInvitations.push(invite.get("email"));
-
-            // Add an invite to this user's existing invites.
-            invite.addUnique("invites", req.params.group);
-            invite.save();
-        }
-
-        // create Invitation entry for nonexistent users with invites to this group
-        var newInvitations = _.difference(req.params.users, existingInvitations);
-        console.log("New invitations array: " + newInvitations);
-
-        for (var i in newInvitations) {
-            var invite = newInvitations[i];
-
-            var invitation = new Invitation();
-            invitation.set("email", invite);
-            invitation.set("invites", [req.params.group]);
-            invitation.save();
-            console.log("Post save: " + JSON.stringify(invitation));
-        }    
-
-     
-
-    }).then( function() {
-       res.success();
-    }, function(error) {
-        console.log("Invitation query failed: " + error);
-    });
-           
-});
-
-
-/* for afterSave
-
-check if object was newly created. Essentially afterCreate
-
-if (request.object.existed()) { 
-    // it existed before 
-} else { 
-    // it is new 
-}
-
-*/
 
 /* Not currently in use */
 Parse.Cloud.define("addUserToAdmin", function(req, res) {

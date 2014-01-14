@@ -6,6 +6,7 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
+<!-- TODO: Prepopulate email address if coming from an invite -->
 <form method="post" action="/signup">
 	<fieldset>
 		<legend>Sign up</legend>

@@ -42,4 +42,13 @@ Parse.Object.saveAll(modifiedInvitationObjects, function (list, error) {
         promise.reject(error);
     }
 });
+
 return promise;
+
+/* for afterSave. check if object was newly created. Essentially afterCreate */
+
+if (request.object.existed()) { 
+    // it existed before 
+} else { 
+    // it is new 
+}
