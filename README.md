@@ -22,4 +22,5 @@ If not importing data and starting from scratch, you must create a Global group,
 layout.js for displaying name
 user.js signup for both initial name setting and adding user to global group
 profile-edit.ejs
+main.js email invite send
 

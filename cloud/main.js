@@ -148,9 +148,15 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
 Parse.Cloud.define("addInviteToUser", function(req, res) {
 
     Parse.Cloud.useMasterKey();
+    // the user objects formatted for Mandrill's recipient list
+    var existingUserRecipients = [];
+    // emails of people who already have SetMatch accounts
     var existingUsers = [];
+    // emails of people who don't have SetMatch acccounts, i.e. existingInvitations + newInvitations
     var newUsers = [];
+    // emails of people who don't have a SetMatch account but have previously been invited
     var existingInvitations = [];
+    // emails of people who don't have a SetMatch account and have never been invited
     var newInvitations = [];
 
     var group = new Group();
@@ -161,7 +167,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
     var userQuery = new Parse.Query(Parse.User);
     userQuery.containedIn("email", req.params.users);
-    userQuery.select("email", "groups", "invites");
+    userQuery.include("profile");
     userQuery.find().then(
         function(userResults) {
             if (userResults.length > 0) {
@@ -170,6 +176,12 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
                 for (var i in userResults) {
                     var user = userResults[i];
                     existingUsers.push(user.getEmail());
+
+                    existingUserRecipients.push( { 
+                        'email': user.get("email"),
+                        'name': user.get("profile").get("t_KkuUBNivsq") +
+                        " " + user.get("profile").get("t_OrKo4Sq2qu") 
+                    } );
 
                     // Add an invite to this user's existing invites.
                     user.addUnique("invites", group.id);
@@ -263,7 +275,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
         function() {
             // send email invite to users
             console.log("About to send email");
-            return Parse.Cloud.run("emailInvites", { existingUsers: existingUsers, newUsers: newUsers, group: group.get("name") });
+            return Parse.Cloud.run("emailInvites", { existingUsers: existingUserRecipients, newUsers: newUsers, group: group.get("name") });
         }
     ).then(
         function() {
@@ -305,14 +317,10 @@ Parse.Cloud.define("emailInvites", function(req, res) {
         );
     }
     if (req.params.existingUsers.length > 0) {
-        var existingUsers = [];
-        for (var i in req.params.existingUsers) {
-            existingUsers.push( { 'email': req.params.existingUsers[i] } );
-        }
-        console.log("existingUsers: " + JSON.stringify(existingUsers));
-        sendEmail(existingUsers, "You've been invited to join a SetMatch group!", 
+        console.log("existingUsers: " + JSON.stringify(req.params.existingUsers));
+        sendEmail(req.params.existingUsers, "You've been invited to join a SetMatch group!", 
             "Woohoo, you've been invited to the " + req.params.group +
-            'group. To accept, log in at <a href="https://www.setmatch.es">https://www.setmatch.es</a>');
+            ' group. To accept, log in at <a href="https://www.setmatch.es">https://www.setmatch.es</a>');
     }
     if (req.params.newUsers.length > 0) {
         var newUsers = [];
