@@ -71,14 +71,15 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
 
 Parse.Cloud.define("getInvites", function(req, res) {
     Parse.Cloud.useMasterKey();
-    var user = req.user;
+    var invitation = new Invitation();
+    invitation = req.params.invites;
 
     // query for groups where the group objectId matches the invite the user is accepting
     var query = new Parse.Query(Group);
-    query.containedIn("objectId", user.get("invites"));
+    query.containedIn("objectId", req.params.invites);
     query.find().then( function(results) {
         var groupsInvited = results;
-        console.log("group results: " + JSON.stringify(groupsInvited));
+        console.log("getInvites results: " + JSON.stringify(groupsInvited));
         res.success(groupsInvited);
         
     })
@@ -88,6 +89,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     Parse.Cloud.useMasterKey();
 
     var user = req.user;
+    console.log("req.user: " + JSON.stringify(req.user));
     var groupName;
 
     var addUserToRole = function(user, roleName) {
@@ -109,15 +111,25 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
         var groupId = group.id;
         groupName = group.get("name");
         // check if an invite exists for this group
-        var inviteMatch = _.find(user.get("invites"), function(invite) {
-            return invite == groupId;
+        console.log("user: " + JSON.stringify(user));
+        console.log("user invitations: " + JSON.stringify(user.get("invitation")));
+        console.log("user invitation ID: " + user.get("invitation").id);
+        var invitation = new Invitation();
+        invitation.id = user.get("invitation").id;
+        invitation.fetch().then(function(invite) {
+        console.log("invitation: " + JSON.stringify(invite));    
+        });
+        
+        console.log("user invitation groups: " + JSON.stringify(invitation.get("groups")));
+        var inviteMatch = _.find(invitation.get("groups"), function(invite) {
+            return invite == group;
         });
         if (inviteMatch != undefined) {
             
             // TODO: check if user is already a member of the group
             
             user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-            user.remove("invites", groupId);
+            user.remove("invitations.groups", {"__type":"Pointer","className":"Group","objectId":groupId});
             user.save();
 
             var roleQuery = new Parse.Query(Parse.Role);
@@ -157,11 +169,10 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
     group.id = req.params.group;
     group.fetch();
 
-    // This functionality is a bit inconsistent. Fix promises.
-
     var userQuery = new Parse.Query(Parse.User);
     userQuery.containedIn("email", req.params.users);
     userQuery.include("profile");
+    userQuery.include("invitation");
     userQuery.find().then(
         function(userResults) {
             if (userResults.length > 0) {
@@ -173,10 +184,11 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
                     existingUserRecipients.push( { 
                         'email': user.get("email"),
-                        'name': user.get("profile").get(settings.traits.fname)
+                        'name': user.get("profile").get(settings.global.fname)
                     } );
 
                     // Add an invite to this user's existing invites.
+                    // TODO: Change to new Invitation row
                     user.addUnique("invites", group.id);
                 }
                 console.log("group.id " + group.id);
@@ -196,14 +208,9 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
             // people who were invited who aren't already users on the site
             newUsers = _.difference(req.params.users, existingUsers);
 
-            // See who's been invited before
-            
-            //Parse.Cloud.run("addInviteToInvitation", { users: newUsers, group: group },
-            // { success: function() {} });
-
             var invitationQuery = new Parse.Query(Invitation);
             invitationQuery.containedIn("email", newUsers);
-            invitationQuery.select("email", "invites");
+            invitationQuery.select("email", "groups");
 
             console.log("starting Invitation query");
             return invitationQuery.find();
@@ -222,7 +229,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
                     modifiedInvitationObjects.push(invite);
 
                     // Add an invite to this user's existing invites.
-                    invite.addUnique("invites", req.params.group);
+                    invite.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
                 }
 
                 var promise = new Parse.Promise();
@@ -248,7 +255,8 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
                 var invitation = new Invitation();
                 invitation.set("email", invite);
-                invitation.set("invites", [req.params.group]);
+                invitation.set("groups", [{"__type":"Pointer","className":"Group","objectId":group.id}]);
+
                 newInvitationObjects.push(invitation);
 
                 console.log("Post save: " + JSON.stringify(invitation));

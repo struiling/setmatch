@@ -66,8 +66,7 @@ exports.new = function(req, res) {
 			// TODO: convert to Cloud Code and set invitations with ACL
 			if (invitation) {
 				console.log("invitation");
-				user.set("invites", invitation.get("invites"));
-				invitation.destroy();
+				user.set("invitation", invitation);
 			}
 			var profile = new Profile();
 			// TODO: Add user to global group on signup

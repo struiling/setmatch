@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var Group = Parse.Object.extend('Group');
+var Invitation = Parse.Object.extend('Invitation');
 var Trait = Parse.Object.extend('Trait');
 
 exports.create = function(req, res) {
@@ -114,12 +115,14 @@ exports.invite = function(req, res) {
 
 exports.join = function(req, res) {
 	var user = Parse.User.current();
-		
-	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( function(message) {
-		// TODO: set user ACL to group members so other members of the newly joined group can see the user
-		res.flash("message", message);
-		res.redirect('back');
-	});
+	console.log("req.user: " + JSON.stringify(req.user));
+	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( 
+		function(message) {
+			// TODO: set user ACL to group members so other members of the newly joined group can see the user
+			res.flash("message", message);
+			res.redirect('back');
+		}
+	);
 
 };
 
@@ -140,8 +143,77 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {
-	var group;
+	var groupUrlName = req.params.urlName;
 
+	var groupQuery = function(urlName) {
+		var query = new Parse.Query(Group);
+		query.equalTo("urlName", urlName);
+		return query.first();
+	};
+
+	var memberQuery = function(group) {
+		var query = new Parse.Query(Parse.User);
+		query.equalTo("groups", group);
+		query.include("profile");
+		return query.find();
+	};
+
+	var invitationQuery = function(group) {
+		var query = new Parse.Query(Invitation);
+		query.containedIn("invites", group.id);
+		// only get email addresses. Doesn't matter whether they already have a SM account
+		query.select("email")
+		return query.find();
+	};
+
+	/* -------------------- */
+
+	var group;
+	var members;
+	var invitations;
+
+	groupQuery(groupUrlName).then(
+		function(groupResult) {
+			group = groupResult;
+			if (group != null) {
+				var query = new Parse.Query(Parse.User);
+				query.equalTo("groups", group);
+				query.include("profile");
+				return query.find();
+			} else {
+				return Parse.Promise.error("You don't have permission to see this page");
+			}
+		}
+	).then( 
+		function(memberResult) {
+			members = memberResult;
+			console.log("Group members: " + JSON.stringify(members));
+			console.log("Group: " + JSON.stringify(group));
+
+			var query = new Parse.Query(Invitation);
+			query.equalTo("groups", group);
+			
+			// only get email addresses. Doesn't matter whether they already have a SM account
+			query.select("email");
+			return query.find();
+		}
+	).then( 
+		function(invitationResult) {
+			invitations = invitationResult;
+			console.log("Group invitations: " + JSON.stringify(invitations));
+			res.render('group', {
+		    	group: group,
+		    	members: members,
+		    	invitations: invitations
+			});
+		},
+		function(error) {
+			res.flash("message", error.message);
+			res.redirect("/");	
+		}
+	);
+
+/*
 	var query = new Parse.Query(Group);
 	query.equalTo("urlName", req.params.urlName);
 	query.first().then(
@@ -151,7 +223,7 @@ exports.view = function(req, res) {
 	    		group = groupResult;
 	    		var memberQuery = new Parse.Query(Parse.User);
 				memberQuery.equalTo("groups", group);
-				memberQuery.include("profile")
+				memberQuery.include("profile");
 				return memberQuery.find();
 			} else {
 				return Parse.Promise.error();
@@ -160,7 +232,6 @@ exports.view = function(req, res) {
 	).then( 
 		function(members) {
 			console.log("Group members: " + JSON.stringify(members));
-			console.log("Group members profile: " + JSON.stringify(members));
 			res.render('group', {
 		    	group: group,
 		    	members: members
@@ -172,5 +243,5 @@ exports.view = function(req, res) {
 			res.redirect("/");	
 		}
 	);				
-
+*/
 };

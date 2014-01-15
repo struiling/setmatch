@@ -20,4 +20,11 @@ This group is <% if (group.get("secretive") != "y") { %> not<% } %> secretive.
 	<% } ) %>
 </ul>
 
+<h3>Invitations</h3>
+<ul>
+	<% _.each(invitations, function(invitation, i) { %>
+		<li><%= invitation.get("email") %></li>
+	<% } ) %>
+</ul>
+
 <p><a href="/group/<%- group.get("urlName") %>/edit">Edit group info</a></p>
