@@ -74,15 +74,21 @@ exports.view = function(req, res) {
 	var query = new Parse.Query(Parse.User);
 	query.include("groups");
 	query.include("profile");
-	query.include("invitation");
+	query.include("invitation.groups");
 	query.get(user.id);
 	query.first().then( 
 		function(result) {
 			userGroups = result.get("groups");
 			userProfile = result.get("profile");
-			userInvitation = result.get("invitation");
+			userInvitation = result.get("invitation").get("groups");
+			console.log("userInvitation:" + JSON.stringify(userInvitation));
+			var groupsInvitedIds = [];
 			if (userInvitation != null ) {
-				return Parse.Cloud.run("getInvites", { invites: userInvitation[0].id });
+				for (i in userInvitation) {
+					groupsInvitedIds.push(userInvitation[i].id);
+				}
+				console.log("groupsInvitedIds:" + groupsInvitedIds);
+				return Parse.Cloud.run("getInvites", { invites: groupsInvitedIds });
 			}
 		}
 	).then( 
@@ -90,7 +96,7 @@ exports.view = function(req, res) {
 		    res.render("profile", { user: user, groups: userGroups, invites: groupsInvited, profile: userProfile });
 		},	
 		function(error) {
-			res.redirect("logout");
+			res.error(error.message);
 		}
 	);
 

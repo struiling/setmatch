@@ -71,18 +71,20 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
 
 Parse.Cloud.define("getInvites", function(req, res) {
     Parse.Cloud.useMasterKey();
-    var invitation = new Invitation();
-    invitation = req.params.invites;
+    console.log("req.params.invites: "+ req.params.invites);
 
     // query for groups where the group objectId matches the invite the user is accepting
     var query = new Parse.Query(Group);
     query.containedIn("objectId", req.params.invites);
-    query.find().then( function(results) {
-        var groupsInvited = results;
-        console.log("getInvites results: " + JSON.stringify(groupsInvited));
-        res.success(groupsInvited);
-        
-    })
+    query.find().then( 
+        function(results) {
+            var groupsInvited = results;
+            console.log("getInvites results: " + JSON.stringify(groupsInvited));
+            res.success(groupsInvited);
+        }, function(error) {
+            res.success(error);
+        }
+    );
 });
 
 Parse.Cloud.define("addUserToGroup", function(req, res) {
@@ -188,10 +190,20 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
                     } );
 
                     // Add an invite to this user's existing invites.
-                    // TODO: Change to new Invitation row
-                    user.addUnique("invites", group.id);
+                    var userInvitation = user.get("invitation");
+                    console.log("userInvitation:" + JSON.stringify(userInvitation));
+                    if (userInvitation != null) {
+                        userInvitation.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id} );
+                    } else {
+                        var invitation = new Invitation();
+                        invitation.set("email", user.get("email"));
+                        invitation.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id} );
+                        user.set("invitation", invitation);
+                    }
+                    
                 }
                 console.log("group.id " + group.id);
+
                 var promise = new Parse.Promise();
                 Parse.Object.saveAll(userResults, function (list, error) {
                     if (list) {
