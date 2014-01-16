@@ -92,9 +92,9 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
 
     var user = req.user;
     console.log("req.user: " + JSON.stringify(req.user));
-    var groupName;
+    var group;
 
-    var addUserToRole = function(user, roleName) {
+    /*var addUserToRole = function(user, roleName) {
         var roleQuery = new Parse.Query(Parse.Role);
         roleQuery.equalTo("name", roleName);
         console.log("addUserToRole(" + JSON.stringify(user) + "," + roleName + ")");
@@ -103,51 +103,76 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
             role[0].getUsers().add(user);      
             role[0].save();
         });
-    };
+    }; */
     //addUserToRole(user, "orrmOKjjUW_member");
-
 
     var groupQuery = new Parse.Query(Group);
     groupQuery.equalTo("urlName", req.params.group);
-    groupQuery.first().then(function(group) {
-        var groupId = group.id;
-        groupName = group.get("name");
-        // check if an invite exists for this group
-        console.log("user: " + JSON.stringify(user));
-        console.log("user invitations: " + JSON.stringify(user.get("invitation")));
-        console.log("user invitation ID: " + user.get("invitation").id);
-        var invitation = new Invitation();
-        invitation.id = user.get("invitation").id;
-        invitation.fetch().then(function(invite) {
-        console.log("invitation: " + JSON.stringify(invite));    
-        });
-        
-        console.log("user invitation groups: " + JSON.stringify(invitation.get("groups")));
-        var inviteMatch = _.find(invitation.get("groups"), function(invite) {
-            return invite == group;
-        });
-        if (inviteMatch != undefined) {
-            
-            // TODO: check if user is already a member of the group
-            
-            user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-            user.remove("invitations.groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-            user.save();
+    groupQuery.first().then(
+        function(groupResult) {
+            group = groupResult;
+            // check if an invite exists for this group
+            //console.log("user invitations: " + JSON.stringify(user.get("invitation")));
+            //console.log("user invitation ID: " + user.get("invitation").id);
 
+            var invitationQuery = new Parse.Query(Invitation);
+            invitationQuery.get(user.get("invitation").id);
+            invitationQuery.include("groups");
+            invitationQuery.equalTo("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+            return invitationQuery.first();
+        }
+    ).then(
+        function(invitation) {
+            console.log("user invitation query: " + JSON.stringify(invitation));
+            //console.log("user invitation groups: " + JSON.stringify(invitation.get("groups")));
+            //console.log("group: " + JSON.stringify(group));
+
+            // check if user has actually been invited to this group
+            /*var invitationGroupIds = [];
+            for (i in invitation.get("groups")) {
+                invitationGroupIds.push(invitation.get("groups")[i].id);
+            }
+            var inviteMatch = _.find(invitationGroupIds, function(invite) {
+                return invite == group.id;
+            });*/
+
+            //console.log("invitationGroupIds: " + invitationGroupIds);
+            //console.log("inviteMatch: " + inviteMatch);
+
+            if (invitation != undefined) {
+                
+                user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                invitation.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                
+                var promise = new Parse.Promise();
+                Parse.Object.saveAll([user, invitation], function (list, error) {
+                    if (list) {
+                        promise.resolve(list);
+                    } else {
+                        promise.reject(error);
+                    }
+                });
+                return promise;
+
+            } else {
+                return Parse.Promise.error("You haven't been invited to this group.");
+            }
+        }
+    ).then(
+        function() {
             var roleQuery = new Parse.Query(Parse.Role);
             roleQuery.equalTo("name", group.id + "_member");
             
             return roleQuery.first();
-
-        } else {
-            return Parse.Promise.error("You haven't been invited to this group.");
         }
-    }).then( function(role) {
-        role.getUsers().add(user);      
-        role.save();
-        
-    }).then( function() {
-        res.success("You've joined " + groupName);
+    ).then( 
+        function(role) {
+            role.getUsers().add(user);      
+            role.save();
+            
+        }
+    ).then( function() {
+        res.success("You've joined " + group.get("name"));
     }, function(error) {
         res.success(error);
     });
@@ -167,6 +192,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
     // emails of people who don't have a SetMatch account and have never been invited
     var newInvitations = [];
 
+    // group being invited to
     var group = new Group();
     group.id = req.params.group;
     group.fetch();
@@ -175,13 +201,32 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
     userQuery.containedIn("email", req.params.users);
     userQuery.include("profile");
     userQuery.include("invitation");
+    userQuery.include("groups");
     userQuery.find().then(
         function(userResults) {
+            // invite users who already exist in the system
             if (userResults.length > 0) {
 
-                // invite users who already exist in the system
                 for (var i in userResults) {
                     var user = userResults[i];
+                    // check if user is already a member of the group, in which case don't invite them
+                    var groupIds = [];
+                    for (j in user.get("groups")) {
+                        groupIds.push(user.get("groups")[j].id);
+                        console.log(user.get("email") + "groupIds.push(user.get(groups)[j].id) : " + user.get("groups")[j].id)
+                        console.log("PRINT");
+                    }
+
+                    var groupMatch = _.find(groupIds, function(currentGroups) {
+                        return currentGroups == group.id;
+                    });
+                    console.log(user.get("email") + " groupMatch:" + groupMatch);
+                    if (groupMatch != undefined) {
+                        // user is already a member of the group. No need to invite
+                        console.log(user.get("email") + " user is already a member of the group. No need to invite");
+                        continue;
+                    }
+                    console.log(user.get("email") +"if user is already a member of the group. This shouldn't print");
                     existingUsers.push(user.getEmail());
 
                     existingUserRecipients.push( { 
@@ -217,9 +262,10 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
         }
     ).then(
         function() {
-            // people who were invited who aren't already users on the site
+            // subset of people who were invited who don't have user accounts, whether they've been invited previously or not
             newUsers = _.difference(req.params.users, existingUsers);
 
+            // subset of people who've been invited to this group already
             var invitationQuery = new Parse.Query(Invitation);
             invitationQuery.containedIn("email", newUsers);
             invitationQuery.select("email", "groups");
@@ -231,7 +277,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
         function(invitationResults) {
             if (invitationResults.length > 0) {
                 var modifiedInvitationObjects = [];
-                // email address that have previously been invited
+                // email address that have previously been invited and already have an Invitation row
 
                 console.log("Got invitation results: " + JSON.stringify(invitationResults));
 
@@ -264,14 +310,12 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
             for (var i in newInvitations) {
                 var invite = newInvitations[i];
-
                 var invitation = new Invitation();
+
                 invitation.set("email", invite);
                 invitation.set("groups", [{"__type":"Pointer","className":"Group","objectId":group.id}]);
 
                 newInvitationObjects.push(invitation);
-
-                console.log("Post save: " + JSON.stringify(invitation));
             }
 
             var promise = new Parse.Promise();
@@ -291,8 +335,8 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
             return Parse.Cloud.run("emailInvites", { existingUsers: existingUserRecipients, newUsers: newUsers, group: group.get("name") });
         }
     ).then(
-        function() {
-            console.log("Success! Finished invite cloud function");
+        function(message) {
+            console.log("Success! Finished invite cloud function: " + message);
             res.success();
         }, 
         function(error) {
@@ -319,12 +363,11 @@ Parse.Cloud.define("emailInvites", function(req, res) {
             },
             {
                 success: function(httpResponse) {
-                    console.log(httpResponse);
-                    //response.success("Email sent!");
+                    res.success("Email sent to " + to);
                 },
                 error: function(httpResponse) {
-                    console.error(httpResponse);
-                    //response.error("Uh oh, something went wrong");
+                    //console.error(httpResponse);
+                    res.error("Uh oh, something went wrong");
                 }
             }
         );
@@ -333,19 +376,21 @@ Parse.Cloud.define("emailInvites", function(req, res) {
         console.log("existingUsers: " + JSON.stringify(req.params.existingUsers));
         sendEmail(req.params.existingUsers, "You've been invited to join a SetMatch group!", 
             "Woohoo, you've been invited to the " + req.params.group +
-            ' group. To accept, log in at <a href="https://www.setmatch.es">https://www.setmatch.es</a>');
+            ' group. To accept, log in at https://www.setmatch.es');
     }
     if (req.params.newUsers.length > 0) {
         var newUsers = [];
         for (var i in req.params.newUsers) {
+            // format for Mandrill to:
             newUsers.push( { 'email': req.params.newUsers[i] } );
         }
+        console.log("newUsers: " + JSON.stringify(newUsers));
         sendEmail(newUsers, "You've been invited to SetMatch!", 
             "Hey! You've been invited to the " + req.params.group +
             " group on SetMatch. To accept, create an account at https://www.setmatch.es");
     }
 
-    res.success();
+    //res.success();
 });
 
 /* Not currently in use */

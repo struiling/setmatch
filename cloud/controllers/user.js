@@ -51,7 +51,7 @@ exports.new = function(req, res) {
 	user.set("gravatar", gravatar.url(req.body.email, {}, true) );
 	
 	user.signUp().then( 
-		function(user) {
+		function() {
 			console.log("in signup function! " + JSON.stringify(user));
 
 			var query = new Parse.Query(Invitation);
@@ -61,12 +61,18 @@ exports.new = function(req, res) {
 
 		}
 	).then( 
-		function(invitation) {
+		function(existingInvitation) {
 
 			// TODO: convert to Cloud Code and set invitations with ACL
-			if (invitation) {
+			if (existingInvitation) {
+				// match up existing Invitation with new User
 				console.log("invitation");
+				user.set("invitation", existingInvitation);
+			} else {
+				// user has never been invited. Create new Invitation row and associate it
+				var invitation = new Invitation();
 				user.set("invitation", invitation);
+				invitation.set("email", user.get("email"));
 			}
 			var profile = new Profile();
 			// TODO: Add user to global group on signup
