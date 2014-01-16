@@ -99,8 +99,10 @@ exports.invite = function(req, res) {
 	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
 	*/
 
-	// remove whitespace and split on comma
-	var inviteMemberList = req.body.inviteMembers.replace(/\s/g, '').split(',');
+	// remove whitespace and split on comma, filter out duplicates
+	var inviteMemberList = _.unique(
+		req.body.inviteMembers.replace(/\s/g, '').split(',')
+	);
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
 	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.body.group }).then(
 		function() {
@@ -115,7 +117,7 @@ exports.invite = function(req, res) {
 
 exports.join = function(req, res) {
 	var user = Parse.User.current();
-	console.log("req.user: " + JSON.stringify(req.user));
+	
 	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( 
 		function(message) {
 			// TODO: set user ACL to group members so other members of the newly joined group can see the user
