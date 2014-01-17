@@ -23,15 +23,6 @@
                         
                         <% if (Parse.User.current()) { %>
                         <li class="has-dropdown">
-                            <a href="/groups">Groups</a>
-                            <ul class="dropdown">
-                                <% _.each(basicGroups, function(group, i) { %>
-                                    <li><a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a></li>
-                                <% } ) %>
-                                <li><a href="/group/new">+ new group</a></li>
-                            </ul>
-                        </li>
-                        <li class="has-dropdown">
                             <!-- TODO: Global variable-ize -->
                             <a href="/profile/"><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" />
                                 <%= basicProfile.get(settings.global.fname) %> 
@@ -39,6 +30,15 @@
                             <ul class="dropdown">
                                 <li><a href="/profile/edit">Edt profile</a></li>
                                 <li><a href="/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                        <li class="has-dropdown">
+                            <a href="/groups">Groups</a>
+                            <ul class="dropdown">
+                                <% _.each(basicGroups, function(group, i) { %>
+                                    <li><a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a></li>
+                                <% } ) %>
+                                <li><a href="/group/new">+ new group</a></li>
                             </ul>
                         </li>
                         <% } %>

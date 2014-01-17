@@ -6,24 +6,59 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
+
 <h2>Profile data</h2>
+<h5>Email address</h5>
+<p><%= user.getEmail() %></p>
+
+<% _.each(globalGroup.get("traits"), function(trait) { %>
+	<h5><%= trait.get("name") %></h5>
+
+	<% if (trait.get("type") == "text" ||
+		   trait.get("type") == "radio" ||
+		   trait.get("type") == "checkbox" ||
+		   trait.get("type") == "select") { %>
+		<p><%= profile.get("t_" + trait.id) %></p>
+	<% } 
+}); %>
+
+
+<p>Want to change your photo? Head over to <a href="http://www.gravatar.com">Gravatar</a>.</p>
 
 <br />
-<% _.each(_.keys(profile.attributes), function(key) { %>
-	<% if (key == "gravatar") { %>
-		<img src="<%= profile.get(key) %>?s=100&r=pg&d=identicon" />
-	<% return;
-	} %>
+<% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
+	<% _.each(customGroups, function(group, i) { 
+		if (typeof(group.get("traits")) !== "undefined") { %>
+			<% if (i == 0) { %>
+			<h3>Group fields</h3>
+			<% } %>
 
-<%= key %>: <%= profile.get(key) %><br />
-
-<% }) %>
-
-<p>Email</p>
-<%- user.getEmail() %>
-
-<p>Photo</p>
-
+			<h4><%= group.get("name") %></h4>
+			<% _.each(group.get("traits"), function(trait) { %>
+				<h5><%= trait.get("name") %></h5>
+					<% if (trait.get("type") == "text" ||
+						   trait.get("type") == "radio" ||
+						   trait.get("type") == "checkbox" ||
+						   trait.get("type") == "select") { %>
+						<p><%- profile.get("t_" + trait.id) %></p>
+					<% } %>
+					<% if (trait.get("type") == "date") { %>
+					<!-- // TODO: change to three dropdowns and a hidden date string input -->
+						<input name="t_<%= trait.id %>" id="t_<%= trait.id %>" type="date" value="<%- profile.get(trait.id) %>" />
+					<% } %>
+					
+					<p>This trait type is: 
+					<% if (trait.get("type") == "text") { %> Text<% } %>
+                    <% if (trait.get("type") == "date") { %> Date<% } %>
+                    <% if (trait.get("type") == "radio") { %> Radio<% } %>
+                    <% if (trait.get("type") == "select") { %> Select<% } %>
+                    <% if (trait.get("type") == "checkbox") { %> Checkbox<% } %></p>
+	                    
+	                <br /><br />
+			<% });
+		}
+	});
+} %>
 
 <% if (typeof(invites) !== 'undefined' && invites.length > 0) { %>
 	<h3>You've been invited to these groups</h3>
@@ -33,10 +68,10 @@
 	<% } ) %>
 <% } %>
 <br />
-<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
+<% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
 	<h3>Your groups</h3>
-	<% _.each(groups, function(group, i) { %>
-		 <a href="/group/<%= groups[i].get("urlName") %>"><%= groups[i].get("name") %></a><br />
+	<% _.each(customGroups, function(group) { %>
+		 <a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a><br />
 	<% } ) %>
 <% } %>
 

@@ -67,12 +67,14 @@ exports.view = function(req, res) {
 
 	var user = Parse.User.current();
 	var userGroups;
+	var customGroups;
+	var globalGroup;
 	var userProfile;
 	var userInvitation;
 	//user.fetch();
 
 	var query = new Parse.Query(Parse.User);
-	query.include("groups");
+	query.include("groups.traits");
 	query.include("profile");
 	query.include("invitation.groups");
 	query.get(user.id);
@@ -82,6 +84,14 @@ exports.view = function(req, res) {
 			userProfile = result.get("profile");
 			userInvitation = result.get("invitation").get("groups");
 			console.log("userInvitation:" + JSON.stringify(userInvitation));
+			customGroups = _.filter(userGroups, function(group) {
+			     return group.get("urlName") !== "global";
+			});
+			console.log("customGroups: " + JSON.stringify(customGroups));
+			globalGroup = _.first(_.filter(userGroups, function(group) {
+			     return group.get("urlName") == "global";
+			}));
+			console.log("globalGroup: " + JSON.stringify(globalGroup));
 			var groupsInvitedIds = [];
 			if (userInvitation != null ) {
 				for (i in userInvitation) {
@@ -93,7 +103,8 @@ exports.view = function(req, res) {
 		}
 	).then( 
 		function(groupsInvited) {
-		    res.render("profile", { user: user, groups: userGroups, invites: groupsInvited, profile: userProfile });
+
+		    res.render("profile", { user: user, customGroups: customGroups, globalGroup: globalGroup, invites: groupsInvited, profile: userProfile });
 		},	
 		function(error) {
 			res.error(error.message);
