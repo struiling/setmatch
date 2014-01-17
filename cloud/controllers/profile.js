@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var settings = require('cloud/settings');
 var Group = Parse.Object.extend("Group");
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
@@ -20,14 +21,17 @@ exports.edit = function(req, res) {
 			var customGroups;
 			var globalGroup;
 			customGroups = _.filter(userGroups, function(group) {
-			     return group.get("urlName") !== "global";
+			     return group.id !== settings.global.group;
 			});
 			console.log("customGroups: " + JSON.stringify(customGroups));
+			console.log("settings.global.group: " + settings.global.group);
 			globalGroup = _.first(_.filter(userGroups, function(group) {
-			     return group.get("urlName") == "global";
+			     return group.id == settings.global.group;
 			}));
 			console.log("globalGroup: " + JSON.stringify(globalGroup));
 
+			// TODO: unnest promises
+			// TODO: only run this query if user.get("invites").get(groups) is not undefined
 			Parse.Cloud.run("getInvites", { invites: user.get("invites") }).then( 
 				function(groupsInvited) {
 			    	res.render("profile-edit", { 
@@ -96,11 +100,11 @@ exports.view = function(req, res) {
 			userInvitation = result.get("invitation").get("groups");
 			console.log("userInvitation:" + JSON.stringify(userInvitation));
 			customGroups = _.filter(userGroups, function(group) {
-			     return group.get("urlName") !== "global";
+			     return group.id !== settings.global.group;
 			});
 			console.log("customGroups: " + JSON.stringify(customGroups));
 			globalGroup = _.first(_.filter(userGroups, function(group) {
-			     return group.get("urlName") == "global";
+			     return group.id == settings.global.group;
 			}));
 			console.log("globalGroup: " + JSON.stringify(globalGroup));
 			var groupsInvitedIds = [];

@@ -68,6 +68,14 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
     }
 });
 */
+Parse.Cloud.afterSave(Parse.User, function(req, res) {
+    Parse.Cloud.run("addUserToGroup", { isGlobal: true} );
+});
+
+Parse.Cloud.afterDelete(Parse.User, function(req, res) {
+    
+});
+
 
 Parse.Cloud.define("getInvites", function(req, res) {
     Parse.Cloud.useMasterKey();
@@ -92,7 +100,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
 
     var user = req.user;
     console.log("req.user: " + JSON.stringify(req.user));
-    var group;
+    var group = {};
 
     /*var addUserToRole = function(user, roleName) {
         var roleQuery = new Parse.Query(Parse.Role);
@@ -110,16 +118,21 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     groupQuery.equalTo("urlName", req.params.group);
     groupQuery.first().then(
         function(groupResult) {
-            group = groupResult;
-            // check if an invite exists for this group
-            //console.log("user invitations: " + JSON.stringify(user.get("invitation")));
-            //console.log("user invitation ID: " + user.get("invitation").id);
+            if (req.params.isGlobal) {
+                group.id = settings.global.group;
+                return;
+            } else {
+                group = groupResult;
+                // check if an invite exists for this group
+                //console.log("user invitations: " + JSON.stringify(user.get("invitation")));
+                //console.log("user invitation ID: " + user.get("invitation").id);
 
-            var invitationQuery = new Parse.Query(Invitation);
-            invitationQuery.get(user.get("invitation").id);
-            invitationQuery.include("groups");
-            invitationQuery.equalTo("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
-            return invitationQuery.first();
+                var invitationQuery = new Parse.Query(Invitation);
+                invitationQuery.get(user.get("invitation").id);
+                invitationQuery.include("groups");
+                invitationQuery.equalTo("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                return invitationQuery.first();
+            }
         }
     ).then(
         function(invitation) {
@@ -153,6 +166,10 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
                     }
                 });
                 return promise;
+
+            } else if (req.params.isGlobal) {
+                user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                return user.save();
 
             } else {
                 return Parse.Promise.error("You haven't been invited to this group.");
