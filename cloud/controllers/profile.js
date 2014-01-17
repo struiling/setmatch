@@ -15,16 +15,27 @@ exports.edit = function(req, res) {
 	query.get(user.id);
 	query.first().then( 
 		function(result) {
-			var userGroups = result.get("groups");
-			console.log("Groups data:" + JSON.stringify(userGroups));
 			var userProfile = result.get("profile");
+			var userGroups = result.get("groups");
+			var customGroups;
+			var globalGroup;
+			customGroups = _.filter(userGroups, function(group) {
+			     return group.get("urlName") !== "global";
+			});
+			console.log("customGroups: " + JSON.stringify(customGroups));
+			globalGroup = _.first(_.filter(userGroups, function(group) {
+			     return group.get("urlName") == "global";
+			}));
+			console.log("globalGroup: " + JSON.stringify(globalGroup));
+
 			Parse.Cloud.run("getInvites", { invites: user.get("invites") }).then( 
-				function(invites) {
+				function(groupsInvited) {
 			    	res.render("profile-edit", { 
 			    		user: user, 
-			    		groups: userGroups, 
-			    		invites: invites, 
-			    		profile: userProfile 
+				    	customGroups: customGroups, 
+				    	globalGroup: globalGroup, 
+				    	invites: groupsInvited, 
+				    	profile: userProfile 
 			    	});
 				}
 			);
@@ -104,7 +115,13 @@ exports.view = function(req, res) {
 	).then( 
 		function(groupsInvited) {
 
-		    res.render("profile", { user: user, customGroups: customGroups, globalGroup: globalGroup, invites: groupsInvited, profile: userProfile });
+		    res.render("profile", { 
+		    	user: user, 
+		    	customGroups: customGroups, 
+		    	globalGroup: globalGroup, 
+		    	invites: groupsInvited, 
+		    	profile: userProfile 
+		    });
 		},	
 		function(error) {
 			res.error(error.message);

@@ -9,18 +9,65 @@
 
 <form method="post" action="/profile/save">
 	<fieldset>
-		<legend>General profile</legend>
-		
-		<!-- TODO: Global group should be separate -->
+		<h3>Basic information</h3>
+
+		<% _.each(globalGroup.get("traits"), function(trait) { %>
+			<label for="t_<%= trait.id %>"><%= trait.get("name") %></label> <br />
+				<% if (trait.get("type") == "text") { %>
+					<input name="t_<%= trait.id %>" id="t_<%= trait.id %>" type="text" value="<%- profile.get("t_" + trait.id) %>" />
+				<% } %>
+				<% if (trait.get("type") == "date") { %>
+				<!-- // TODO: change to three dropdowns and a hidden date string input -->
+					<input name="t_<%= trait.id %>" id="t_<%= trait.id %>" type="date" value="<%- profile.get(trait.id) %>" />
+				<% } %>
+				<% if (trait.get("type") == "radio") { 
+					_.each(trait.get("listoption"), function(option) { %>
+						<input name="t_<%= trait.id %>" type="radio" value="<%= option %>"
+						<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %> />
+						<%= option %>
+						<br />
+					<% });
+				} %>
+				<% if (trait.get("type") == "checkbox") { 
+					_.each(trait.get("listoption"), function(option) { %>
+						<input name="t_<%= trait.id %>[]" type="checkbox" value="<%= option %>"
+						<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %> />
+						<%= option %>
+						<br />
+					<% });
+				} %>
+				<% if (trait.get("type") == "select") { %>
+					<select name="t_<%= trait.id %>">
+						<option value=""> </option>
+					<% _.each(trait.get("listoption"), function(option) { %>
+						<option value="<%= option %>"
+						<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %>>
+							<%= option %>
+						</option>
+						<br />
+					<% }); %>
+					</select>
+				<% } %>
+
+				Type: 
+				<% if (trait.get("type") == "text") { %> Text<% } %>
+                <% if (trait.get("type") == "date") { %> Date<% } %>
+                <% if (trait.get("type") == "radio") { %> Radio<% } %>
+                <% if (trait.get("type") == "select") { %> Select<% } %>
+                <% if (trait.get("type") == "checkbox") { %> Checkbox<% } %>
+                    
+                <br /><br />
+			<% }); %>
         
         <label for="email">Email</label>
         <input name="email" type="text" placeholder="Email address" value="<%= user.getEmail() %>" />
         <label for="password">Password</label>
         <input name="password" type="password" placeholder="Leave blank to keep your password the same">
+        <p><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" /> Want to change your photo? Head over to <a href="http://www.gravatar.com">Gravatar</a>.</p>
 
-		<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
-		<h3>Group-specific profiles</h3>
-			<% _.each(groups, function(group) { %>
+		<% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
+		<h3>Group fields</h3>
+			<% _.each(customGroups, function(group) { %>
 				<h4><%= group.get("name") %></h4>
 				<% _.each(group.get("traits"), function(trait) { %>
 					<label for="t_<%= trait.id %>"><%= trait.get("name") %></label> <br />

@@ -6,8 +6,8 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
-
-<h2>Profile data</h2>
+<h1><%= basicProfile.get(settings.global.fname) %> <%= basicProfile.get(settings.global.lname) %></h1>
+<h2>Basic information</h2>
 <h5>Email address</h5>
 <p><%= user.getEmail() %></p>
 
@@ -22,15 +22,12 @@
 	<% } 
 }); %>
 
-
-<p>Want to change your photo? Head over to <a href="http://www.gravatar.com">Gravatar</a>.</p>
-
 <br />
 <% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
 	<% _.each(customGroups, function(group, i) { 
 		if (typeof(group.get("traits")) !== "undefined") { %>
 			<% if (i == 0) { %>
-			<h3>Group fields</h3>
+			<h2>Group fields</h2>
 			<% } %>
 
 			<h4><%= group.get("name") %></h4>
@@ -72,7 +69,7 @@
 	<h3>Your groups</h3>
 	<% _.each(customGroups, function(group) { %>
 		 <a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a><br />
-	<% } ) %>
+	<% } ); %>
 <% } %>
 
 <br />
