@@ -47,6 +47,19 @@
 								<br />
 							<% });
 						} %>
+						<% if (trait.get("type") == "select") { %>
+							<select name="t_<%= trait.id %>">
+								<option value=""> </option>
+							<% _.each(trait.get("listoption"), function(option) { %>
+								<option value="<%= option %>"
+								<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %>>
+									<%= option %>
+								</option>
+								<br />
+							<% }); %>
+							</select>
+						<% } %>
+
 						Type: 
 						<% if (trait.get("type") == "text") { %> Text<% } %>
 	                    <% if (trait.get("type") == "date") { %> Date<% } %>
