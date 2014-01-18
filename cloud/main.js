@@ -69,37 +69,76 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
 });
 */
 Parse.Cloud.afterSave(Parse.User, function(req, res) {
-    Parse.Cloud.run("addUserToGroup", { isGlobal: true} );
+    if (!req.object.existed()) {
+        console.log("only for new users: " + JSON.stringify(req.user));
+        Parse.Cloud.run("addUserToGroup", { isGlobal: true} );
+    }
 });
 
 Parse.Cloud.afterDelete(Parse.User, function(req, res) {
     
 });
 
-
-Parse.Cloud.define("getInvites", function(req, res) {
+Parse.Cloud.define("getProfileData", function(req, res) {
     Parse.Cloud.useMasterKey();
-    console.log("req.params.invites: "+ req.params.invites);
 
-    // query for groups where the group objectId matches the invite the user is accepting
-    var query = new Parse.Query(Group);
-    query.containedIn("objectId", req.params.invites);
-    query.find().then( 
-        function(results) {
-            var groupsInvited = results;
-            console.log("getInvites results: " + JSON.stringify(groupsInvited));
-            res.success(groupsInvited);
+    var user = Parse.User.current();
+    var userGroups;
+    var customGroups;
+    var globalGroup;
+    var userProfile;
+    var groupsInvited;
+    //user.fetch();
+    console.log("getProfileData user: " + JSON.stringify(user));
+
+    var query = new Parse.Query(Parse.User);
+    query.include("groups.traits");
+    query.include("profile");
+    query.include("invitation.groups");
+    query.get(user.id);
+    query.first().then( 
+        function(result) {
+            userGroups = result.get("groups");
+            userProfile = result.get("profile");
+            console.log("userProfile:" + JSON.stringify(userProfile));
+            groupsInvited = result.get("invitation").get("groups");
+            console.log("groupsInvited:" + JSON.stringify(groupsInvited));
+            customGroups = _.filter(userGroups, function(group) {
+                 return group.id !== settings.global.group;
+            });
+            console.log("customGroups: " + JSON.stringify(customGroups));
+            globalGroup = _.first(_.filter(userGroups, function(group) {
+                 return group.id == settings.global.group;
+            }));
+            console.log("globalGroup: " + JSON.stringify(globalGroup));
+
+            res.success( {
+                user: user, 
+                customGroups: customGroups, 
+                globalGroup: globalGroup, 
+                userProfile: userProfile, 
+                groupsInvited: groupsInvited
+            } );
         }, function(error) {
-            res.success(error);
+            res.error(error);
         }
+            /*var groupsInvitedIds = [];
+            if (userInvitation != null && userInvitation.length > 0) {
+                for (i in userInvitation) {
+                    groupsInvitedIds.push(userInvitation[i].id);
+                }
+                console.log("groupsInvitedIds:" + groupsInvitedIds);
+                return Parse.Cloud.run("getInvites", { invites: groupsInvitedIds });
+            }*/
     );
 });
 
 Parse.Cloud.define("addUserToGroup", function(req, res) {
+    console.log("in addUserToGroup");
     Parse.Cloud.useMasterKey();
 
-    var user = req.user;
-    console.log("req.user: " + JSON.stringify(req.user));
+    var user = Parse.User.current();
+    console.log("req.user: " + JSON.stringify(user));
     var group = {};
 
     /*var addUserToRole = function(user, roleName) {
@@ -169,6 +208,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
 
             } else if (req.params.isGlobal) {
                 user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                console.log("return out of addUserToGroup");
                 return user.save();
 
             } else {
@@ -191,7 +231,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     ).then( function() {
         res.success("You've joined " + group.get("name"));
     }, function(error) {
-        res.success(error);
+        res.error(error);
     });
 });
 
@@ -407,6 +447,7 @@ Parse.Cloud.define("emailInvites", function(req, res) {
             " group on SetMatch. To accept, create an account at https://www.setmatch.es");
     }
 
+    // ??
     //res.success();
 });
 

@@ -76,8 +76,7 @@ exports.new = function(req, res) {
 				user.set("invitation", invitation);
 				invitation.set("email", user.get("email"));
 			}
-			// add invite to Global group, which will be immediately fulfilled in afterSave
-			invitation.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":settings.global.group} );
+			
 			var profile = new Profile();
 			// TODO: Add user to global group on signup
 			profile.set(settings.global.fname, req.body.fname);
