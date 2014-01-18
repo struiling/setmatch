@@ -6,14 +6,7 @@ var Invitation = Parse.Object.extend("Invitation");
 exports.delete = function(req, res) {
 	// TODO: create deactivate feature that makes user invisible and restricts their view of others 
     var user = Parse.User.current();
-    // TODO: move to afterDelete
-    var profile = new Profile();
-    profile = user.get("profile");
-    profile.destroy().then(
-    	function() {
-    		return user.destroy();
-    	}
-	).then(
+    user.destroy().then(
 		function() {
 			Parse.User.logOut();
 			res.flash('message', 'Your account has been deleted.');

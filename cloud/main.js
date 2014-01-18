@@ -76,7 +76,18 @@ Parse.Cloud.afterSave(Parse.User, function(req, res) {
 });
 
 Parse.Cloud.afterDelete(Parse.User, function(req, res) {
-    
+    var profile = new Profile();
+    profile = req.object.get("profile");
+
+    var invitation = new Invitation();
+    invitation = req.object.get("invitation");
+
+    Parse.Object.destroyAll([profile, invitation], {
+        success: function() {},
+        error: function(error) {
+          console.error("Error deleting related user data. " + error.code + ": " + error.message);
+        }
+    });
 });
 
 Parse.Cloud.define("getProfileData", function(req, res) {
