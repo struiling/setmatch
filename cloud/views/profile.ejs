@@ -61,14 +61,14 @@
 	<h3>You've been invited to these groups</h3>
 
 	<% _.each(invites, function(invite, i) { %>
-		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
+		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("slug") %>/join">Join</a><br />
 	<% } ) %>
 <% } %>
 <br />
 <% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
 	<h3>Your groups</h3>
 	<% _.each(customGroups, function(group) { %>
-		 <a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a><br />
+		 <a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a><br />
 	<% } ); %>
 <% } %>
 

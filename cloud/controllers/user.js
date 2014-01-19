@@ -6,13 +6,7 @@ var Invitation = Parse.Object.extend("Invitation");
 exports.delete = function(req, res) {
 	// TODO: create deactivate feature that makes user invisible and restricts their view of others 
     var user = Parse.User.current();
-    var profile = new Profile();
-    profile = user.get("profile");
-    profile.destroy().then(
-    	function() {
-    		return user.destroy();
-    	}
-	).then(
+    user.destroy().then(
 		function() {
 			Parse.User.logOut();
 			res.flash('message', 'Your account has been deleted.');
@@ -22,7 +16,7 @@ exports.delete = function(req, res) {
 };
 
 exports.login = function(req, res) {
-	Parse.User.logIn(req.body.email, req.body.password).then(
+	Parse.User.logIn(req.body.email.toLowerCase(), req.body.password).then(
 		function() {
 		    // Do stuff after successful login.
 		    res.redirect('/');
@@ -43,12 +37,14 @@ exports.logout = function(req, res) {
 };
 
 exports.new = function(req, res) {
+	/* TODO: add email verification? */
 
 	var user = new Parse.User();
 	user.set("username", req.body.email.toLowerCase());
 	user.set("email", req.body.email.toLowerCase());
 	user.set("password", req.body.password);
 	user.set("gravatar", gravatar.url(req.body.email, {}, true) );
+	user.set("slug", req.body.slug);
 	
 	user.signUp().then( 
 		function() {
@@ -56,14 +52,13 @@ exports.new = function(req, res) {
 
 			var query = new Parse.Query(Invitation);
 			query.equalTo("email", req.body.email.toLowerCase());
-			console.log("query.first(): " + JSON.stringify(query.first()));
 			return query.first();
 
 		}
 	).then( 
 		function(existingInvitation) {
 
-			// TODO: convert to Cloud Code and set invitations with ACL
+			// TODO: convert to CloudCode. Invitations should be restricted by ACL
 			if (existingInvitation) {
 				// match up existing Invitation with new User
 				console.log("invitation");
@@ -74,14 +69,13 @@ exports.new = function(req, res) {
 				user.set("invitation", invitation);
 				invitation.set("email", user.get("email"));
 			}
+			
 			var profile = new Profile();
-			// TODO: Add user to global group on signup
 			profile.set(settings.global.fname, req.body.fname);
 			profile.set(settings.global.lname, req.body.lname);
 
 	    	user.set("profile", profile);
 	    	return user.save();
-
 		}
 	).then(
 		function(success) {
@@ -91,13 +85,8 @@ exports.new = function(req, res) {
 		function(error) {
 			// Show the error message somewhere and let the user try again.
 		    //res.send(500, "Error: " + error.code + " " + error.message);
-		    var errorMessage = undefined;
-		    errorMessage = "Oops! Something went wrong.";
-
-		    res.render('index', {
-		    	error: errorMessage,
-		    	errorParseMessage: error.code + ' ' + error.message
-		    });
+		    res.flash("message", "Oops! Something went wrong." + error.message);
+		    res.redirect("/");
 		}
 	);
 };
@@ -106,6 +95,7 @@ exports.reset = function(req, res) {
 
 	Parse.User.requestPasswordReset(req.body.email, {
 		success: function() {
+			res.flash("message", "Password reset email sent. Check your email!");
 	    	res.redirect("/");
 		},
 		error: function(error) {

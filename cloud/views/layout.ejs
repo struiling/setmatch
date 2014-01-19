@@ -25,7 +25,7 @@
                         <li class="has-dropdown">
                             <!-- TODO: Global variable-ize -->
                             <a href="/profile/"><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" />
-                                <%= basicProfile.get(settings.global.fname) %> 
+                                <%= basicProfile.get(settings.global.fname) %>
                                 <%= basicProfile.get(settings.global.lname) %></a>
                             <ul class="dropdown">
                                 <li><a href="/profile/edit">Edt profile</a></li>
@@ -36,7 +36,7 @@
                             <a href="/groups">Groups</a>
                             <ul class="dropdown">
                                 <% _.each(basicGroups, function(group, i) { %>
-                                    <li><a href="/group/<%= group.get("urlName") %>"><%= group.get("name") %></a></li>
+                                    <li><a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a></li>
                                 <% } ) %>
                                 <li><a href="/group/new">+ new group</a></li>
                             </ul>
@@ -47,7 +47,7 @@
                 </section>
             </nav>
         </div>
-        
+
         <div class="row">
 
             <% include flashify %>

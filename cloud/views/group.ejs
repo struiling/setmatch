@@ -1,16 +1,10 @@
-Group name:
-<%- group.get("name") %>
-<br />
 
-Group URL:
-<%- group.get("urlName") %>
-<br />
+<h1><%- group.get("name") %></h1>
+<% if (group.get("description")) { %>
+	<p><%- group.get("description") %></p>
+<% } %>
 
-Description:
-<%- group.get("description") %>
-
-<br />
-This group is <% if (group.get("secretive") != "y") { %> not<% } %> secretive.
+<p><a href="/group/<%- group.get("slug") %>/edit">Edit group info</a></p>
 
 <h3>Members</h3>
 
@@ -19,12 +13,14 @@ This group is <% if (group.get("secretive") != "y") { %> not<% } %> secretive.
 		<li><a href="/group/#"><%= member.get("profile").get(settings.global.fname) %> <%= member.get("profile").get(settings.global.lname) %></a><br /></li>
 	<% } ) %>
 </ul>
+<% if (invitations && invitations.length > 0) { %>
+	<h3>Invitations</h3>
+	<ul>
+		<% _.each(invitations, function(invitation, i) { %>
+			<li><%= invitation.get("email") %></li>
+		<% } ) %>
+	</ul>
+<% } %>
 
-<h3>Invitations</h3>
-<ul>
-	<% _.each(invitations, function(invitation, i) { %>
-		<li><%= invitation.get("email") %></li>
-	<% } ) %>
-</ul>
 
-<p><a href="/group/<%- group.get("urlName") %>/edit">Edit group info</a></p>
+<p><a href="/group/<%- group.get("slug") %>/leave">Leave this group</a></p>

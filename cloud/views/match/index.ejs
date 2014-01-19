@@ -28,14 +28,14 @@
 	<h3>You've been invited to these groups</h3>
 <%- JSON.stringify(invites) %>
 	<% _.each(invites, function(invite, i) { %>
-		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("urlName") %>/join">Join</a><br />
+		<%= invites[i].get("name") %> <a href="/group/<%= invites[i].get("slug") %>/join">Join</a><br />
 	<% } ) %>
 <% } %>
 
 <% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
 	<h3>Your groups</h3>
 	<% _.each(groups, function(group, i) { %>
-		 <a href="/group/<%= groups[i].get("urlName") %>"><%= groups[i].get("name") %></a><br />
+		 <a href="/group/<%= groups[i].get("slug") %>"><%= groups[i].get("name") %></a><br />
 	<% } ) %>
 <% } %>
 

@@ -41,7 +41,7 @@ exports.create = function(req, res) {
 		}
 	).then(
 		function () {
-    		res.redirect('/group/' + req.params.urlName + '/edit');
+    		res.redirect('/group/' + req.params.slug + '/edit');
 		}, 
 		function(error) {
 			res.send(500, "Could not create trait: " + error.message);
@@ -62,7 +62,7 @@ exports.save = function(req, res) {
 	var group = new Group();
 
 	// Explicitly specify which fields to save to prevent bad input data
-	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(object) {
+	group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then(function(object) {
 
 	    
 
@@ -70,7 +70,7 @@ exports.save = function(req, res) {
 		user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
         return user.save();
 	}).then( function (success) {
-    	res.redirect('/group/' + object.get("urlName"));
+    	res.redirect('/group/' + object.get("slug"));
 	}, function(error) {
 		res.send(500, "Could not create group: " + error.message);
 	});

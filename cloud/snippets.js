@@ -75,3 +75,17 @@ object.save().then(function (savedObject) {
 }).then(function () { 
 	// this here will not execute until the returned promise from the previous then completes including all its chained "then"s 
 });
+
+/* send json response (for API?) */
+res.json({ msgId: msg.fileName })
+
+/* loop through all traits when not specifying trait name */
+<% _.each(_.keys(profile.attributes), function(key) { %>
+	<% if (key == "gravatar") { %>
+		<img src="<%= profile.get(key) %>?s=100&r=pg&d=identicon" />
+	<% return;
+	} %>
+
+<%= key %>: <%= profile.get(key) %><br />
+
+<% }) %>

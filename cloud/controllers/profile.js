@@ -1,47 +1,22 @@
 var _ = require('underscore');
+var settings = require('cloud/settings');
 var Group = Parse.Object.extend("Group");
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
 
 exports.edit = function(req, res) {
-	var user = Parse.User.current();
-	//var userGroups;
-	//var userProfile;
-	//var userInvites;
-
-	var query = new Parse.Query(Parse.User);
-	query.include("groups.traits");
-	query.include("profile");
-	query.get(user.id);
-	query.first().then( 
-		function(result) {
-			var userProfile = result.get("profile");
-			var userGroups = result.get("groups");
-			var customGroups;
-			var globalGroup;
-			customGroups = _.filter(userGroups, function(group) {
-			     return group.get("urlName") !== "global";
-			});
-			console.log("customGroups: " + JSON.stringify(customGroups));
-			globalGroup = _.first(_.filter(userGroups, function(group) {
-			     return group.get("urlName") == "global";
-			}));
-			console.log("globalGroup: " + JSON.stringify(globalGroup));
-
-			Parse.Cloud.run("getInvites", { invites: user.get("invites") }).then( 
-				function(groupsInvited) {
-			    	res.render("profile-edit", { 
-			    		user: user, 
-				    	customGroups: customGroups, 
-				    	globalGroup: globalGroup, 
-				    	invites: groupsInvited, 
-				    	profile: userProfile 
-			    	});
-				}
-			);
-		}, 
+	Parse.Cloud.run("getProfileData", {}).then( 
+		function(results) {
+		    res.render("profile-edit", { 
+		    	user: results.user,
+		    	customGroups: results.customGroups, 
+		    	globalGroup: results.globalGroup, 
+		    	invites: results.groupsInvited, 
+		    	profile: results.userProfile 
+		    });
+		},	
 		function(error) {
-			res.redirect("logout");
+			res.error(error.message);
 		}
 	);
 };
@@ -75,52 +50,15 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {
-
-	var user = Parse.User.current();
-	var userGroups;
-	var customGroups;
-	var globalGroup;
-	var userProfile;
-	var userInvitation;
-	//user.fetch();
-
-	var query = new Parse.Query(Parse.User);
-	query.include("groups.traits");
-	query.include("profile");
-	query.include("invitation.groups");
-	query.get(user.id);
-	query.first().then( 
-		function(result) {
-			userGroups = result.get("groups");
-			userProfile = result.get("profile");
-			userInvitation = result.get("invitation").get("groups");
-			console.log("userInvitation:" + JSON.stringify(userInvitation));
-			customGroups = _.filter(userGroups, function(group) {
-			     return group.get("urlName") !== "global";
-			});
-			console.log("customGroups: " + JSON.stringify(customGroups));
-			globalGroup = _.first(_.filter(userGroups, function(group) {
-			     return group.get("urlName") == "global";
-			}));
-			console.log("globalGroup: " + JSON.stringify(globalGroup));
-			var groupsInvitedIds = [];
-			if (userInvitation != null ) {
-				for (i in userInvitation) {
-					groupsInvitedIds.push(userInvitation[i].id);
-				}
-				console.log("groupsInvitedIds:" + groupsInvitedIds);
-				return Parse.Cloud.run("getInvites", { invites: groupsInvitedIds });
-			}
-		}
-	).then( 
-		function(groupsInvited) {
-
+	
+	Parse.Cloud.run("getProfileData", {}).then( 
+		function(results) {
 		    res.render("profile", { 
-		    	user: user, 
-		    	customGroups: customGroups, 
-		    	globalGroup: globalGroup, 
-		    	invites: groupsInvited, 
-		    	profile: userProfile 
+		    	user: results.user,
+		    	customGroups: results.customGroups, 
+		    	globalGroup: results.globalGroup, 
+		    	invites: results.groupsInvited, 
+		    	profile: results.userProfile 
 		    });
 		},	
 		function(error) {

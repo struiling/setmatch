@@ -1,15 +1,15 @@
 <!-- TODO: Add jQuery to make value of checkboxes "n" if unchecked -->
 
 
-<form method="post" action="<%- '/group/' + group.get('urlName') %>">
+<form method="post" action="<%- '/group/' + group.get('slug') %>">
 	<fieldset>
 		<legend>Edit group info</legend>
 
 		<label for="group-name">Name</label>
         <input name="name" id="group-name" type="text" placeholder="Name" value="<%- group.get("name") %>">
         
-        <label for="group-urlName">URL</label>
-        <input name="urlName" id="group-urlName" type="text" placeholder="URL" value="<%- group.get("urlName") %>">
+        <label for="group-slug">URL</label>
+        <input name="slug" id="group-slug" type="text" placeholder="URL" value="<%- group.get("slug") %>">
         
         <label for="description">Description</label>
         <input name="description" id="description" type="textarea" placeholder="Description" value="<%- group.get("description") %>">
@@ -25,7 +25,7 @@
         <input class="button" type="submit" value="Save changes" />
 	</fieldset>
 </form>
-<form method="post" action="<%- '/group/' + group.get('urlName') + '/trait' %>">
+<form method="post" action="<%- '/group/' + group.get('slug') + '/trait' %>">
     <fieldset>
         <legend>Add a new group custom trait</legend>
         <p>How does this work? TODO: add tooltip and guidance</p>
@@ -54,7 +54,7 @@
 <% if (typeof(traits) !== 'undefined' && traits.length > 0) { %>
     <h3>Edit group traits</h3>
     <% _.each(traits, function(trait) { %>
-        <form method="post" action="<%- '/group/' + group.get('urlName') + '/trait' %>">
+        <form method="post" action="<%- '/group/' + group.get('slug') + '/trait' %>">
             <fieldset>
                 <label for="name">Name</label>
                 <input name="name" id="name" type="text" placeholder="Name" value="<%= trait.get("name") %>">
@@ -89,7 +89,7 @@
             
 <% } %>
 
-<form method="post" action="<%- '/group/' + group.get('urlName') + '/invite' %>">
+<form method="post" action="<%- '/group/' + group.get('slug') + '/invite' %>">
     <fieldset>
         <legend>Invite members</legend>
         <label for="inviteMembers">Enter email addresses separated by commas</label>
@@ -103,4 +103,4 @@
 <h3>Current members</h3>
 
 
-<p><a href="/group/<%- group.get("urlName") %>">View group</a></p>
+<p><a href="/group/<%- group.get("slug") %>">View group</a></p>

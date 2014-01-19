@@ -10,6 +10,9 @@
 <form method="post" action="/profile/save">
 	<fieldset>
 		<h3>Basic information</h3>
+		<!-- TODO: make the edit profile field code a separate include since it repeats -->
+		<!-- TODO: make Change Password its own small form and add second field for confirm? better deal with validation errors -->
+		<!-- TODO: add email verification? -->
 
 		<% _.each(globalGroup.get("traits"), function(trait) { %>
 			<label for="t_<%= trait.id %>"><%= trait.get("name") %></label> <br />

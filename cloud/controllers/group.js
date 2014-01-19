@@ -9,7 +9,7 @@ exports.create = function(req, res) {
     var group = new Group();
 
     // Explicitly specify which fields to save to prevent bad input data
-    group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then( function() {
+    group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then( function() {
         console.log("group id: " + group.id);
         //create admin role
         var adminRoleACL = new Parse.ACL();
@@ -40,7 +40,7 @@ exports.create = function(req, res) {
         return Parse.Object.saveAll([userRole, user, group]);
         
     }).then( function () {
-        res.redirect('/group/' + group.get("urlName"));
+        res.redirect('/group/' + group.get("slug"));
     }, function(error) {
         res.send(500, "Could not create group: " + error.message);
     });
@@ -51,7 +51,7 @@ exports.edit = function(req, res) {
 	var groupTraits;
 
 	var groupQuery = new Parse.Query(Group);
-	groupQuery.equalTo("urlName", req.params.urlName);
+	groupQuery.equalTo("slug", req.params.slug);
 	groupQuery.include("traits");
 	// TODO: reformat ALL the promises to follow this indentation
 	groupQuery.first().then(
@@ -99,6 +99,8 @@ exports.invite = function(req, res) {
 	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
 	*/
 
+	//TODO: check if user is an admin before running addInviteToUser
+
 	// remove whitespace and split on comma, filter out duplicates
 	var inviteMemberList = _.unique(
 		req.body.inviteMembers.replace(/\s/g, '').split(',')
@@ -106,7 +108,7 @@ exports.invite = function(req, res) {
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
 	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.body.group }).then(
 		function() {
-			res.redirect('/group/' + req.params.urlName + "/edit");		
+			res.redirect('/group/' + req.params.slug + "/edit");		
 		}
 	);
 
@@ -118,14 +120,51 @@ exports.invite = function(req, res) {
 exports.join = function(req, res) {
 	var user = Parse.User.current();
 	
-	Parse.Cloud.run("addUserToGroup", { group: req.params.urlName }).then( 
+	Parse.Cloud.run("addUserToGroup", { group: req.params.slug }).then( 
 		function(message) {
-			// TODO: set user ACL to group members so other members of the newly joined group can see the user
 			res.flash("message", message);
 			res.redirect('back');
 		}
 	);
 
+};
+
+exports.leave = function(req, res) {
+
+	// TODO: check if the user is the last admin, and if so, prevent leaving
+	// TODO: if user is the last member, delete the group
+	var user = Parse.User.current();
+	var group;
+
+
+	var groupQuery = function(slug) {
+        var query = new Parse.Query(Group);
+        query.equalTo("slug", slug);
+        return query.first();
+    };
+    groupQuery(req.params.slug).then(
+        function(result) {
+        	if (!result) {
+        		return Parse.Promise.error("You're not a member of this group.");
+        	}
+        	group = result;
+        	console.log("leave result: " + JSON.stringify(result));
+        	user.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+            return user.save().then(
+		    	function() {
+					return Parse.Cloud.run("leaveGroup", {groupId: group.id});
+				}
+			);
+        }
+	).then( 
+		function() {
+			res.flash("message", "You are no longer a member of " + group.get("name"));
+			res.redirect("/");
+		}, function(error) {
+
+			res.redirect("/group/" + req.params.slug);
+		}
+	);
 };
 
 exports.new = function(req, res) {
@@ -136,8 +175,8 @@ exports.save = function(req, res) {
 	var query = new Parse.Query(Group);
 	query.get(req.body.id).then(function(group) {
 		console.log("Group being saved: " + JSON.stringify(group));
-    	group.save(_.pick(req.body, 'name', 'urlName', 'description', 'secretive')).then(function(object) {
-    		res.redirect('/group/' + object.get("urlName"));	
+    	group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then(function(object) {
+    		res.redirect('/group/' + object.get("slug"));	
     	}, function(error) {
 			res.send(500, "Could not save group: " + error.message);
 		});
@@ -145,14 +184,15 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {
-	var groupUrlName = req.params.urlName;
+	var groupslug = req.params.slug;
 
-	var groupQuery = function(urlName) {
+	var groupQuery = function(slug) {
 		var query = new Parse.Query(Group);
-		query.equalTo("urlName", urlName);
+		query.equalTo("slug", slug);
 		return query.first();
 	};
-
+	
+	/* ---------- not currently being used ---------- */
 	var memberQuery = function(group) {
 		var query = new Parse.Query(Parse.User);
 		query.equalTo("groups", group);
@@ -173,8 +213,9 @@ exports.view = function(req, res) {
 	var group;
 	var members;
 	var invitations;
+	var isAdmin;
 
-	groupQuery(groupUrlName).then(
+	groupQuery(groupslug).then(
 		function(groupResult) {
 			group = groupResult;
 			if (group != null) {
@@ -183,7 +224,7 @@ exports.view = function(req, res) {
 				query.include("profile");
 				return query.find();
 			} else {
-				return Parse.Promise.error("You don't have permission to see this page");
+				return Parse.Promise.error("You don't have permission to see this page.");
 			}
 		}
 	).then( 
@@ -194,7 +235,6 @@ exports.view = function(req, res) {
 
 			var query = new Parse.Query(Invitation);
 			query.equalTo("groups", group);
-			
 			// only get email addresses. Doesn't matter whether they already have a SM account
 			query.select("email");
 			return query.find();
@@ -210,40 +250,8 @@ exports.view = function(req, res) {
 			});
 		},
 		function(error) {
-			res.flash("message", error.message);
+			res.flash("message", error);
 			res.redirect("/");	
 		}
 	);
-
-/*
-	var query = new Parse.Query(Group);
-	query.equalTo("urlName", req.params.urlName);
-	query.first().then(
-		function(groupResult) {
-			console.log("Query for view: " + JSON.stringify(groupResult));
-	    	if (groupResult != null) {
-	    		group = groupResult;
-	    		var memberQuery = new Parse.Query(Parse.User);
-				memberQuery.equalTo("groups", group);
-				memberQuery.include("profile");
-				return memberQuery.find();
-			} else {
-				return Parse.Promise.error();
-			}
-		}
-	).then( 
-		function(members) {
-			console.log("Group members: " + JSON.stringify(members));
-			res.render('group', {
-		    	group: group,
-		    	members: members
-			});
-
-	    },
-    	function(error) {
-			res.flash("message", "You don't have permission to see this page.");
-			res.redirect("/");	
-		}
-	);				
-*/
 };

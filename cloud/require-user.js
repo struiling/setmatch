@@ -1,34 +1,47 @@
+var _ = require('underscore');
+var settings = require('cloud/settings');
 var Profile = Parse.Object.extend("Profile");
 var Group = Parse.Object.extend("Group");
 
 // Use this middleware to require that a user is logged in
 
 module.exports = function(req, res, next) {
-	if (Parse.User.current()) {
+	var user = Parse.User.current();
+	var basicProfile;
+	var basicGroups = [];
+
+	if (user) {
 		// actually get current user fields
-		Parse.User.current()
-			.fetch()
-			.then(
-				function(user) {
-			        res.locals.basicUser = user;
+		user.fetch().then(
+				function(result) {
+					res.locals.basicUser = user;
+			        console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
+
 			        var profile = new Profile();
 					profile.id = user.get("profile").id;
-					profile.fetch();
+					return profile.fetch();
+				}
+			).then(
+	        	function(profile) {
 			        res.locals.basicProfile = profile;
+			        console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
 
-			        var group = new Group();
-			        var groups = []
-			        for (var i in user.get("groups")) {
-			        	group = user.get("groups")[i];
-			        	group.fetch();
-						groups.push(group);
-					}
-
-			        res.locals.basicGroups = groups;
-			        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
+			        var promises = [];
+			        var groups = [];
+					customGroups = _.filter(user.get("groups"), function(group) {
+		                return group.id !== settings.global.group;
+		            });
+			        _.each(customGroups, function(group) {
+			        	basicGroups.push(group);
+			        	promises.push(group.fetch());
+					});
+					// Return a promise that will be resolved when each of the groups has finished fetching
+  					return Parse.Promise.when(promises);
 		        }
 	        ).then(
 	        	function() {
+			        res.locals.basicGroups = basicGroups;
+			        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
 					next();
 		        },
 		        function(error) {

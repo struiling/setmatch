@@ -79,22 +79,24 @@ app.post('/group/create', requireUser, groupController.create);
 // app.post('/group/save', requireUser, groupController.save);
 
 // view group info
-app.get('/group/:urlName', requireUser, groupController.view);
+app.get('/group/:slug', requireUser, groupController.view);
 // view group edit form
-app.get('/group/:urlName/edit', requireUser, groupController.edit);
+app.get('/group/:slug/edit', requireUser, groupController.edit);
 // save edits to group info
-app.put('/group/:urlName', requireUser, groupController.save);
-//app.get('/group/:urlName/delete', requireUser, groupController.delete);
+
+app.put('/group/:slug', requireUser, groupController.save);
+//app.get('/group/:slug/delete', requireUser, groupController.delete);
+app.get('/group/:slug/leave', requireUser, groupController.leave);
 
 // invite another user to the group
-app.post('/group/:urlName/invite', requireUser, groupController.invite);
+app.post('/group/:slug/invite', requireUser, groupController.invite);
 // accept invitation to a group
-app.get('/group/:urlName/join', requireUser, groupController.join);
+app.get('/group/:slug/join', requireUser, groupController.join);
 
 // create new group trait (custom field)
-app.post('/group/:urlName/trait', requireUser, traitController.create);
+app.post('/group/:slug/trait', requireUser, traitController.create);
 // save edits group trait (custom field) definition
-app.put('/group/:urlName/trait', requireUser, traitController.save);
+app.put('/group/:slug/trait', requireUser, traitController.save);
 
 app.get('/trait/:traitId/delete', requireUser, traitController.save);
 
