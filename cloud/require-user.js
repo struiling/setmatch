@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var settings = require('cloud/settings');
 var Profile = Parse.Object.extend("Profile");
 var Group = Parse.Object.extend("Group");
 
@@ -6,10 +7,16 @@ var Group = Parse.Object.extend("Group");
 
 module.exports = function(req, res, next) {
 	var user = Parse.User.current();
+	var basicProfile;
+	var basicGroups = [];
+
 	if (user) {
 		// actually get current user fields
 		user.fetch().then(
 				function(result) {
+					res.locals.basicUser = user;
+			        console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
+
 			        var profile = new Profile();
 					profile.id = user.get("profile").id;
 					return profile.fetch();
@@ -17,25 +24,23 @@ module.exports = function(req, res, next) {
 			).then(
 	        	function(profile) {
 			        res.locals.basicProfile = profile;
-
-			        var group = new Group();
-			        var promise = Parse.Promise.as();
-			        //var groups = []
-			        _.each(user.get("groups"), function(group) {
-				        promise = promise.then(function() {
-	    					// Return a promise that will be resolved when the group is fetched
-	    					return group.fetch();
-	  					});
-					});
-  					return promise;
-
 			        console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
-			        console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
+
+			        var promises = [];
+			        var groups = [];
+					customGroups = _.filter(user.get("groups"), function(group) {
+		                return group.id !== settings.global.group;
+		            });
+			        _.each(customGroups, function(group) {
+			        	basicGroups.push(group);
+			        	promises.push(group.fetch());
+					});
+					// Return a promise that will be resolved when each of the groups has finished fetching
+  					return Parse.Promise.when(promises);
 		        }
 	        ).then(
-	        	function(groups) {
-					res.locals.basicUser = user;
-			        res.locals.basicGroups = groups;
+	        	function() {
+			        res.locals.basicGroups = basicGroups;
 			        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
 					next();
 		        },
