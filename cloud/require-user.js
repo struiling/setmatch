@@ -1,34 +1,42 @@
+var _ = require('underscore');
 var Profile = Parse.Object.extend("Profile");
 var Group = Parse.Object.extend("Group");
 
 // Use this middleware to require that a user is logged in
 
 module.exports = function(req, res, next) {
-	if (Parse.User.current()) {
+	var user = Parse.User.current();
+	if (user) {
 		// actually get current user fields
-		Parse.User.current()
-			.fetch()
-			.then(
-				function(user) {
-			        res.locals.basicUser = user;
+		user.fetch().then(
+				function(result) {
 			        var profile = new Profile();
 					profile.id = user.get("profile").id;
-					profile.fetch();
+					return profile.fetch();
+				}
+			).then(
+	        	function(profile) {
 			        res.locals.basicProfile = profile;
 
 			        var group = new Group();
-			        var groups = []
-			        for (var i in user.get("groups")) {
-			        	group = user.get("groups")[i];
-			        	group.fetch();
-						groups.push(group);
-					}
+			        var promise = Parse.Promise.as();
+			        //var groups = []
+			        _.each(user.get("groups"), function(group) {
+				        promise = promise.then(function() {
+	    					// Return a promise that will be resolved when the group is fetched
+	    					return group.fetch();
+	  					});
+					});
+  					return promise;
 
-			        res.locals.basicGroups = groups;
-			        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
+			        console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
+			        console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
 		        }
 	        ).then(
-	        	function() {
+	        	function(groups) {
+					res.locals.basicUser = user;
+			        res.locals.basicGroups = groups;
+			        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
 					next();
 		        },
 		        function(error) {
