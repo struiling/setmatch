@@ -130,12 +130,10 @@ exports.join = function(req, res) {
 };
 
 exports.leave = function(req, res) {
-
 	// TODO: check if the user is the last admin, and if so, prevent leaving
 	// TODO: if user is the last member, delete the group
 	var user = Parse.User.current();
 	var group;
-
 
 	var groupQuery = function(slug) {
         var query = new Parse.Query(Group);
@@ -161,7 +159,6 @@ exports.leave = function(req, res) {
 			res.flash("message", "You are no longer a member of " + group.get("name"));
 			res.redirect("/");
 		}, function(error) {
-
 			res.redirect("/group/" + req.params.slug);
 		}
 	);

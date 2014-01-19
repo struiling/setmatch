@@ -49,8 +49,7 @@ exports.save = function(req, res) {
 	});
 };
 
-exports.view = function(req, res) {
-	
+exports.view = function(req, res) {	
 	Parse.Cloud.run("getProfileData", {}).then( 
 		function(results) {
 		    res.render("profile", { 
