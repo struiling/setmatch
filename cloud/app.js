@@ -85,6 +85,7 @@ app.get('/group/:urlName/edit', requireUser, groupController.edit);
 // save edits to group info
 app.put('/group/:urlName', requireUser, groupController.save);
 //app.get('/group/:urlName/delete', requireUser, groupController.delete);
+app.get('/group/:urlName/leave', requireUser, groupController.leave);
 
 // invite another user to the group
 app.post('/group/:urlName/invite', requireUser, groupController.invite);

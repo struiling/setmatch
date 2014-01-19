@@ -100,7 +100,6 @@ Parse.Cloud.define("getProfileData", function(req, res) {
     var userProfile;
     var groupsInvited;
     //user.fetch();
-    console.log("getProfileData user: " + JSON.stringify(user));
 
     var query = new Parse.Query(Parse.User);
     query.include("groups.traits");
@@ -112,6 +111,7 @@ Parse.Cloud.define("getProfileData", function(req, res) {
             userGroups = result.get("groups");
             userProfile = result.get("profile");
             console.log("userProfile:" + JSON.stringify(userProfile));
+            console.log("invites:" + JSON.stringify(result.get("invitation")));
             groupsInvited = result.get("invitation").get("groups");
             console.log("groupsInvited:" + JSON.stringify(groupsInvited));
             customGroups = _.filter(userGroups, function(group) {
@@ -149,7 +149,6 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     Parse.Cloud.useMasterKey();
 
     var user = Parse.User.current();
-    console.log("req.user: " + JSON.stringify(user));
     var group = {};
 
     /*var addUserToRole = function(user, roleName) {
@@ -246,6 +245,41 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     });
 });
 
+Parse.Cloud.define("leaveGroup", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    var user = Parse.User.current();
+    var groupId = req.params.groupId;
+
+    var query = new Parse.Query(Parse.Role);
+    query.startsWith("name", groupId);
+    
+    query.find().then( 
+        function(roles) {
+            for (i in roles) {
+                roles[i].getUsers().remove(user);
+            }
+ 
+            var promise = new Parse.Promise();
+            Parse.Object.saveAll(roles, function (list, error) {
+                if (list) {
+                    console.log("promise list");
+                    promise.resolve(list);
+                } else {
+                    console.log("promise error");
+                    promise.reject(error);
+                }
+            });
+            return promise;
+        }
+    ).then(
+        function() {
+            res.success();
+        }, function(error) {
+            res.error(error);
+        }
+    );
+
+});
 Parse.Cloud.define("addInviteToUser", function(req, res) {
 
     Parse.Cloud.useMasterKey();

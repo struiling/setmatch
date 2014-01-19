@@ -99,6 +99,8 @@ exports.invite = function(req, res) {
 	console.log("JSON.stringify: " + JSON.stringify(membersJSON)); 
 	*/
 
+	//TODO: check if user is an admin before running addInviteToUser
+
 	// remove whitespace and split on comma, filter out duplicates
 	var inviteMemberList = _.unique(
 		req.body.inviteMembers.replace(/\s/g, '').split(',')
@@ -126,6 +128,41 @@ exports.join = function(req, res) {
 		}
 	);
 
+};
+
+exports.leave = function(req, res) {
+	//TODO: check if the user is the last admin, and if so, prevent leaving
+	// TODO: if user is the last member, delete the group
+	var user = Parse.User.current();
+	var group;
+
+	var groupQuery = function(urlName) {
+        var query = new Parse.Query(Group);
+        query.equalTo("urlName", urlName);
+        return query.first();
+    };
+    groupQuery(req.params.urlName).then(
+        function(result) {
+        	if (!result) {
+        		return Parse.Promise.error("You're not a member of this group.");
+        	}
+        	group = result;
+        	console.log("leave result: " + JSON.stringify(result));
+        	user.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+            return user.save().then(
+		    	function() {
+					return Parse.Cloud.run("leaveGroup", {groupId: group.id});
+				}
+			);
+        }
+	).then( 
+		function() {
+			res.flash("message", "You are no longer a member of " + group.get("name"));
+			res.redirect("/");
+		}, function(error) {
+			res.redirect("/group/" + req.params.urlName);
+		}
+	);
 };
 
 exports.new = function(req, res) {
@@ -173,6 +210,7 @@ exports.view = function(req, res) {
 	var group;
 	var members;
 	var invitations;
+	var isAdmin;
 
 	groupQuery(groupUrlName).then(
 		function(groupResult) {
@@ -183,7 +221,7 @@ exports.view = function(req, res) {
 				query.include("profile");
 				return query.find();
 			} else {
-				return Parse.Promise.error("You don't have permission to see this page");
+				return Parse.Promise.error("You don't have permission to see this page.");
 			}
 		}
 	).then( 
@@ -194,7 +232,6 @@ exports.view = function(req, res) {
 
 			var query = new Parse.Query(Invitation);
 			query.equalTo("groups", group);
-			
 			// only get email addresses. Doesn't matter whether they already have a SM account
 			query.select("email");
 			return query.find();
@@ -210,7 +247,7 @@ exports.view = function(req, res) {
 			});
 		},
 		function(error) {
-			res.flash("message", error.message);
+			res.flash("message", error);
 			res.redirect("/");	
 		}
 	);
