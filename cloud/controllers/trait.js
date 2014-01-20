@@ -50,6 +50,7 @@ exports.create = function(req, res) {
 };
 
 exports.delete = function(req, res) {
+	// Do most of this in afterDelete so the same functions will run on deleting a group
 	// TODO: remove pointer from traits array in Group
 	// TODO: clear all data that column in Profile
 	// TODO: delete column in Profile table (not currently possible)

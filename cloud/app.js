@@ -67,8 +67,8 @@ app.get('/logout', userController.logout);
 
 app.get('/profile/edit', requireUser, profileController.edit);
 app.get('/profile', requireUser, profileController.view);
+app.get('/profile/:slug', requireUser, profileController.view);
 
-app.get('/profile/save', requireUser, profileController.view);
 // TODO: change to app.put('/profile') and change in profile-edit.ejs
 app.post('/profile/save', requireUser, profileController.save);
 
@@ -96,22 +96,14 @@ app.get('/group/:slug/join', requireUser, groupController.join);
 
 // create new group trait (custom field)
 app.post('/group/:slug/trait', requireUser, traitController.create);
+// NOT SET UP YET
 // save edits group trait (custom field) definition
-app.put('/group/:slug/trait', requireUser, traitController.save);
-
+app.put('/trait/:traitId', requireUser, traitController.save);
+// NOT SET UP YET
 app.get('/trait/:traitId/delete', requireUser, traitController.save);
 
 /*app.get('/404', function(req, res) {
    res.render('404');
-});*/
-
-/*app.use(function(err, res, res, next) { 
-    console.log("in error1");
-    if (err.message.indexOf('NotFound') !== -1) { 
-        console.log("in error2");
-        res.status(404).send('Not found dude'); 
-
-    };
 });*/
 
 app.use(function(req, res) {
@@ -120,7 +112,7 @@ app.use(function(req, res) {
     //console.log("status2: " + res.status);
     if (req.accepts('html')) {
         console.log("accepts html");
-        res.render('404', {error: "Sorry, there isn't anything at " + req.url });
+        res.render('404', { 404url: req.url });
         return;
     }
 

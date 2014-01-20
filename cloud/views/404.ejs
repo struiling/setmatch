@@ -1,4 +1,11 @@
 <h1>Page not found</h1>
-<% if (typeof(error) !== "undefined") { %>
-	<p><%= error %></p>
-<% } %>
+
+<p>Sorry, there isn't anything to see
+	<% if (typeof(404url) !== "undefined") { %>
+		at <%= 404url %>!
+	<% } else { %>
+		here!
+	<% } %>
+
+	Go <a href="/">home</a>?
+</p>
