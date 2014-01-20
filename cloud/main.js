@@ -52,6 +52,7 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
         var query = new Parse.Query(Parse.User);
 
         // check if another user has this email address, and is not the one you're saving
+        // TODO: make sure slug is unique
         query.equalTo("email", req.object.get("email"));
         console.log("req.object.email: "+req.object.get("email"));
 
@@ -90,6 +91,96 @@ Parse.Cloud.afterDelete(Parse.User, function(req, res) {
     });
 });
 
+/*
+// TODO: make groups not be deletable if there are members other than the current member
+Parse.Cloud.beforeDelete("Group", function(req, res) {
+
+});
+*/
+Parse.Cloud.afterDelete("Group", function(req, res) {
+    // TODO: delete group members' Profile trait values that were part of this group
+    //       or move to background job that runs daily
+
+    Parse.Cloud.useMasterKey();
+    var group = req.object;
+    var traits = group.get("traits");
+
+    var userQuery = new Parse.Query(Parse.User);
+    userQuery.limit(1000);
+    userQuery.equalTo("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+    // userQuery.include("profile");
+    return userQuery.find().then( 
+        function(users) {
+            var promise = new Parse.Promise();
+            _.each(users, function(user) {
+                user.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+            });
+            
+            Parse.Object.saveAll(users, function (list, error) {
+                if (list) {
+                    promise.resolve(list);
+                } else {
+                    promise.reject(error);
+                }
+            });
+            return promise;
+        }
+    ).then(
+        function() {
+            var promise = new Parse.Promise();
+            Parse.Object.destroyAll(traits, function (list, error) {
+                if (list) {
+                    promise.resolve(list);
+                } else {
+                    promise.reject(error);
+                }
+            });
+            return promise;
+        }   
+    ).then(
+        function() {
+            var invitationQuery = new Parse.Query("Invitation");
+            invitationQuery.limit(1000);
+            invitationQuery.equalTo("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+            return invitationQuery.find().then( 
+                // TODO: check if results are undefined
+                function(invitations) {
+                    var promise = new Parse.Promise();
+                    _.each(invitations, function(invitation) {
+                        invitation.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                    });
+                    
+                    Parse.Object.saveAll(invitations, function (list, error) {
+                        if (list) {
+                            promise.resolve(list);
+                        } else {
+                            promise.reject(error);
+                        }
+                    });
+                    return promise;
+                }
+            );
+        }
+    ).then(
+        function() {
+            var roleQuery = new Parse.Query(Parse.Role);
+            roleQuery.startsWith("name", group.id);
+            return roleQuery.find().then( 
+                function(roles) {
+                    var promise = new Parse.Promise();
+                    Parse.Object.destroyAll(roles, function (list, error) {
+                        if (list) {
+                            promise.resolve(list);
+                        } else {
+                            promise.reject(error);
+                        }
+                    });
+                    return promise;
+                }
+            );
+        }
+    );
+});
 Parse.Cloud.define("getProfileData", function(req, res) {
     Parse.Cloud.useMasterKey();
 
@@ -474,6 +565,7 @@ Parse.Cloud.define("emailInvites", function(req, res) {
             }
         );
     }
+    // this may be buggy
     if (req.params.existingUsers.length > 0) {
         console.log("existingUsers: " + JSON.stringify(req.params.existingUsers));
         sendEmail(req.params.existingUsers, "You've been invited to join a SetMatch group!", 
@@ -493,7 +585,7 @@ Parse.Cloud.define("emailInvites", function(req, res) {
     }
 
     // ??
-    //res.success();
+    res.success();
 });
 
 /* Not currently in use */

@@ -1,4 +1,4 @@
-<!-- TODO: Add jQuery to make value of checkboxes "n" if unchecked -->
+<p><a href="/group/<%- group.get("slug") %>">View group</a></p>
 
 
 <form method="post" action="<%- '/group/' + group.get('slug') %>">
@@ -103,4 +103,4 @@
 <h3>Current members</h3>
 
 
-<p><a href="/group/<%- group.get("slug") %>">View group</a></p>
+<p><a href="/group/<%- group.get("slug") %>/delete">Delete this group (there is no undo)</a></p>

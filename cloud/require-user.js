@@ -15,7 +15,7 @@ module.exports = function(req, res, next) {
 		user.fetch().then(
 				function(result) {
 					res.locals.basicUser = user;
-			        console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
+			        // console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
 
 			        var profile = new Profile();
 					profile.id = user.get("profile").id;
@@ -24,7 +24,7 @@ module.exports = function(req, res, next) {
 			).then(
 	        	function(profile) {
 			        res.locals.basicProfile = profile;
-			        console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
+			        // console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
 
 			        var promises = [];
 			        var groups = [];
@@ -41,7 +41,7 @@ module.exports = function(req, res, next) {
 	        ).then(
 	        	function() {
 			        res.locals.basicGroups = basicGroups;
-			        console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
+			        // console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
 					next();
 		        },
 		        function(error) {

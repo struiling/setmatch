@@ -46,6 +46,34 @@ exports.create = function(req, res) {
     });
 };
 
+exports.delete = function(req, res) {
+	var user = Parse.User.current();
+    var group;
+    var groupQuery = new Parse.Query(Group);
+	groupQuery.equalTo("slug", req.params.slug);
+	groupQuery.first().then(
+		function(result) {
+			group = result;
+			
+    		return group.destroy();
+		}
+	).then(
+		function(promise) {
+			res.flash('message', "You've succesfully deleted the " + group.get("name") + ' group.');
+		    res.redirect('/');		
+		}, function(error) {
+			if (error.code == Parse.Error.AGGREGATE_ERROR) {
+		        for (var i = 0; i < error.errors.length; i++) {
+		          console.log("Couldn't delete " + error.errors[i].object.id + 
+		            "due to " + error.errors[i].message);
+		        }
+		    } else {
+		        console.log("Delete aborted because of " + error.message);
+		    }
+		}
+	);
+};
+
 exports.edit = function(req, res) {
 	var group;
 	var groupTraits;
@@ -56,12 +84,16 @@ exports.edit = function(req, res) {
 	// TODO: reformat ALL the promises to follow this indentation
 	groupQuery.first().then(
 		function(result) {
-			group = result;
-			groupTraits = group.get("traits");
-			console.log("Query for edit: " + JSON.stringify(group));
-			var roleQuery = new Parse.Query(Parse.Role);
-			roleQuery.equalTo("name", group.id + "_admin");
-			return roleQuery.first();
+			if (result != null) {
+				group = result;
+				groupTraits = group.get("traits");
+				console.log("Query for edit: " + JSON.stringify(group));
+				var roleQuery = new Parse.Query(Parse.Role);
+				roleQuery.equalTo("name", group.id + "_admin");
+				return roleQuery.first();
+			} else {
+				return Parse.Promise.error("You don't have permission to see this page.");	
+			}
 		}
 	).then(
 		function(role) {
@@ -85,6 +117,7 @@ exports.edit = function(req, res) {
 			}
 	    },
 	    function(error) {
+			res.flash("message", "Group not found.");	
 			res.redirect("/");	
 		}
 	);			
