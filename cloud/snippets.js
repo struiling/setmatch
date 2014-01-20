@@ -32,6 +32,17 @@ if ( req.headers["HTTP_X_REQUESTED_WITH"] === "XMLHttpRequest" ) {
   res.render(...);
 }
 
+// Example reading from the request query string of an HTTP get request.
+app.get('/test', function(req, res) {
+   // GET http://example.parseapp.com/test?message=hello
+   res.send(req.query.message);
+});
+
+// Example reading from the request body of an HTTP post request.
+app.post('/test', function(req, res) {
+   // POST http://example.parseapp.com/test (with request body "message=hello")
+   res.send(req.body.message);
+});
 
 /* Promises with saveAll() */
 var promise = new Parse.Promise();
@@ -42,7 +53,6 @@ Parse.Object.saveAll(modifiedInvitationObjects, function (list, error) {
         promise.reject(error);
     }
 });
-
 return promise;
 
 /* for afterSave. check if object was newly created. Essentially afterCreate */
@@ -62,7 +72,6 @@ settings.my_password // 'value'
 
 /* chained/nested promises */
 object.save().then(function (savedObject) {
-
 	return someOtherObject.save().then(
 		function (someOtherSavedObject) {
     		// do stuff

@@ -69,6 +69,7 @@ app.get('/profile/edit', requireUser, profileController.edit);
 app.get('/profile', requireUser, profileController.view);
 
 app.get('/profile/save', requireUser, profileController.view);
+// TODO: change to app.put('/profile') and change in profile-edit.ejs
 app.post('/profile/save', requireUser, profileController.save);
 
 // view group creation form
@@ -100,18 +101,33 @@ app.put('/group/:slug/trait', requireUser, traitController.save);
 
 app.get('/trait/:traitId/delete', requireUser, traitController.save);
 
+/*app.get('/404', function(req, res) {
+   res.render('404');
+});*/
 
-// // Example reading from the request query string of an HTTP get request.
-// app.get('/test', function(req, res) {
-//   // GET http://example.parseapp.com/test?message=hello
-//   res.send(req.query.message);
-// });
+/*app.use(function(err, res, res, next) { 
+    console.log("in error1");
+    if (err.message.indexOf('NotFound') !== -1) { 
+        console.log("in error2");
+        res.status(404).send('Not found dude'); 
 
-// // Example reading from the request body of an HTTP post request.
-// app.post('/test', function(req, res) {
-//   // POST http://example.parseapp.com/test (with request body "message=hello")
-//   res.send(req.body.message);
-// });
+    };
+});*/
+
+app.use(function(req, res) {
+    //console.log("status1: " + res.status);
+    //res.status(404);
+    //console.log("status2: " + res.status);
+    if (req.accepts('html')) {
+        console.log("accepts html");
+        res.render('404', {error: "Sorry, there isn't anything at " + req.url });
+        return;
+    }
+
+    if (req.accepts('json')) {
+        res.send({ title: '404: Page not found', error: '404: Page not found', url: req.url });
+    }
+});
 
 // Attach the Express app to Cloud Code.
 app.listen();
