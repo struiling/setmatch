@@ -50,7 +50,7 @@ exports.delete = function(req, res) {
 	var user = Parse.User.current();
     var group;
     var groupQuery = new Parse.Query(Group);
-	groupQuery.equalTo("slug", req.params.slug);
+	groupQuery.equalTo("slug", req.params.groupSlug);
 	groupQuery.first().then(
 		function(result) {
 			group = result;
@@ -79,7 +79,7 @@ exports.edit = function(req, res) {
 	var groupTraits;
 
 	var groupQuery = new Parse.Query(Group);
-	groupQuery.equalTo("slug", req.params.slug);
+	groupQuery.equalTo("slug", req.params.groupSlug);
 	groupQuery.include("traits");
 	// TODO: reformat ALL the promises to follow this indentation
 	groupQuery.first().then(
@@ -141,7 +141,7 @@ exports.invite = function(req, res) {
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
 	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.body.group }).then(
 		function() {
-			res.redirect('/group/' + req.params.slug + "/edit");		
+			res.redirect('/group/' + req.params.groupSlug + "/edit");		
 		}
 	);
 
@@ -153,7 +153,7 @@ exports.invite = function(req, res) {
 exports.join = function(req, res) {
 	var user = Parse.User.current();
 	
-	Parse.Cloud.run("addUserToGroup", { group: req.params.slug }).then( 
+	Parse.Cloud.run("addUserToGroup", { group: req.params.groupSlug }).then( 
 		function(message) {
 			res.flash("message", message);
 			res.redirect('back');
@@ -173,7 +173,7 @@ exports.leave = function(req, res) {
         query.equalTo("slug", slug);
         return query.first();
     };
-    groupQuery(req.params.slug).then(
+    groupQuery(req.params.groupSlug).then(
         function(result) {
         	if (!result) {
         		return Parse.Promise.error("You're not a member of this group.");
@@ -192,7 +192,7 @@ exports.leave = function(req, res) {
 			res.flash("message", "You are no longer a member of " + group.get("name"));
 			res.redirect("/");
 		}, function(error) {
-			res.redirect("/group/" + req.params.slug);
+			res.redirect("/group/" + req.params.groupSlug);
 		}
 	);
 };
@@ -214,7 +214,7 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {
-	var groupslug = req.params.slug;
+	var groupSlug = req.params.groupSlug;
 
 	var groupQuery = function(slug) {
 		var query = new Parse.Query(Group);
@@ -245,7 +245,7 @@ exports.view = function(req, res) {
 	var invitations;
 	var isAdmin;
 
-	groupQuery(groupslug).then(
+	groupQuery(groupSlug).then(
 		function(groupResult) {
 			group = groupResult;
 			if (group != null) {

@@ -40,8 +40,8 @@ exports.create = function(req, res) {
 			return group.save();
 		}
 	).then(
-		function () {
-    		res.redirect('/group/' + req.params.slug + '/edit');
+		function (result) {
+    		res.redirect('/group/' + result.get("slug") + '/edit');
 		}, 
 		function(error) {
 			res.send(500, "Could not create trait: " + error.message);

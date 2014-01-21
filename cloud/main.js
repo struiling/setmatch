@@ -182,45 +182,54 @@ Parse.Cloud.afterDelete("Group", function(req, res) {
     );
 });
 Parse.Cloud.define("getProfileData", function(req, res) {
-    Parse.Cloud.useMasterKey();
 
-    var user = Parse.User.current();
+    var user;
     var userGroups;
     var customGroups;
     var globalGroup;
     var userProfile;
     var groupsInvited;
     //user.fetch();
+    console.log("slug: " + req.params.userSlug);
 
-    var query = new Parse.Query(Parse.User);
-    query.include("groups.traits");
-    query.include("profile");
-    query.include("invitation.groups");
-    query.get(user.id);
-    query.first().then( 
+    var userQuery = new Parse.Query(Parse.User);
+    if (Parse.User.current().get("slug") == req.params.userSlug) {
+        console.log("You're looking at your own profile");
+        Parse.Cloud.useMasterKey();
+        userQuery.include("invitation.groups");
+    }
+    userQuery.include("groups.traits");
+    userQuery.include("profile");
+    userQuery.equalTo("slug", req.params.userSlug);
+    userQuery.first().then( 
         function(result) {
-            userGroups = result.get("groups");
-            userProfile = result.get("profile");
-            console.log("userProfile:" + JSON.stringify(userProfile));
-            console.log("invites:" + JSON.stringify(result.get("invitation")));
-            groupsInvited = result.get("invitation").get("groups");
-            console.log("groupsInvited:" + JSON.stringify(groupsInvited));
-            customGroups = _.filter(userGroups, function(group) {
-                 return group.id !== settings.global.group;
-            });
-            console.log("customGroups: " + JSON.stringify(customGroups));
-            globalGroup = _.first(_.filter(userGroups, function(group) {
-                 return group.id == settings.global.group;
-            }));
-            console.log("globalGroup: " + JSON.stringify(globalGroup));
+            if (result != null) {
+                user = result;
+                userGroups = result.get("groups");
+                userProfile = result.get("profile");
+                console.log("userProfile:" + JSON.stringify(userProfile));
+                console.log("invites:" + JSON.stringify(result.get("invitation")));
+                groupsInvited = result.get("invitation").get("groups");
+                console.log("groupsInvited:" + JSON.stringify(groupsInvited));
+                customGroups = _.filter(userGroups, function(group) {
+                     return group.id !== settings.global.group;
+                });
+                console.log("customGroups: " + JSON.stringify(customGroups));
+                globalGroup = _.first(_.filter(userGroups, function(group) {
+                     return group.id == settings.global.group;
+                }));
+                console.log("globalGroup: " + JSON.stringify(globalGroup));
 
-            res.success( {
-                user: user, 
-                customGroups: customGroups, 
-                globalGroup: globalGroup, 
-                userProfile: userProfile, 
-                groupsInvited: groupsInvited
-            } );
+                res.success( {
+                    user: user, 
+                    customGroups: customGroups, 
+                    globalGroup: globalGroup, 
+                    userProfile: userProfile, 
+                    groupsInvited: groupsInvited
+                });
+            } else {
+                res.success(error.message);    
+            }
         }, function(error) {
             res.error(error);
         }

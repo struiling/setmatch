@@ -6,7 +6,7 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
-<h1><%= basicProfile.get(settings.global.fname) %> <%= basicProfile.get(settings.global.lname) %></h1>
+<h1><%= profile.get(settings.global.fname) %> <%= profile.get(settings.global.lname) %></h1>
 <h2>Basic information</h2>
 <h5>Email address</h5>
 <p><%= user.getEmail() %></p>
@@ -74,5 +74,6 @@
 
 <br />
 
-
-<p><a href="/profile/edit">Edit profile</a></p>
+<% if (selfView) { %>
+	<p><a href="/profile/edit">Edit profile</a></p>
+<% } %>

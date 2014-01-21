@@ -50,18 +50,25 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {	
-	Parse.Cloud.run("getProfileData", {}).then( 
+	var params = {userSlug: req.params.userSlug};
+	if (Parse.User.current().get("slug") == req.params.userSlug) {
+		params.selfView = true;
+	}
+	Parse.Cloud.run("getProfileData", params).then( 
 		function(results) {
 		    res.render("profile", { 
 		    	user: results.user,
 		    	customGroups: results.customGroups, 
 		    	globalGroup: results.globalGroup, 
 		    	invites: results.groupsInvited, 
-		    	profile: results.userProfile 
+		    	profile: results.userProfile,
+		    	selfView: params.selfView
 		    });
 		},	
 		function(error) {
-			res.error(error.message);
+			//res.error(error.message);
+			res.flashify("message", "That user does not exist.");
+			res.redirect("/");
 		}
 	);
 

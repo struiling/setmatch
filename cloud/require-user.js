@@ -15,7 +15,7 @@ module.exports = function(req, res, next) {
 		user.fetch().then(
 				function(result) {
 					res.locals.basicUser = user;
-			        // console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
+			        console.log("basicUser: " + JSON.stringify(res.locals.basicUser));
 
 			        var profile = new Profile();
 					profile.id = user.get("profile").id;

@@ -66,8 +66,11 @@ app.post('/reset', userController.reset);
 app.get('/logout', userController.logout);
 
 app.get('/profile/edit', requireUser, profileController.edit);
-app.get('/profile', requireUser, profileController.view);
-app.get('/profile/:slug', requireUser, profileController.view);
+// TODO: change this to redirect to /profile/:slug for current user's slug?
+app.get('/profile', requireUser, function(req, res) {
+   res.redirect('/profile/' + res.locals.basicUser.get("slug"));
+});
+app.get('/profile/:userSlug', requireUser, profileController.view);
 
 // TODO: change to app.put('/profile') and change in profile-edit.ejs
 app.post('/profile/save', requireUser, profileController.save);
@@ -80,26 +83,26 @@ app.post('/group/create', requireUser, groupController.create);
 // app.post('/group/save', requireUser, groupController.save);
 
 // view group info
-app.get('/group/:slug', requireUser, groupController.view);
+app.get('/group/:groupSlug', requireUser, groupController.view);
 // view group edit form
-app.get('/group/:slug/edit', requireUser, groupController.edit);
+app.get('/group/:groupSlug/edit', requireUser, groupController.edit);
 // save edits to group info
 
-app.put('/group/:slug', requireUser, groupController.save);
-app.get('/group/:slug/delete', requireUser, groupController.delete);
-app.get('/group/:slug/leave', requireUser, groupController.leave);
+app.put('/group/:groupSlug', requireUser, groupController.save);
+app.get('/group/:groupSlug/delete', requireUser, groupController.delete);
+app.get('/group/:groupSlug/leave', requireUser, groupController.leave);
 
 // invite another user to the group
-app.post('/group/:slug/invite', requireUser, groupController.invite);
+app.post('/group/:groupSlug/invite', requireUser, groupController.invite);
 // accept invitation to a group
-app.get('/group/:slug/join', requireUser, groupController.join);
+app.get('/group/:groupSlug/join', requireUser, groupController.join);
 
 // create new group trait (custom field)
-app.post('/group/:slug/trait', requireUser, traitController.create);
-// NOT SET UP YET
+app.post('/trait/create', requireUser, traitController.create);
+// TODO: NOT SET UP YET
 // save edits group trait (custom field) definition
 app.put('/trait/:traitId', requireUser, traitController.save);
-// NOT SET UP YET
+// TODO: NOT SET UP YET
 app.get('/trait/:traitId/delete', requireUser, traitController.save);
 
 /*app.get('/404', function(req, res) {
@@ -112,7 +115,7 @@ app.use(function(req, res) {
     //console.log("status2: " + res.status);
     if (req.accepts('html')) {
         console.log("accepts html");
-        res.render('404', { 404url: req.url });
+        res.render('404', { url: req.url });
         return;
     }
 
