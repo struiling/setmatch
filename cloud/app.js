@@ -33,12 +33,12 @@ app.use(express.cookieSession());
 app.use(flashify);
 app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
 
-// Globals in EJS templates
+// Globals
 app.locals._ = _;
+app.locals.settings = require('cloud/settings');
 app.locals.copyrightDate = function(){
     return moment().format("YYYY");
 }
-app.locals.settings = require('cloud/settings');
 
 app.use(app.router);				// Explicitly user route handlers, even though Express would add it otherwise
 

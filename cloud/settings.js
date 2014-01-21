@@ -1,9 +1,8 @@
 var settings = {}
 
 settings.global = {};
-
-settings.global.fname = 't_KkuUBNivsq';
-settings.global.lname = 't_OrKo4Sq2qu';
-settings.global.group = 'HtG1VVlVtX';
+settings.global.fname = 'KkuUBNivsq';
+settings.global.lname = 'OrKo4Sq2qu';
+settings.global.groupId = 'HtG1VVlVtX';
 
 module.exports = settings;

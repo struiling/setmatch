@@ -71,8 +71,8 @@ exports.new = function(req, res) {
 			}
 			
 			var profile = new Profile();
-			profile.set(settings.global.fname, req.body.fname);
-			profile.set(settings.global.lname, req.body.lname);
+			profile.set("t_" + "t_" + settings.global.fname, req.body.fname);
+			profile.set("t_" + settings.global.lname, req.body.lname);
 
 	    	user.set("profile", profile);
 	    	return user.save();

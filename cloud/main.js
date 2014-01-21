@@ -211,14 +211,16 @@ Parse.Cloud.define("getProfileData", function(req, res) {
                 console.log("invites:" + JSON.stringify(result.get("invitation")));
                 groupsInvited = result.get("invitation").get("groups");
                 console.log("groupsInvited:" + JSON.stringify(groupsInvited));
-                customGroups = _.filter(userGroups, function(group) {
-                     return group.id !== settings.global.group;
-                });
-                console.log("customGroups: " + JSON.stringify(customGroups));
-                globalGroup = _.first(_.filter(userGroups, function(group) {
-                     return group.id == settings.global.group;
-                }));
-                console.log("globalGroup: " + JSON.stringify(globalGroup));
+                if (userGroups.length > 0) {
+                    customGroups = _.filter(userGroups, function(group) {
+                         return group.id !== settings.global.groupId;
+                    });
+                    console.log("customGroups: " + JSON.stringify(customGroups));
+                    globalGroup = _.first(_.filter(userGroups, function(group) {
+                         return group.id == settings.global.groupId;
+                    }));
+                    console.log("globalGroup: " + JSON.stringify(globalGroup));
+                }
 
                 res.success( {
                     user: user, 
@@ -268,7 +270,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     groupQuery.first().then(
         function(groupResult) {
             if (req.params.isGlobal) {
-                group.id = settings.global.group;
+                group.id = settings.global.groupId;
                 return;
             } else {
                 group = groupResult;
@@ -338,11 +340,14 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
             role.save();
             
         }
-    ).then( function() {
-        res.success("You've joined " + group.get("name"));
-    }, function(error) {
-        res.error(error);
-    });
+    ).then( 
+        function() {
+            res.success("You've joined " + group.get("name"));
+        },
+        function(error) {
+            res.error(error);
+        }
+    );
 });
 
 Parse.Cloud.define("leaveGroup", function(req, res) {
@@ -433,7 +438,7 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
 
                     existingUserRecipients.push( { 
                         'email': user.get("email"),
-                        'name': user.get("profile").get(settings.global.fname)
+                        'name': user.get("profile").get("t_" + settings.global.fname)
                     } );
 
                     // Add an invite to this user's existing invites.

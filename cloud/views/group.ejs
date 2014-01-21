@@ -10,7 +10,7 @@
 
 <ul>
 	<% _.each(members, function(member, i) { %>
-		<li><a href="/group/#"><%= member.get("profile").get(settings.global.fname) %> <%= member.get("profile").get(settings.global.lname) %></a><br /></li>
+		<li><a href="/group/#"><%= member.get("profile").get("t_" + settings.global.fname) %> <%= member.get("profile").get("t_" + settings.global.lname) %></a><br /></li>
 	<% } ) %>
 </ul>
 <% if (invitations && invitations.length > 0) { %>

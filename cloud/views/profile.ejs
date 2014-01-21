@@ -6,7 +6,7 @@
 <% if (typeof(message) !== 'undefined') { %>
 	<p><%= message %></p>
 <% } %>
-<h1><%= profile.get(settings.global.fname) %> <%= profile.get(settings.global.lname) %></h1>
+<h1><%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></h1>
 <h2>Basic information</h2>
 <h5>Email address</h5>
 <p><%= user.getEmail() %></p>

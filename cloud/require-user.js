@@ -24,12 +24,12 @@ module.exports = function(req, res, next) {
 			).then(
 	        	function(profile) {
 			        res.locals.basicProfile = profile;
-			        // console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
+			        console.log("basicProfile: " + JSON.stringify(res.locals.basicProfile));
 
 			        var promises = [];
 			        var groups = [];
 					customGroups = _.filter(user.get("groups"), function(group) {
-		                return group.id !== settings.global.group;
+		                return group.id !== settings.global.groupId;
 		            });
 			        _.each(customGroups, function(group) {
 			        	basicGroups.push(group);
@@ -41,8 +41,16 @@ module.exports = function(req, res, next) {
 	        ).then(
 	        	function() {
 			        res.locals.basicGroups = basicGroups;
-			        // console.log("basicGroups: " + JSON.stringify(res.locals.basicGroups));
-					next();
+				    var group = new Group();
+				    group.id = settings.global.groupId;
+				    return group.fetch();
+				    }
+	        ).then(	      
+	        // TODO: move this to app.locals?
+    		    function(globalGroup) {
+		            console.log("require-user globalGroup: " + JSON.stringify(globalGroup));
+		            res.locals.globalGroup = globalGroup;
+					next();			        
 		        },
 		        function(error) {
 		        	// Render error page.
