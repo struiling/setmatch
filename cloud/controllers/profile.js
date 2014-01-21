@@ -49,22 +49,30 @@ exports.save = function(req, res) {
 };
 
 exports.view = function(req, res) {	
+	var user = Parse.User.current();
 	var params = {};
-	if (Parse.User.current().get("slug") == req.params.userSlug) {
+	console.log("view slug: " + req.params.userSlug);
+    console.log("view my slug: " + user.get("slug"));
+	if (user.get("slug") == req.params.userSlug) {
 		params.selfView = true;
-		params.userSlug = Parse.User.current().get("slug");
-	} else {
 		params.userSlug = user.get("slug");
+	} else {
+		params.userSlug = req.params.userSlug;
 	}
 	Parse.Cloud.run("getProfileData", params).then( 
 		function(results) {
-		    res.render("profile", { 
-		    	user: results.user,
-		    	customGroups: results.customGroups, 
-		    	invites: results.groupsInvited, 
-		    	profile: results.userProfile,
-		    	selfView: params.selfView
-		    });
+			console.log("results.profile: " + JSON.stringify(results.userProfile));
+			if (results.userProfile !== undefined) {
+			    res.render("profile", { 
+			    	user: results.user,
+			    	customGroups: results.customGroups, 
+			    	invites: results.groupsInvited, 
+			    	profile: results.userProfile,
+			    	selfView: params.selfView
+			    });
+			} else {
+				res.render("404");
+			}
 		},	
 		function(error) {
 			//res.error(error.message);

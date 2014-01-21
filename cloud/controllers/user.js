@@ -44,7 +44,7 @@ exports.new = function(req, res) {
 	user.set("email", req.body.email.toLowerCase());
 	user.set("password", req.body.password);
 	user.set("gravatar", gravatar.url(req.body.email, {}, true) );
-	user.set("slug", req.body.slug);
+	user.set("slug", req.body.slug.toLowerCase());
 	
 	user.signUp().then( 
 		function() {
@@ -71,7 +71,7 @@ exports.new = function(req, res) {
 			}
 			
 			var profile = new Profile();
-			profile.set("t_" + "t_" + settings.global.fname, req.body.fname);
+			profile.set("t_" + settings.global.fname, req.body.fname);
 			profile.set("t_" + settings.global.lname, req.body.lname);
 
 	    	user.set("profile", profile);
