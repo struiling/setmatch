@@ -10,7 +10,6 @@ exports.edit = function(req, res) {
 		    res.render("profile-edit", { 
 		    	user: results.user,
 		    	customGroups: results.customGroups, 
-		    	globalGroup: results.globalGroup, 
 		    	invites: results.groupsInvited, 
 		    	profile: results.userProfile 
 		    });
@@ -55,7 +54,6 @@ exports.view = function(req, res) {
 		params.selfView = true;
 		params.userSlug = Parse.User.current().get("slug");
 	} else {
-		var user = Parse.User.current();
 		params.userSlug = user.get("slug");
 	}
 	Parse.Cloud.run("getProfileData", params).then( 
@@ -63,7 +61,6 @@ exports.view = function(req, res) {
 		    res.render("profile", { 
 		    	user: results.user,
 		    	customGroups: results.customGroups, 
-		    	//globalGroup: results.globalGroup, 
 		    	invites: results.groupsInvited, 
 		    	profile: results.userProfile,
 		    	selfView: params.selfView

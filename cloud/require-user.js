@@ -42,9 +42,11 @@ module.exports = function(req, res, next) {
 	        	function() {
 			        res.locals.basicGroups = basicGroups;
 				    var group = new Group();
-				    group.id = settings.global.groupId;
-				    return group.fetch();
-				    }
+					var groupQuery = new Parse.Query(Group);
+					groupQuery.get(settings.global.groupId);
+					groupQuery.include("traits");
+					return groupQuery.first();
+			    }
 	        ).then(	      
 	        // TODO: move this to app.locals?
     		    function(globalGroup) {

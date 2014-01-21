@@ -31,7 +31,8 @@ app.use(express.methodOverride()); // Allow HTML forms to do other RESTful calls
 app.use(express.cookieParser('YOUR_SIGNING_SECRET')); /* TODO: change this */
 app.use(express.cookieSession());
 app.use(flashify);
-app.use(parseExpressCookieSession({ cookie: { maxAge: 36000000 } }));
+// number in millseconds
+app.use(parseExpressCookieSession({ cookie: { maxAge: 86400000 } }));
 
 // Globals
 app.locals._ = _;

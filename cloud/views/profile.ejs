@@ -10,7 +10,7 @@
 <h2>Basic information</h2>
 <h5>Email address</h5>
 <p><%= user.getEmail() %></p>
-
+<%= JSON.stringify(settings.global.group) %>
 <% _.each(globalGroup.get("traits"), function(trait) { %>
 	<h5><%= trait.get("name") %></h5>
 

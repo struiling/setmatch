@@ -186,7 +186,6 @@ Parse.Cloud.define("getProfileData", function(req, res) {
     var user;
     var userGroups;
     var customGroups;
-    var globalGroup;
     var userProfile;
     var groupsInvited;
     //user.fetch();
@@ -216,16 +215,11 @@ Parse.Cloud.define("getProfileData", function(req, res) {
                          return group.id !== settings.global.groupId;
                     });
                     console.log("customGroups: " + JSON.stringify(customGroups));
-                    globalGroup = _.first(_.filter(userGroups, function(group) {
-                         return group.id == settings.global.groupId;
-                    }));
-                    console.log("globalGroup: " + JSON.stringify(globalGroup));
                 }
 
                 res.success( {
                     user: user, 
                     customGroups: customGroups, 
-                    globalGroup: globalGroup, 
                     userProfile: userProfile, 
                     groupsInvited: groupsInvited
                 });

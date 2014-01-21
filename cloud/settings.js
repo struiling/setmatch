@@ -1,3 +1,5 @@
+var Group = Parse.Object.extend("Group");
+
 var settings = {}
 
 settings.global = {};
