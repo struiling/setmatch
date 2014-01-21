@@ -73,20 +73,9 @@ Parse.Cloud.afterSave(Parse.User, function(req, res) {
     if (!req.object.existed()) {
         var user = req.user; 
         console.log("only for new users: " + JSON.stringify(user));
-        Parse.Cloud.run("addUserToGroup", { isGlobal: true} ).then(
+        user.fetch().then(
             function() {
-                Parse.Cloud.useMasterKey();
-                
-                var acl = new Parse.ACL(user);  
-                acl.setPublicReadAccess(false);
-                user.setACL(acl);
-                user.get("profile").setACL(acl);
-                //user.get("invitation").setACL(acl);
-                return user.save();     
-            }
-        ).then(
-            function(user) {
-                console.log("ACLed user? " + JSON.stringify(user));
+                return Parse.Cloud.run("addUserToGroup", { isGlobal: true} );
             }
         );
     }
@@ -99,12 +88,15 @@ Parse.Cloud.afterDelete(Parse.User, function(req, res) {
     var invitation = new Invitation();
     invitation = req.object.get("invitation");
 
-    Parse.Object.destroyAll([profile, invitation], {
-        success: function() {},
-        error: function(error) {
-          console.error("Error deleting related user data. " + error.code + ": " + error.message);
+    var promise = new Parse.Promise();
+    Parse.Object.destroyAll([profile, invitation], function (list, error) {
+        if (list) {
+            promise.resolve(list);
+        } else {
+            promise.reject(error);
         }
     });
+    return promise;
 });
 
 /*

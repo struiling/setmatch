@@ -57,24 +57,29 @@ exports.new = function(req, res) {
 		}
 	).then( 
 		function(existingInvitation) {
+			var acl = new Parse.ACL(user);
 
-			// TODO: convert to CloudCode. Invitations should be restricted by ACL
+			// TODO: convert to CloudCode bc invitations should be locked down by ACL when they are created. 
 			if (existingInvitation) {
 				// match up existing Invitation with new User
 				console.log("invitation");
 				user.set("invitation", existingInvitation);
+				existingInvitation.setACL(acl);
 			} else {
 				// user has never been invited. Create new Invitation row and associate it
 				var invitation = new Invitation();
 				user.set("invitation", invitation);
 				invitation.set("email", user.get("email"));
+				invitation.setACL(acl);
 			}
 			
 			var profile = new Profile();
 			profile.set("t_" + settings.global.fname, req.body.fname);
 			profile.set("t_" + settings.global.lname, req.body.lname);
+			profile.setACL(acl);
 
 	    	user.set("profile", profile);
+	    	user.setACL(acl);
 	    	return user.save();
 		}
 	).then(
@@ -85,7 +90,7 @@ exports.new = function(req, res) {
 		function(error) {
 			// Show the error message somewhere and let the user try again.
 		    //res.send(500, "Error: " + error.code + " " + error.message);
-		    res.flash("message", "Oops! Something went wrong." + error.message);
+		    res.flash("message", error.message);
 		    res.redirect("/");
 		}
 	);
