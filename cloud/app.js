@@ -12,6 +12,7 @@ var _ = require('underscore');
 /* stuff I wrote */
 var requireUser = require('cloud/require-user');
 var groupController = require('cloud/controllers/group.js');
+var matchController = require('cloud/controllers/match.js');
 var profileController = require('cloud/controllers/profile.js');
 var traitController = require('cloud/controllers/trait.js');
 var userController = require('cloud/controllers/user.js');
@@ -110,7 +111,13 @@ app.post('/trait/create', requireUser, traitController.create);
 // save edits group trait (custom field) definition
 app.put('/trait/:traitId', requireUser, traitController.save);
 // TODO: NOT SET UP YET
-app.get('/trait/:traitId/delete', requireUser, traitController.save);
+app.get('/trait/:traitId/delete', requireUser, traitController.delete);
+
+// view the landscape of values for a trait
+app.get('/match/:traitId', requireUser, matchController.view);
+
+// traits passed in in the GET, e.g. ?KkuUBNivsq=Sarah
+//app.get('/match', requireUser, matchController.match);
 
 // TODO: change with below 404 function to keep the URL that's 404ing
 app.get('/404', requireUser, function(req, res) {
@@ -125,10 +132,10 @@ app.use(function(req, res) {
     if (req.accepts('html')) {
         console.log("accepts html");
         if (Parse.User.current()) {
+            // TODO: this doesn't keep the URL
             res.redirect("/404");
         } else {
-            res.status(404).end('error');
-            //.render('404', { url: req.url });
+            res.render('404', { url: req.url });
             
         }
 
