@@ -154,8 +154,8 @@ exports.join = function(req, res) {
 	var user = Parse.User.current();
 	
 	Parse.Cloud.run("addUserToGroup", { group: req.params.groupSlug }).then( 
-		function(message) {
-			res.flash("message", "You've joined " + group.get("name"));
+		function(group) {
+			res.flash("message", "You've joined " + group.get("name") + ".");
 			res.redirect('back');
 		}
 	);

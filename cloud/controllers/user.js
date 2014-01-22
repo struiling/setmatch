@@ -90,7 +90,7 @@ exports.new = function(req, res) {
 		function(error) {
 			// Show the error message somewhere and let the user try again.
 		    //res.send(500, "Error: " + error.code + " " + error.message);
-		    res.flash("message", error.message);
+		    res.flash("message", error.code + ": " + error.message);
 		    res.redirect("/");
 		}
 	);
@@ -105,7 +105,7 @@ exports.reset = function(req, res) {
 		},
 		error: function(error) {
 	    // Show the error message somewhere
-			alert("Error: " + error.code + " " + error.message);
+			console.log("Error: " + error.code + " " + error.message);
 	  	}
 	});
 

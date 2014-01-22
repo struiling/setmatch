@@ -311,6 +311,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
             //console.log("inviteMatch: " + inviteMatch);
 
             if (invitation != undefined) {
+                console.log("invitation != undefined");
                 user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
                 invitation.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
                 
@@ -333,19 +334,22 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
         }
     ).then(
         function() {
+            console.log("querying for role");
             var roleQuery = new Parse.Query(Parse.Role);
             roleQuery.equalTo("name", group.id + "_member");
             return roleQuery.first();
         }
     ).then( 
         function(role) {
+            console.log("saving role");
             role.getUsers().add(user);      
             return role.save();            
         }
     ).then( 
         function() {
+            console.log("almost there");
             if(!req.params.isGlobal) { 
-                res.success( {group: group.get("name")} );
+                res.success(group);
             } else {
                 res.success();
             }
