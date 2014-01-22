@@ -73,14 +73,13 @@ exports.new = function(req, res) {
 				invitation.setACL(acl);
 			}
 			
-	    	user.set("profile", profile);
-	    	user.setACL(acl);
-	    	
 			var profile = new Profile();
 			profile.set("t_" + settings.global.fname, req.body.fname);
 			profile.set("t_" + settings.global.lname, req.body.lname);
 			profile.setACL(acl);
 
+	    	user.set("profile", profile);
+	    	user.setACL(acl);
 	    	return user.save();
 		}
 	).then(
