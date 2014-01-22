@@ -43,6 +43,12 @@ app.locals.copyrightDate = function(){
 
 app.use(app.router);				// Explicitly user route handlers, even though Express would add it otherwise
 
+/*app.use(function(req, res, next) {
+res.locals.session = req.session;
+next();
+});
+*/
+
 // Routes routes routes
 app.get('/', requireUser, profileController.view);
 
@@ -106,17 +112,26 @@ app.put('/trait/:traitId', requireUser, traitController.save);
 // TODO: NOT SET UP YET
 app.get('/trait/:traitId/delete', requireUser, traitController.save);
 
-/*app.get('/404', function(req, res) {
+// TODO: change with below 404 function to keep the URL that's 404ing
+app.get('/404', requireUser, function(req, res) {
    res.render('404');
-});*/
+});
 
 app.use(function(req, res) {
     //console.log("status1: " + res.status);
     //res.status(404);
     //console.log("status2: " + res.status);
+    // TODO: convert requireUser to something involving req.session
     if (req.accepts('html')) {
         console.log("accepts html");
-        res.render('404', { url: req.url });
+        if (Parse.User.current()) {
+            res.redirect("/404");
+        } else {
+            res.status(404).end('error');
+            //.render('404', { url: req.url });
+            
+        }
+
         return;
     }
 
@@ -124,6 +139,46 @@ app.use(function(req, res) {
         res.send({ title: '404: Page not found', error: '404: Page not found', url: req.url });
     }
 });
+
+/* other error cases
+app.use( function(err, req, res, next) {
+    // curl https://localhost:4000/error/403 -vk
+    // curl https://localhost:4000/error/403 -vkH "Accept: application/json"
+    var statusCode = err.status || 500;
+    var statusText = '';
+    var errorDetail = (process.env.NODE_ENV === 'production') ? 'Sorry about this error' : err.stack;
+
+    switch (statusCode) {
+    case 400:
+      statusText = 'Bad Request';
+      break;
+    case 401:
+      statusText = 'Unauthorized';
+      break;
+    case 403:
+      statusText = 'Forbidden';
+      break;
+    case 500:
+      statusText = 'Internal Server Error';
+      break;
+    }
+
+    res.status(statusCode);
+
+    if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'test') {
+      console.log(errorDetail);
+    }
+
+    if (req.accepts('html')) {
+      res.render('error/500', { title: statusCode + ': ' + statusText, error: errorDetail, url: req.url });
+      return;
+    }
+
+    if (req.accepts('json')) {
+      res.send({ title: statusCode + ': ' + statusText, error: errorDetail, url: req.url });
+    }
+  });
+*/
 
 // Attach the Express app to Cloud Code.
 app.listen();

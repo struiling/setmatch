@@ -1,0 +1,149 @@
+https://www.parse.com/questions/saveall-and-destroyall-dont-return-promises#answer-which-version-of-the-javascript-sdk-are-you-using-im | saveAll and destroyAll don't return promises? | Parse
+http://stackoverflow.com/questions/15693677/how-should-asynchrony-be-handled-in-cloud-code-of-parse-com | javascript - How should asynchrony be handled in Cloud Code of Parse.com? - Stack Overflow
+http://stackoverflow.com/questions/18229041/use-own-promises-in-parse-cloud-code | javascript - Use own promises in Parse cloud code - Stack Overflow
+https://www.parse.com/questions/parseobjectsaveall-performances | Parse.Object.saveAll .. performances ? | Parse
+https://www.parse.com/questions/does-matcheskeyinquery-support-pointers-and-relations | Does matchesKeyInQuery support Pointers and Relations? | Parse
+http://stackoverflow.com/questions/19777207/nested-queries-using-javascript-in-cloud-code-parse-com | Nested queries using javascript in cloud code (Parse.com) - Stack Overflow
+https://www.parse.com/questions/multiple-matcheskeyinquery | Multiple matchesKeyInQuery | Parse
+https://www.parse.com/questions/multiple-sorts-on-query | Multiple Sorts on Query | Parse
+https://parse.com/questions/can-i-use-include-in-a-query-to-include-all-members-of-a-parserelation-error-102 | Can I use include in a query to include all members of a Parse.Relation? (Error 102) | Parse
+https://www.parse.com/questions/relation-vs-pointer-vs-neither | Relation Vs Pointer Vs Neither | Parse
+http://stackoverflow.com/questions/12590429/expressjs-what-is-the-difference-between-app-local-and-res-local | node.js - ExpressJS: What is the difference between app.local and res.local? - Stack Overflow
+http://stackoverflow.com/questions/12241449/displaying-the-flash-after-a-redirect-in-express-3-x | node.js - Displaying the flash after a redirect in express 3.x - Stack Overflow
+http://stackoverflow.com/questions/14087125/how-to-pass-session-into-views-in-node-express | node.js - How to pass session into views in node/express - Stack Overflow
+http://danialk.github.io/blog/2013/02/20/simple-authentication-in-nodejs/ | Simple Authentication In NodeJS - Danial Khosravi's Blog
+http://stackoverflow.com/questions/13653717/nodejs-express-req-session-not-storing-my-variable | nodejs express req.session not storing my variable - Stack Overflow
+http://jaspreetchahal.org/expressjs-exposing-variables-and-session-to-jade-templates/ | ExpressJS exposing variables and session to Jade templates | Jaspreet Chahal
+https://parse.com/questions/beforesave-user-set-permissions-for-self-and-administrators | beforeSave user: set permissions for self and administrators | Parse
+http://nicolahibbert.com/migrating-to-expressjs-v3/ | Migrating to Express.js v3 | Freelance Front End Developer London
+http://stackoverflow.com/questions/13886897/access-req-and-res-inside-of-app-locals?rq=1 | javascript - Access req and res inside of app.locals - Stack Overflow
+http://stackoverflow.com/questions/12570923/express-3-0-how-to-use-app-locals-use-and-res-locals-use | node.js - express 3.0 how to use app.locals.use and res.locals.use - Stack Overflow
+http://stackoverflow.com/questions/8393275/how-to-programmatically-send-a-404-response-with-express-node | node.js - How to programmatically send a 404 response with Express/Node? - Stack Overflow
+https://www.parse.com/questions/how-do-i-send-custom-errors-with-expressjs-401-404-etc | How do I send custom errors with Express/JS (401, 404, etc)? | Parse
+https://www.parse.com/questions/how-can-i-do-a-custom-404-error-page-for-my-parse-web-app | How can I do a custom 404 error page for my Parse web app? | Parse
+
+http://truffles.me.uk/ | Tim Ruffles
+https://github.com/timruffles/d3-class | timruffles/d3-class
+file:///Users/adriennechew/Sites/d3-class/index.html#21 | Visualising Data Using Javascript
+http://bost.ocks.org/mike/join/ | Thinking with Joins
+http://knowledgestockpile.blogspot.co.uk/2012/01/understanding-selectall-data-enter.html | knowledge stockpile: Understanding selectAll, data, enter, append sequence in D3.js
+http://eyeseast.github.io/visible-data/2013/08/26/responsive-d3/ | DavaViz for Everyone: Responsive Maps With D3 | Visible Data
+http://www.wired.com/wiredscience/2013/12/make-better-maps-with-d3/ | 6 Reasons to Get Over Your Fear of Coding and Start Making Better Maps - Wired Science
+http://blog.cartodb.com/post/39680106243/cartodb-makes-d3-maps-a-breeze | CartoDB | Blog, CartoDB makes D3 maps a breeze
+http://bl.ocks.org/mbostock/4063269 | Bubble Chart
+http://mbostock.github.io/d3/talk/20111116/pack-hierarchy.html | mbostock.github.io/d3/talk/20111116/pack-hierarchy.html
+http://bl.ocks.org/mbostock/1062544 | OMG Particles!
+http://ggruiz.me/weeknd3/ | Echoes.
+http://xliberation.com/parse/colortable/parsed3.html | A mashup of parse.com and d3.js
+http://vallandingham.me/bubble_charts_in_d3.html | Creating Animated Bubble Charts in D3 - Jim Vallandingham
+http://neuralengr.com/asifr/journals/ | Journals
+http://stackoverflow.com/questions/12148794/d3-bubble-chart?rq=1 | javascript - D3 Bubble Chart - Stack Overflow
+http://bl.ocks.org/mbostock/4063269 | Bubble Chart
+https://github.com/mbostock/d3/wiki/Pack-Layout#wiki-pack | Pack Layout · mbostock/d3 Wiki
+https://github.com/mbostock/d3/wiki/Hierarchy-Layout | Hierarchy Layout · mbostock/d3 Wiki
+
+https://app.singaporeday.gov.sg/registration.aspx | Singapore Day 2014 Registration
+http://elitedaily.com/entertainment/celebrity/beyoncetribute/ | These Girls May Have Outdone Queen Bey Herself With This Dance Tribute To Beyoncé (Video) | Elite Daily
+https://parse.com/questions/delete-all-values-in-a-column | Delete all values in a column. | Parse
+https://parse.com/questions/how-to-drop-a-column-with-the-api | How to drop a column with the API ? | Parse
+https://parse.com/questions/returning-promises-in-separate-function | Returning promises in separate function | Parse
+https://www.parse.com/questions/parse-promises-each-function | Parse Promises Each Function? | Parse
+https://mandrillapp.com/ | Transactional Reports | Mandrill
+http://help.mandrill.com/entries/21694868-getting-started-with-templates | Getting Started with Templates : Mandrill Support
+https://www.parse.com/questions/returning-promises-in-separate-function#answer-memberquery-returns-a-promise-not-an-immediate-result-to-get | Returning promises in separate function | Parse
+https://www.parse.com/questions/difference-between-existed-and-isnew#answer-in-a-beforesave-handler-use-isnew-isnew-is-a-backbone | Difference between existed() and isNew() ? | Parse
+https://www.livingsocial.com/deals/742666-luxury-milk-wedding-album/purchases/123340818/coupons/152330196/print.pdf | https://www.livingsocial.com/deals/742666-luxury-milk-wedding-album/purchases/123340818/coupons/152330196/print.pdf
+http://zurb.com/ink/templates.php | Ink: Responsive Email Templates
+http://openmymind.net/2012/2/3/Node-Require-and-Exports/ | Node.js, Require and Exports
+https://parse.com/questions/simple-way-to-make-parse-query-synchronous-in-javascript | Simple way to make Parse Query synchronous in JavaScript | Parse
+http://stackoverflow.com/questions/14224048/pass-value-to-nested-parse-com-query-callback | javascript - Pass value to nested parse.com query callback - Stack Overflow
+http://blog.parse.com/2013/08/22/deleting-objects/ | New Ways to Delete Objects | Parse Blog
+https://parse.com/docs/js/symbols/Parse.Object.html | Parse.Object - Parse JavaScript SDK Reference
+https://parse.com/questions/how-to-check-if-a-user-has-a-specific-role | How to check if a user has a specific role? | Parse
+https://www.parse.com/questions/parseobjectsaveall-fails-in-promises | Parse.Object.saveAll fails in Promises | Parse
+https://github.com/brennanMKE/PostThings/blob/master/Parse/PostThings/cloud/main.js | PostThings/Parse/PostThings/cloud/main.js at master · brennanMKE/PostThings
+http://www.getbiked.com/list/ | Get Biked • Submit a Bike For Sale
+https://www.google.com/search?q=%22Failed+with%3A+ReferenceError%3A+error+is+not+defined%22&oq=%22Failed+with%3A+ReferenceError%3A+error+is+not+defined%22&sourceid=chrome&espv=210&es_sm=91&ie=UTF-8#q=response.error+cloud+code | response.error cloud code - Google Search
+https://parse.com/questions/custom-error-response-codes-for-cloud-code | Custom error response codes for Cloud Code? | Parse
+https://www.parse.com/questions/error-code-on-responseerror | Error code on response.error | Parse
+https://parse.com/questions/setting-the-code-of-the-responseerror-call-in-cloudcode | Setting the code of the response.error call in CloudCode | Parse
+
+http://stackoverflow.com/questions/18831655/underscore-each-callback-when-finished | javascript - Underscore _.each callback when finished? - Stack Overflow
+https://github.com/epeli/underscore.string | epeli/underscore.string
+http://stackoverflow.com/questions/15294941/express-js-app-locals-vs-req-locals-vs-req-session | node.js - Express.js: app.locals vs req.locals vs req.session - Stack Overflow
+http://blog.modulus.io/nodejs-and-express-sessions | Node.js and Express - Sessions
+https://parse.com/questions/fetching-a-collection-with-nested-relation-objects-in-one-call-with-javascript-api | Fetching a collection with nested relation objects in one call with JavaScript API | Parse
+https://parse.com/questions/how-to-retrieve-parent-objects-with-their-children-in-one-call-javascript-api | How to retrieve parent objects with their children in one call? - JavaScript API | Parse
+https://parse.com/questions/how-do-i-get-tojson-to-include-properties-for-objects-in-an-array | How do I get toJSON to include properties for Objects in an array? | Parse
+http://stackoverflow.com/questions/14173228/wait-until-promise-and-nested-thens-are-complete | javascript - Wait until promise and nested thens are complete - Stack Overflow
+https://parse.com/questions/multiple-promises-nestedchained | Multiple promises, nested/chained? | Parse
+https://www.parse.com/questions/building-data-relationships-when-to-use-pointer-or-relation-type | https://www.parse.com/questions/building-data-relationships-when-to-use-pointer-or-relation-type
+https://www.parse.com/questions/inverse-relationship-support | Inverse relationship support | Parse
+http://sensiblecocoa.com/community/topic/1458-parsecom-manipulating-and-displaying-date-and-geopoint-info/ | Parse.com -- manipulating and displaying Date and geoPoint Info - Sensible TableView Cells - STV Community
+https://www.parse.com/questions/find-orphaned-pointer-objects | Find orphaned pointer objects | Parse
+https://www.parse.com/questions/retrieving-objects-with-pointers | Retrieving objects with pointers | Parse
+https://parse.com/questions/parsequery-in-cloudcode-retrieve-by-pointer | parse.query in CloudCode - retrieve by pointer | Parse
+https://www.parse.com/questions/difference-between-existed-and-isnew#answer-in-a-beforesave-handler-use-isnew-isnew-is-a-backbone | Difference between existed() and isNew() ? | Parse
+https://docs.google.com/a/wistdom.com/forms/d/1ZtOPyyNtHT2gc2b1Nscmma4b3CpUSHMqHavzqkbSIO8/edit | Untitled form - Google Drive
+https://www.parse.com/questions/how-to-query-and-compare-against-pointer-data-types | How to query and compare against Pointer data types? | Parse
+https://parse.com/questions/how-to-check-if-a-user-has-a-specific-role | How to check if a user has a specific role? | Parse
+https://parse.com/questions/get-a-list-of-all-users-roles-in-javascript | Get a list of all user's Roles in javascript | Parse
+https://parse.com/questions/querying-based-on-value-of-a-querys-result-value | Querying based on value of a query's result value | Parse
+https://gist.github.com/struiling/f404afd6742f55b63a5f | gist:f404afd6742f55b63a5f
+http://www.echoecho.com/htmlforms09.htm | Forms : Check Box - HTML Tutorial
+
+https://parse.com/docs/js_guide#users-signup | JavaScript Developer Guide | Parse
+http://underscorejs.org/#pairs | Underscore.js
+http://www.timeout.com/london/shopping/londons-best-free-haircuts?pageNumber=2 | London's best free haircuts - Cheap haircuts - Time Out London
+http://stackoverflow.com/questions/13335881/redirecting-to-previous-page-after-authentication-in-node-js-using-passport | Redirecting to previous page after authentication in node.js using passport - Stack Overflow
+http://stackoverflow.com/questions/12442716/nodejs-express-res-redirectback-with-params | node.js - NodeJS + Express: res.redirect('back'); with params - Stack Overflow
+http://parse.com/docs/js/symbols/Parse.Object.html#toJSON | Parse.Object - Parse JavaScript SDK Reference
+http://stackoverflow.com/questions/11680540/fetch-all-parse-relations-pointing-to-a-given-object | javascript - Fetch all Parse.Relations pointing to a given object - Stack Overflow
+https://parse.com/questions/a-complicated-query-with-relationships | A complicated Query with Relationships | Parse
+http://stackoverflow.com/questions/15693677/how-should-asynchrony-be-handled-in-cloud-code-of-parse-com | javascript - How should asynchrony be handled in Cloud Code of Parse.com? - Stack Overflow
+https://parse.com/questions/problems-with-nested-when-promises | Problems with nested when() promises | Parse
+https://www.parse.com/questions/cloud-code-problem-with-promises-and-saving-parse-objects | Cloud Code: Problem with Promises and Saving Parse Objects | Parse
+http://net.tutsplus.com/tutorials/javascript-ajax/getting-cozy-with-underscore-js/ | Getting Cozy With Underscore.js | Nettuts+
+http://www.dohop.com/virginatlantic/?d1=190414&d2=020514&a1=LHR%2CLGW%2CLCY%2CSTN%2CLTN&a2=HND%2CNRT%2CIBR&return=1 | Cheap flights, Hotels and Rental cars | Dohop.com
+http://blog.parse.com/2013/12/18/parse-developer-day-video-series-advanced-cloud-code/ | Parse Developer Day Video Series: Advanced Cloud Code | Parse Blog
+http://stackoverflow.com/questions/18229041/use-own-promises-in-parse-cloud-code | javascript - Use own promises in Parse cloud code - Stack Overflow
+http://blog.chaoscollective.org/post/40284901138/webninja-tutorial-asynchronous-for-loops | The Chaos Collective: WebNinja Tutorial: Asynchronous For Loops
+http://strongloop.com/strongblog/promises-in-node-js-with-q-an-alternative-to-callbacks/ | StrongLoop | Promises in Node.js with Q – An Alternative to Callbacks
+http://stackoverflow.com/questions/19464328/parse-com-get-data-from-query-into-variable-outside-success-function | javascript - parse.com get data from query into variable outside success function - Stack Overflow
+
+http://rkvsraman.blogspot.co.uk/2013/09/asynchronous-loops-in-nodejs.html | Asynchronous loops in NodeJS - Interesting insights
+https://www.parse.com/questions/linking-a-facebook-user-to-an-existing-user | Linking a Facebook user to an existing user | Parse
+https://parse.com/questions/interacting-with-the-facebook-api-in-cloud-code | Interacting with the Facebook API in Cloud Code | Parse
+https://www.parse.com/questions/how-can-i-access-a-client-side-facebook-login-in-express-js | How can I access a client side facebook login in express js? | Parse
+http://stackoverflow.com/questions/12540949/how-to-stop-form-submission-with-express-js-and-node | validation - how to stop form submission with express.js and node - Stack Overflow
+https://www.parse.com/questions/add-user-to-to-a-role-via-after-save | Add user to to a role via after save | Parse
+https://gist.github.com/niraj-shah/6141831 | Two examples of setting ACL controls using Parse JS SDK
+https://gist.github.com/HeshamAmiri/4327600 | Add User to Role in AfterSave Callback
+http://stackoverflow.com/questions/16475957/how-to-store-some-particular-data-for-some-particular-parse-user-in-android | how to store some particular data for some particular parse user in android - Stack Overflow
+http://stackoverflow.com/questions/17709131/simple-way-to-get-multiple-related-objects-in-parse-com-with-javascript | Simple way to get multiple related objects in Parse.com with Javascript? - Stack Overflow
+http://stackoverflow.com/questions/14120847/how-to-get-json-response-form-parse-com-using-query-find-using-javascript-in?rq=1 | how to get json response form parse.com using query.find(); using javascript in web app? - Stack Overflow
+http://stackoverflow.com/questions/19062072/cloud-code-user-cant-access-object-which-has-acl-for-the-role-it-belongs | parse.com - cloud code : User can't access object which has ACL for the role it belongs - Stack Overflow
+http://stackoverflow.com/questions/16223663/how-to-save-an-object-relationship-with-cloud-code-and-parse-com?rq=1 | How to save an object relationship with Cloud Code and Parse.com? - Stack Overflow
+http://stackoverflow.com/questions/17914117/using-cloud-code-to-monitor-for-new-users-and-conditionally-add-them-to-acl?rq=1 | parse.com - Using cloud code to monitor for new users and conditionally add them to ACL - Stack Overflow
+https://www.parse.com/questions/role-assignment-management-and-permissions#answer-the-role-does-not-need-to-be-public-writable-if-you | Role assignment, management, and permissions | Parse
+https://parse.com/questions/save-multiple-records-using-js-sdk | save multiple records using JS SDK | Parse
+https://parse.com/questions/can-you-save-a-collection-all-at-once-something-like-collectionsave | Can you save a collection all at once? something like collection.save(); | Parse
+https://www.parse.com/questions/possible-to-use-roles-for-a-friends-list | Possible to use Roles for a friends list | Parse
+https://parse.com/questions/querying-for-list-of-all-of-a-users-roles | Querying for list of all of a users "Roles"? | Parse
+https://parse.com/questions/default-acl-for-pfuser | Default ACL for PFUser | Parse
+https://parse.com/questions/change-acl-on-objects-only-after-user-signup | Change ACL on objects ONLY after user signup | Parse
+http://stackoverflow.com/questions/12658175/how-to-pass-data-to-every-view-in-express-3 | node.js - How to pass data to every view in Express 3? - Stack Overflow
+https://www.parse.com/questions/merge-a-user-signed-up-by-facebook-and-already-user-signed-up-by-email | merge a user signed up by Facebook and already user signed up by email? | Parse
+http://stackoverflow.com/questions/14288727/how-to-convert-string-separated-by-commas-to-array | javascript - How to convert string separated by commas to array? - Stack Overflow
+https://www.parse.com/questions/how-to-write-a-query-to-match-a-value-with-multiple-keys-of-the-same-object-in-javascript | how to write a query to match a value with multiple keys of the same object in javascript | Parse
+http://stackoverflow.com/questions/13251955/how-to-can-i-update-current-object-in-parse-com-with-javascript | how to can i update current object in parse.com with javascript? - Stack Overflow
+http://www.upworthy.com/next-time-someone-tells-you-that-immigrants-are-destroying-our-country-show-them-this | Next Time Someone Tells You That Immigrants Are Destroying Our Country, Show Them This
+https://parse.com/questions/cloud-code-efficiency-questions-arrays-of-pointers-vs-separate-pointers | Cloud Code Efficiency Questions--arrays of Pointers vs separate Pointers | Parse
+https://parse.com/questions/array-of-related-objects-again | Array of related objects - again. | Parse
+https://parse.com/questions/using-containedin-with-array-of-pointers | Using containedIn with array of pointers | Parse
+http://stackoverflow.com/questions/17709131/simple-way-to-get-multiple-related-objects-in-parse-com-with-javascript | Simple way to get multiple related objects in Parse.com with Javascript? - Stack Overflow
+https://coderwall.com/p/n22mqq | Yamill Vallecillo : Including relational data in a query (Parse.com)
+https://www.parse.com/questions/help-with-a-simple-relational-query | Help with a simple relational query | Parse
+https://www.parse.com/questions/relational-query-1-to-many | Relational Query 1 to many | Parse
+http://justjs.com/posts/page-templates-with-ejs-finally-we-can-have-nice-things | justjs: Page Templates With EJS: Finally, We Can Have Nice Things
+https://www.parse.com/questions/array-of-pointer | Array of Pointer | Parse

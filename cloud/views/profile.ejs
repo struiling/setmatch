@@ -12,13 +12,13 @@
 <p><%= user.getEmail() %></p>
 <%- JSON.stringify(settings.global.group) %>
 <% _.each(globalGroup.get("traits"), function(trait) { %>
-	<h5><%= trait.get("name") %></h5>
+	<h5><a href="/match/<%= trait.id %>"><%= trait.get("name") %></a></h5>
 
 	<% if (trait.get("type") == "text" ||
 		   trait.get("type") == "radio" ||
 		   trait.get("type") == "checkbox" ||
 		   trait.get("type") == "select") { %>
-		<p><%= profile.get("t_" + trait.id) %></p>
+		<p><a href="/match/<%= trait.id %>/<%= profile.get("t_" + trait.id) %>"><%= profile.get("t_" + trait.id) %></a></p>
 	<% } 
 }); %>
 
@@ -69,7 +69,11 @@
 <% } %>
 <br />
 <% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
+	<% if (selfView) { %>
 	<h3>Your groups</h3>
+	<% } else { %>
+	<h3>Groups you and <%= profile.get("t_" + settings.global.fname) %> have in common</h3>
+	<% } %>
 	<% _.each(customGroups, function(group) { %>
 		 <a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a><br />
 	<% } ); %>
