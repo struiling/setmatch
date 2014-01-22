@@ -296,16 +296,21 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     ).then(
         function(invitation) {
             console.log("user invitation query: " + JSON.stringify(invitation));
-            var userACL = new Parse.ACL();
-            userACL.setRoleReadAccess(group.id + "_member", true);
-            user.setACL(userACL);
 
-            var profile = new Profile();
-            profile = user.get("profile");
-            profile.setACL(userACL);
-
-            if (invitation != undefined) {
+            if (req.params.isGlobal) {
+                user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
+                console.log("adding globalGroup");
+                return user.save();
+            } else if (invitation != undefined) {
                 console.log("invitation != undefined");
+                var userACL = new Parse.ACL();
+                userACL.setRoleReadAccess(group.id + "_member", true);
+                user.setACL(userACL);
+
+                var profile = new Profile();
+                profile = user.get("profile");
+                profile.setACL(userACL);
+                
                 user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
                 invitation.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
                 
@@ -318,10 +323,6 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
                     }
                 });
                 return promise;
-            } else if (req.params.isGlobal) {
-                user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
-                console.log("return out of addUserToGroup");
-                return user.save();
             } else {
                 return Parse.Promise.error("You haven't been invited to this group.");
             }
