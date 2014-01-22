@@ -82,6 +82,7 @@ Parse.Cloud.afterSave(Parse.User, function(req, res) {
 });
 
 Parse.Cloud.afterDelete(Parse.User, function(req, res) {
+    Parse.Cloud.useMasterKey();
     var profile = new Profile();
     profile = req.object.get("profile");
 
@@ -295,20 +296,13 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
     ).then(
         function(invitation) {
             console.log("user invitation query: " + JSON.stringify(invitation));
-            //console.log("user invitation groups: " + JSON.stringify(invitation.get("groups")));
-            //console.log("group: " + JSON.stringify(group));
+            var userACL = new Parse.ACL();
+            userACL.setRoleReadAccess(group.id + "_member", true);
+            user.setACL(userACL);
 
-            // check if user has actually been invited to this group
-            /*var invitationGroupIds = [];
-            for (i in invitation.get("groups")) {
-                invitationGroupIds.push(invitation.get("groups")[i].id);
-            }
-            var inviteMatch = _.find(invitationGroupIds, function(invite) {
-                return invite == group.id;
-            });*/
-
-            //console.log("invitationGroupIds: " + invitationGroupIds);
-            //console.log("inviteMatch: " + inviteMatch);
+            var profile = new Profile();
+            profile = user.get("profile");
+            profile.setACL(userACL);
 
             if (invitation != undefined) {
                 console.log("invitation != undefined");
@@ -316,7 +310,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
                 invitation.remove("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
                 
                 var promise = new Parse.Promise();
-                Parse.Object.saveAll([user, invitation], function (list, error) {
+                Parse.Object.saveAll([user, invitation, profile], function (list, error) {
                     if (list) {
                         promise.resolve(list);
                     } else {

@@ -34,7 +34,7 @@ exports.create = function(req, res) {
         userRole.getRoles().add(adminRole);
 
         // group permissions
-        group.setACL(userRoleACL);        
+        group.setACL(userRoleACL);
         
         user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
         return Parse.Object.saveAll([userRole, user, group]);
