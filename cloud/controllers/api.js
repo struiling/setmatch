@@ -1,17 +1,11 @@
 var _ = require('underscore');
 var settings = require('cloud/settings');
-//var Group = Parse.Object.extend("Group");
-var Profile = Parse.Object.extend("Profile");
-var Trait = Parse.Object.extend("Trait");
+var Group = Parse.Object.extend('Group');
+var Profile = Parse.Object.extend('Profile');
+var Trait = Parse.Object.extend('Trait');
 
-exports.create = function(req, res) {
-
-	
-};
-
-exports.view = function(req, res) {
-
-	var traitId = req.params.traitId; 
+exports.match = function(req, res) {
+var traitId = req.params.traitId; 
 
 	
 
@@ -38,19 +32,6 @@ exports.view = function(req, res) {
 			});
 			console.log("profileResults:" + JSON.stringify(profileResults));
 
-			/*var grouped =  _.groupBy(userResults, function(userResult) {
-				return userResult.get("t_" + traitId);
-			});
-			*/
-			//return filtered = _.pick(profileResults[0], 't_OrKo4Sq2qu');
-			/*return _.map(
-				_.countBy(profileResults, 
-					function(profileResult) {
-						return profileResult.get("t_" + traitId)}), 
-				function(count, key) {
-    				return {name: key, count:count};
-
-			});*/
 			var totals = _.countBy(profileResults,
 				function(profile) {
 					return profile.trait;
@@ -62,24 +43,7 @@ exports.view = function(req, res) {
 	).then( 
 		function(results) {
 			console.log("groupBy:" + JSON.stringify(results));
-			res.render("match", {matches: results});
+			res.json( {matches: results});
 		}
 	);
-
-// TODO: this function
-/*	var group = new Group();
-
-	// Explicitly specify which fields to save to prevent bad input data
-	group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then(function(object) {
-
-	    
-
-	}).then( function() {
-		user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-        return user.save();
-	}).then( function (success) {
-    	res.redirect('/group/' + object.get("slug"));
-	}, function(error) {
-		res.send(500, "Could not create group: " + error.message);
-	});*/
 };

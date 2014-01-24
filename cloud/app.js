@@ -11,6 +11,7 @@ var _ = require('underscore');
 
 /* stuff I wrote */
 var requireUser = require('cloud/require-user');
+var apiController = require('cloud/controllers/api.js');
 var groupController = require('cloud/controllers/group.js');
 var matchController = require('cloud/controllers/match.js');
 var profileController = require('cloud/controllers/profile.js');
@@ -118,6 +119,9 @@ app.get('/match/:traitId', requireUser, matchController.view);
 
 // traits passed in in the GET, e.g. ?KkuUBNivsq=Sarah
 //app.get('/match', requireUser, matchController.match);
+
+// API OMG
+app.get('/api/match/:traitId', requireUser, apiController.match);
 
 // TODO: change with below 404 function to keep the URL that's 404ing
 app.get('/404', requireUser, function(req, res) {
