@@ -2,8 +2,9 @@
 <%= JSON.stringify(matches) %>
 
 
-
 <script src="/js/d3.v3.min.js"></script>
+
+
         <script>
 
         var diameter = 960,
@@ -20,7 +21,7 @@
             .attr("height", diameter)
             .attr("class", "bubble");
 
-        d3.json("/api/match/KkuUBNivsq", function(error, data) {
+        d3.json("/api/v1/matches/KkuUBNivsq", function(error, data) {
           console.log("error: " + error);
           console.log("data: " + JSON.stringify(data));
           var root = superSpecialSarahPack(data);
@@ -51,8 +52,8 @@
 
         function superSpecialSarahPack(data) {
         	var classes = [];
-        	for (var key in data.matches.totals) {
-        		classes.push({trait: key, value: data.matches.totals[key]})
+        	for (var key in data.counts) {
+        		classes.push({trait: key, value: data.counts[key]})
         	}
         	return {children: classes};
         }

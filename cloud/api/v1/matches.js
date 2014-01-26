@@ -32,18 +32,22 @@ var traitId = req.params.traitId;
 			});
 			console.log("profileResults:" + JSON.stringify(profileResults));
 
-			var totals = _.countBy(profileResults,
+			var counts = _.countBy(profileResults,
 				function(profile) {
 					return profile.trait;
 				}
 			);
+			var groupedProfiles =  _.groupBy(profileResults, function(profile) {
+				return profile.trait;
+			});
 
-			return {totals: totals, profiles: profileResults};
+
+			return {counts: counts, profiles: groupedProfiles};
 		}
 	).then( 
 		function(results) {
-			console.log("groupBy:" + JSON.stringify(results));
-			res.json( {matches: results});
+			console.log("results:" + JSON.stringify(results));
+			res.json(results);
 		}
 	);
 };

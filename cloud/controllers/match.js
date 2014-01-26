@@ -51,13 +51,13 @@ exports.view = function(req, res) {
     				return {name: key, count:count};
 
 			});*/
-			var totals = _.countBy(profileResults,
+			var counts = _.countBy(profileResults,
 				function(profile) {
 					return profile.trait;
 				}
 			);
 
-			return {totals: totals, profiles: profileResults};
+			return {counts: counts, profiles: profileResults};
 		}
 	).then( 
 		function(results) {
