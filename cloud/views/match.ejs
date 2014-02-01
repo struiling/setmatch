@@ -1,53 +1,53 @@
 
-<%= JSON.stringify(matches) %>
+<%= JSON.stringify(id) %>
 
 
 <script src="/js/d3.v3.min.js"></script>
-
+<script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
 
         <script>
 
-        var diameter = 960,
+        var diameter = $("#main").width(),
             format = d3.format(",d"),
             color = d3.scale.category20c();
-
         var bubble = d3.layout.pack()
             .sort(null)
             .size([diameter, diameter])
             .padding(1.5);
 
-        var svg = d3.select("body").append("svg")
+        var svg = d3.select("#main").append("svg")
             .attr("width", diameter)
             .attr("height", diameter)
             .attr("class", "bubble");
 
         d3.json("/api/v1/matches/KkuUBNivsq", function(error, data) {
-          console.log("error: " + error);
-          console.log("data: " + JSON.stringify(data));
-          var root = superSpecialSarahPack(data);
-          console.log("root: " + JSON.stringify(root));
-          var node = svg.selectAll(".node")
-              .data(bubble.nodes(root)
-              .filter(function(d) { return !d.children; }))
-            .enter().append("g")
-              .attr("class", "node")
-              .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+			console.log("error: " + error);
+			console.log("data: " + JSON.stringify(data));
+			var root = superSpecialSarahPack(data);
+			console.log("root: " + JSON.stringify(root));
+			var node = svg.selectAll(".node")
+				.data(bubble.nodes(root)
+				.filter(function(d) { return !d.children; }))
+			.enter().append("g")
+				.attr("class", "node")
+				.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 
-          node.append("title")
-              .text(function(d) { return d.trait + ": " + format(d.value); });
+			node.append("title")
+				.text(function(d) { return d.trait + ": " + format(d.value); });
 
-          node.append("circle")
-              .attr("r", function(d) { 
-              	console.log("d: " + d);
-              	return d.r; })
-              .style("fill", function(d) { return color(d.trait); });
+			node.append("a")
+    			.attr("xlink:href", function(d) {return "/match/<%= id %>/" + d.trait; })
+    			.append("circle")
+				.attr("r", function(d) { 
+			  		console.log("d: " + d);
+			  		return d.r; })
+				.style("fill", function(d) { return color(d.trait); });
 
-          node.append("text")
-              .attr("dy", ".3em")
-              .style("text-anchor", "middle")
-              .text(function(d) {
-              	console.log("d: " + d);
-              	return d.trait.substring(0, d.r / 3); });
+			node.append("text")
+				.attr("dy", ".3em")
+				.style("text-anchor", "middle")
+				.text(function(d) {
+			  		return d.trait.substring(0, d.r / 3); });
         });
 
         function superSpecialSarahPack(data) {
@@ -74,3 +74,5 @@
         d3.select(self.frameElement).style("height", diameter + "px");
 
         </script>
+
+        

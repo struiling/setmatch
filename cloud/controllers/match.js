@@ -57,12 +57,12 @@ exports.view = function(req, res) {
 				}
 			);
 
-			return {counts: counts, profiles: profileResults};
+			return {counts: counts, profiles: profileResults, id: traitId};
 		}
 	).then( 
 		function(results) {
 			console.log("groupBy:" + JSON.stringify(results));
-			res.render("match", {matches: results});
+			res.render("match", results);
 		}
 	);
 

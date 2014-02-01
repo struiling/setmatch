@@ -42,7 +42,7 @@ var traitId = req.params.traitId;
 			});
 
 
-			return {counts: counts, profiles: groupedProfiles};
+			return {counts: counts, profiles: groupedProfiles, id: traitId};
 		}
 	).then( 
 		function(results) {
