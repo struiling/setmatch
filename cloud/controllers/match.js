@@ -4,16 +4,40 @@ var settings = require('cloud/settings');
 var Profile = Parse.Object.extend("Profile");
 var Trait = Parse.Object.extend("Trait");
 
-exports.create = function(req, res) {
-
+exports.match = function(req, res) {
+	if (req.query == {}) {
+		res.redirect("/");
+	} else {
+		var profileQuery = new Parse.Query(Profile);
+		var userQuery = new Parse.Query(Parse.User);
+		_.each(_.keys(req.query), function(key) {
+			profileQuery.equalTo("t_" + key, req.query.key);
+		});
+		userQuery.matchesQuery("profile", profileQuery);
+		userQuery.include("profile");
+		userQuery.find().then(
+			function(userResults) {
+				var profileResults = userResult.get("profile");
+				_.each(userResults, function(userResult) {
+					profileResults.push({
+					    slug: userResult.get("slug")
+					});
+					console.log("profileResults:" + JSON.stringify(profileResults));
+				});
+				return {profiles: profileResults};
+			}
+		).then( 
+			function(results) {
+				res.render("match", results);
+			}
+		);
+	}
 	
 };
 
 exports.view = function(req, res) {
 
 	var traitId = req.params.traitId; 
-
-	
 
 	var profileQuery = new Parse.Query(Profile);
 	var userQuery = new Parse.Query(Parse.User);

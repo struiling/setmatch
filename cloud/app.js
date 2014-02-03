@@ -11,7 +11,7 @@ var _ = require('underscore');
 
 /* stuff I wrote */
 var requireUser = require('cloud/require-user');
-var apiMatches = require('cloud/api/v1/matches.js');
+var traitsAPI = require('cloud/api/v1/traits.js');
 var groupController = require('cloud/controllers/group.js');
 var matchController = require('cloud/controllers/match.js');
 var profileController = require('cloud/controllers/profile.js');
@@ -115,13 +115,15 @@ app.put('/trait/:traitId', requireUser, traitController.save);
 app.get('/trait/:traitId/delete', requireUser, traitController.delete);
 
 // view the landscape of values for a trait
-app.get('/match/:traitId', requireUser, matchController.view);
+app.get('/match/:traitId', requireUser, traitController.match);
+
+//app.get('/match/group/:groupSlug', requireUser, groupController.match);
 
 // traits passed in in the GET, e.g. ?KkuUBNivsq=Sarah
-//app.get('/match', requireUser, matchController.match);
+app.get('/match', requireUser, profileController.match);
 
 // API OMG
-app.get('/api/v1/matches/:traitId', requireUser, apiMatches.match);
+app.get('/api/v1/traits/:traitId', requireUser, traitsAPI.match);
 
 // TODO: change with below 404 function to keep the URL that's 404ing
 app.get('/404', requireUser, function(req, res) {

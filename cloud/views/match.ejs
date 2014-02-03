@@ -20,7 +20,7 @@
             .attr("height", diameter)
             .attr("class", "bubble");
 
-        d3.json("/api/v1/matches/KkuUBNivsq", function(error, data) {
+        d3.json("/api/v1/traits/KkuUBNivsq", function(error, data) {
 			console.log("error: " + error);
 			console.log("data: " + JSON.stringify(data));
 			var root = superSpecialSarahPack(data);
@@ -36,7 +36,7 @@
 				.text(function(d) { return d.trait + ": " + format(d.value); });
 
 			node.append("a")
-    			.attr("xlink:href", function(d) {return "/match/<%= id %>/" + d.trait; })
+    			.attr("xlink:href", function(d) {return "/match?<%= id %>=" + d.trait; })
     			.append("circle")
 				.attr("r", function(d) { 
 			  		console.log("d: " + d);

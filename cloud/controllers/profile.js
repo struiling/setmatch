@@ -20,6 +20,23 @@ exports.edit = function(req, res) {
 	);
 };
 
+exports.match = function(req, res) {
+	//TODO : change this to be real
+	Parse.Cloud.run("getProfileData", {}).then( 
+		function(results) {
+		    res.render("profile-edit", { 
+		    	user: results.user,
+		    	customGroups: results.customGroups, 
+		    	invites: results.groupsInvited, 
+		    	profile: results.userProfile 
+		    });
+		},	
+		function(error) {
+			res.error(error.message);
+		}
+	);
+};
+
 exports.save = function(req, res) {
 	var user = Parse.User.current();
 	var profile = new Profile();

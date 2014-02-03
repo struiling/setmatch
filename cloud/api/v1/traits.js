@@ -5,9 +5,7 @@ var Profile = Parse.Object.extend('Profile');
 var Trait = Parse.Object.extend('Trait');
 
 exports.match = function(req, res) {
-var traitId = req.params.traitId; 
-
-	
+	var traitId = req.params.traitId; 
 
 	var profileQuery = new Parse.Query(Profile);
 	var userQuery = new Parse.Query(Parse.User);

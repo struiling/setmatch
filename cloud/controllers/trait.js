@@ -40,7 +40,13 @@ exports.create = function(req, res) {
 			return group.save();
 		}
 	).then(
+		function(savedGroup) {
+console.log("savedGroup: " + JSON.stringify(savedGroup));
+			 return savedGroup.fetch();
+		}
+	).then(
 		function (result) {
+			console.log("group result: " + JSON.stringify(result));
     		res.redirect('/group/' + result.get("slug") + '/edit');
 		}, 
 		function(error) {
@@ -57,6 +63,61 @@ exports.delete = function(req, res) {
 	// TODO: destroy() row in Trait
 };
 
+exports.match = function(req, res) {
+
+	var traitId = req.params.traitId; 
+
+	var profileQuery = new Parse.Query(Profile);
+	var userQuery = new Parse.Query(Parse.User);
+	profileQuery.exists("t_" + traitId);
+	//profileQuery.select("t_" + traitId, "t_" + settings.global.fname, "t_" + settings.global.lname);
+	userQuery.matchesQuery("profile", profileQuery);
+	userQuery.include("profile");
+	userQuery.find().then(
+		function(userResults) {
+			console.log("userResults:" + JSON.stringify(userResults));
+
+			var profileResults = [];
+			_.each(userResults, function(userResult) {
+//				userObjects.push(_.omit(userResult, "profile", "invitation", "groups"));
+//				profileResults.push(_.pick(userResult.get("profile"), "t_" + traitId));
+				profileResults.push({
+					trait: userResult.get("profile").get("t_" + traitId),
+				    fname: userResult.get("profile").get("t_" + settings.global.fname),
+				    lname: userResult.get("profile").get("t_" + settings.global.lname),
+				    slug: userResult.get("slug")
+				});
+			});
+			console.log("profileResults:" + JSON.stringify(profileResults));
+
+			/*var grouped =  _.groupBy(userResults, function(userResult) {
+				return userResult.get("t_" + traitId);
+			});
+			*/
+			//return filtered = _.pick(profileResults[0], 't_OrKo4Sq2qu');
+			/*return _.map(
+				_.countBy(profileResults, 
+					function(profileResult) {
+						return profileResult.get("t_" + traitId)}), 
+				function(count, key) {
+    				return {name: key, count:count};
+
+			});*/
+			var counts = _.countBy(profileResults,
+				function(profile) {
+					return profile.trait;
+				}
+			);
+
+			return {counts: counts, profiles: profileResults, id: traitId};
+		}
+	).then( 
+		function(results) {
+			console.log("groupBy:" + JSON.stringify(results));
+			res.render("match", results);
+		}
+	);
+};
 exports.save = function(req, res) {
 // TODO: this function
 	var user = Parse.User.current();

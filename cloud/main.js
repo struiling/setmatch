@@ -69,6 +69,7 @@ Parse.Cloud.beforeSave(Parse.User, function(req, res) {
     }
 });
 */
+
 Parse.Cloud.afterSave(Parse.User, function(req, res) {
     if (!req.object.existed()) {
         var user = req.user; 

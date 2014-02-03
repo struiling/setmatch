@@ -54,7 +54,7 @@
 <% if (typeof(traits) !== 'undefined' && traits.length > 0) { %>
     <h3>Edit group traits</h3>
     <% _.each(traits, function(trait) { %>
-        <form method="post" action="<%- '/group/' + group.get('slug') + '/trait' %>">
+        <form method="post" action="/trait/<%= trait.id %>">
             <fieldset>
                 <label for="name">Name</label>
                 <input name="name" id="name" type="text" placeholder="Name" value="<%= trait.get("name") %>">
