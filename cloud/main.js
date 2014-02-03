@@ -100,6 +100,20 @@ Parse.Cloud.afterDelete(Parse.User, function(req, res) {
     });
     return promise;
 });
+Parse.Cloud.afterDelete("Trait", function(req, res) {
+    var trait = req.object;
+    console.log("var trait: " + trait.id);
+    var group = new Group();
+    var groupQuery = new Parse.Query("Group");
+    groupQuery.equalTo("traits", {"__type":"Pointer","className":"Trait","objectId":trait.id});
+    groupQuery.first().then(
+        function (groupResult) {
+            console.log("groupResult: " + JSON.stringify(groupResult));
+            groupResult.remove("traits", {"__type":"Pointer","className":"Trait","objectId":trait.id});
+            return groupResult.save();
+        }
+    );
+});
 
 /*
 // TODO: make groups not be deletable if there are members other than the current member

@@ -18,7 +18,7 @@
 		   trait.get("type") == "radio" ||
 		   trait.get("type") == "checkbox" ||
 		   trait.get("type") == "select") { %>
-		<p><a href="/match/<%= trait.id %>/<%= profile.get("t_" + trait.id) %>"><%= profile.get("t_" + trait.id) %></a></p>
+		<p><a href="/match?<%= trait.id %>=<%= profile.get("t_" + trait.id) %>"><%= profile.get("t_" + trait.id) %></a></p>
 	<% } 
 }); %>
 

@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var settings = require('cloud/settings');
 var Group = Parse.Object.extend("Group");
 var Profile = Parse.Object.extend("Profile");
 var Trait = Parse.Object.extend("Trait");
@@ -61,6 +62,23 @@ exports.delete = function(req, res) {
 	// TODO: clear all data that column in Profile
 	// TODO: delete column in Profile table (not currently possible)
 	// TODO: destroy() row in Trait
+	var trait = new Trait();
+	var traitName;
+	trait.id = req.params.traitId;
+	console.log("Trait prefetch: " + JSON.stringify(trait));
+	trait.fetch().then(
+		function() {
+			traitName = trait.get("name");
+			console.log("Trait: " + JSON.stringify(trait));
+			console.log("traitName: " + trait.get("name"));
+			return trait.destroy();
+		}
+	).then(
+		function() {
+			res.flash("message", "You have deleted &#8220;" + traitName + "&#8221;");
+			res.redirect("back");
+		}
+	);
 };
 
 exports.match = function(req, res) {

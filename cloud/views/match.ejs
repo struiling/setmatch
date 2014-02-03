@@ -23,7 +23,7 @@
         d3.json("/api/v1/traits/KkuUBNivsq", function(error, data) {
 			console.log("error: " + error);
 			console.log("data: " + JSON.stringify(data));
-			var root = superSpecialSarahPack(data);
+			var root = counts(data);
 			console.log("root: " + JSON.stringify(root));
 			var node = svg.selectAll(".node")
 				.data(bubble.nodes(root)
@@ -50,16 +50,16 @@
 			  		return d.trait.substring(0, d.r / 3); });
         });
 
-        function superSpecialSarahPack(data) {
+        function counts(d) {
         	var classes = [];
-        	for (var key in data.counts) {
-        		classes.push({trait: key, value: data.counts[key]})
+        	for (var key in d.counts) {
+        		classes.push({trait: key, value: d.counts[key]})
         	}
         	return {children: classes};
         }
 
         // Returns a flattened hierarchy containing all leaf nodes under the root.
-        function classes(root) {
+        /*function classes(root) {
           var classes = [];
 
           function recurse(name, node) {
@@ -69,7 +69,7 @@
 
           recurse(null, root);
           return {children: classes};
-        }
+        }*/
 
         d3.select(self.frameElement).style("height", diameter + "px");
 
