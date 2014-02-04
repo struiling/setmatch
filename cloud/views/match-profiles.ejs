@@ -11,15 +11,18 @@
 </p>
 <% } %>
 
-<% _.each(groups, function(group) { %>
-    <h3><a href="/group/<%= group.slug %>"><%= group.name %></a></h3>
-    <ul>
-    <% _.each(profiles[group.slug], function(profile) { %>
-        <li><a href="/profile/<%= profile.get("slug") %>"><%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></a></li>
+<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
+    <% _.each(groups, function(group) { %>
+        <h3><a href="/group/<%= group.slug %>"><%= group.name %></a></h3>
+        <ul>
+        <% _.each(profiles[group.slug], function(profile) { %>
+            <li><a href="/profile/<%= profile.get("slug") %>"><%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></a></li>
+        <% }); %>
+        </ul>
     <% }); %>
-    </ul>
-<% }); %>
-
+<% } else { %>
+<p>Huh, no matches. Go <a href="/">home</a>?</p>
+<% } %>
 
 
 <script src="/js/d3.v3.min.js"></script>
