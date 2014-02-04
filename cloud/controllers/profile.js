@@ -42,12 +42,13 @@ exports.match = function(req, res) {
 		userQuery.include("groups");
 		userQuery.find().then(
 			function(userResults) {
+				console.log("get groups: " + JSON.stringify(userResults));
 				_.each(userResults, function(userResult) {
 					var profileResult = userResult.get("profile");
 					var groupArray = [];
 					profileResult.set("slug", userResult.get("slug"));
 					_.each(userResult.get("groups"), function(group) {
-						if (group.id != settings.global.groupId) {
+						if (group !== null && group.id != settings.global.groupId) {
 							groupArray.push(group.get("slug"));
 
 							var groupResult = { slug: group.get("slug"), name: group.get("name") };

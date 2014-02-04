@@ -1,7 +1,4 @@
-
-<%= JSON.stringify(id) %>
-
-
+<h1><%= trait.get("name") %></h1>
 <script src="/js/d3.v3.min.js"></script>
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
 
@@ -20,7 +17,7 @@
             .attr("height", diameter)
             .attr("class", "bubble");
 
-        d3.json("/api/v1/traits/KkuUBNivsq", function(error, data) {
+        d3.json("/api/v1/traits/<%= trait.id %>", function(error, data) {
 			console.log("error: " + error);
 			console.log("data: " + JSON.stringify(data));
 			var root = counts(data);
@@ -36,7 +33,7 @@
 				.text(function(d) { return d.trait + ": " + format(d.value); });
 
 			node.append("a")
-    			.attr("xlink:href", function(d) {return "/match?<%= id %>=" + d.trait; })
+    			.attr("xlink:href", function(d) {return "/match?<%= trait.id %>=" + d.trait; })
     			.append("circle")
 				.attr("r", function(d) { 
 			  		console.log("d: " + d);

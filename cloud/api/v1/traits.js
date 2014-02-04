@@ -14,11 +14,11 @@ exports.match = function(req, res) {
 	userQuery.matchesQuery("profile", profileQuery);
 	userQuery.include("profile");
 	userQuery.find().then(
+		// TODO: use .each() instead of .find() ?
 		function(userResults) {
+
 			var profileResults = [];
 			_.each(userResults, function(userResult) {
-//				userObjects.push(_.omit(userResult, "profile", "invitation", "groups"));
-//				profileResults.push(_.pick(userResult.get("profile"), "t_" + traitId));
 				profileResults.push({
 					trait: userResult.get("profile").get("t_" + traitId),
 				    fname: userResult.get("profile").get("t_" + settings.global.fname),
