@@ -15,8 +15,6 @@ exports.match = function(req, res) {
 	userQuery.include("profile");
 	userQuery.find().then(
 		function(userResults) {
-			console.log("userResults:" + JSON.stringify(userResults));
-
 			var profileResults = [];
 			_.each(userResults, function(userResult) {
 //				userObjects.push(_.omit(userResult, "profile", "invitation", "groups"));

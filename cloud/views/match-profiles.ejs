@@ -1,11 +1,7 @@
-
-<%= JSON.stringify(profiles) %>
-<br />
-<%= JSON.stringify(traits) %>
 <h1>Profile matches</h1>
 <p> 
     <% _.each(traits, function(trait, i) { %>
-        <%- trait.get("name") + " is " + profiles[0].get("t_" + trait.id) %>
+        <%- trait.get("name") + ": " + profiles[0].get("t_" + trait.id) %>
         <% if (i !== trait.length) { %> 
         <br />  
         <% } %>

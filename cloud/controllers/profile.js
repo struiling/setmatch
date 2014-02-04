@@ -22,17 +22,18 @@ exports.edit = function(req, res) {
 };
 
 exports.match = function(req, res) {
-	if (req.query == {}) {
+		console.log("req.query: " + JSON.stringify(req.query));
+	if (_.isEmpty(req.query)) {
 		console.log("no req.query");
 		res.redirect("/");
 	} else {
+		console.log("req.query.length: " + req.query.length);
 		var profileQuery = new Parse.Query(Profile);
 		var userQuery = new Parse.Query(Parse.User);
 		var profileResults = [];
 		// TODO: sanitize GET variables?
 		_.each(_.keys(req.query), function(key) {
 			profileQuery.equalTo("t_" + key, req.query[key]);
-			console.log("profileQuery.equalTo('t_' +"+ key + ", " + req.query[key]+")");
 		});
 		userQuery.matchesQuery("profile", profileQuery);
 		userQuery.include("profile");
@@ -43,17 +44,13 @@ exports.match = function(req, res) {
 				_.each(userResults, function(userResult) {
 					var profileResult = {};
 					profileResult = userResult.get("profile");
-					console.log("profileResult: " +JSON.stringify(profileResult));
 					profileResult.set("slug", userResult.get("slug"));
-					console.log("profileResult with slug: " +JSON.stringify(profileResult));
 					profileResults.push(profileResult);
 				});
 				//return profileResults;
 			}
 		).then( 
 			function() {
-				console.log("match profileResults:" + JSON.stringify(profileResults));
-				console.log("slug test: " + profileResults[0].get("slug"));
 				var traitQuery = new Parse.Query(Trait);
 				traitQuery.containedIn("objectId", _.keys(req.query));
 				return traitQuery.find()
