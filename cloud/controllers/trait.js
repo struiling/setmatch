@@ -132,7 +132,7 @@ exports.match = function(req, res) {
 	).then( 
 		function(results) {
 			console.log("groupBy:" + JSON.stringify(results));
-			res.render("match", results);
+			res.render("match-traits", results);
 		}
 	);
 };

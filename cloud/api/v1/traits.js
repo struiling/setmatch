@@ -40,12 +40,12 @@ exports.match = function(req, res) {
 			});
 
 
-			return {counts: counts, profiles: groupedProfiles, id: traitId};
+			return {status: "success", counts: counts, profiles: groupedProfiles, id: traitId};
 		}
 	).then( 
 		function(results) {
 			console.log("results:" + JSON.stringify(results));
-			res.json(results);
+			res.json(200, results);
 		}
 	);
 };

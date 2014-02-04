@@ -104,7 +104,7 @@ Parse.Cloud.afterDelete("Trait", function(req, res) {
     var trait = req.object;
     console.log("var trait: " + trait.id);
     var group = new Group();
-    var groupQuery = new Parse.Query("Group");
+    var groupQuery = new Parse.Query(Group);
     groupQuery.equalTo("traits", {"__type":"Pointer","className":"Trait","objectId":trait.id});
     groupQuery.first().then(
         function (groupResult) {
@@ -163,7 +163,7 @@ Parse.Cloud.afterDelete("Group", function(req, res) {
         }   
     ).then(
         function() {
-            var invitationQuery = new Parse.Query("Invitation");
+            var invitationQuery = new Parse.Query(Invitation);
             invitationQuery.limit(1000);
             invitationQuery.equalTo("groups", {"__type":"Pointer","className":"Group","objectId":group.id});
             return invitationQuery.find().then( 

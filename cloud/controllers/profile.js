@@ -21,20 +21,40 @@ exports.edit = function(req, res) {
 };
 
 exports.match = function(req, res) {
-	//TODO : change this to be real
-	Parse.Cloud.run("getProfileData", {}).then( 
-		function(results) {
-		    res.render("profile-edit", { 
-		    	user: results.user,
-		    	customGroups: results.customGroups, 
-		    	invites: results.groupsInvited, 
-		    	profile: results.userProfile 
-		    });
-		},	
-		function(error) {
-			res.error(error.message);
-		}
-	);
+	if (req.query == {}) {
+		console.log("no req.query");
+		res.redirect("/");
+	} else {
+		var profileQuery = new Parse.Query(Profile);
+		var userQuery = new Parse.Query(Parse.User);
+		var profileResults = [];
+		// TODO: sanitize GET variables?
+		_.each(_.keys(req.query), function(key) {
+			profileQuery.equalTo("t_KkuUBNivsq", "Sarah");
+			console.log("profileQuery.equalTo('t_' +"+ key + ", " + req.query[key]+")");
+		});
+		userQuery.matchesQuery("profile", profileQuery);
+		userQuery.include("profile");
+		userQuery.find().then(
+			function(userResults) {
+				//var profileResults = userResults.get("profile");
+
+				_.each(userResults, function(userResult) {
+					var profileResult = {};
+					profileResult = userResult.get("profile");
+					console.log("profileResult: " +JSON.stringify(profileResult));
+					profileResult.slug = userResult.get("slug");
+					profileResults.push(profileResult);
+					console.log("match profileResults:" + JSON.stringify(profileResults));
+				});
+				return {profiles: profileResults, traits: req.query};
+			}
+		).then( 
+			function(results) {
+				res.render("match-profiles", results);
+			}
+		);
+	}
 };
 
 exports.save = function(req, res) {
