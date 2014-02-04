@@ -3,6 +3,7 @@ var settings = require('cloud/settings');
 var Group = Parse.Object.extend("Group");
 var Profile = Parse.Object.extend("Profile");
 var Invitation = Parse.Object.extend("Invitation");
+var Trait = Parse.Object.extend('Trait');
 
 exports.edit = function(req, res) {
 	Parse.Cloud.run("getProfileData", {}).then( 
@@ -30,7 +31,7 @@ exports.match = function(req, res) {
 		var profileResults = [];
 		// TODO: sanitize GET variables?
 		_.each(_.keys(req.query), function(key) {
-			profileQuery.equalTo("t_KkuUBNivsq", "Sarah");
+			profileQuery.equalTo("t_" + key, req.query[key]);
 			console.log("profileQuery.equalTo('t_' +"+ key + ", " + req.query[key]+")");
 		});
 		userQuery.matchesQuery("profile", profileQuery);
@@ -43,15 +44,23 @@ exports.match = function(req, res) {
 					var profileResult = {};
 					profileResult = userResult.get("profile");
 					console.log("profileResult: " +JSON.stringify(profileResult));
-					profileResult.slug = userResult.get("slug");
+					profileResult.set("slug", userResult.get("slug"));
+					console.log("profileResult with slug: " +JSON.stringify(profileResult));
 					profileResults.push(profileResult);
-					console.log("match profileResults:" + JSON.stringify(profileResults));
 				});
-				return {profiles: profileResults, traits: req.query};
+				//return profileResults;
 			}
 		).then( 
-			function(results) {
-				res.render("match-profiles", results);
+			function() {
+				console.log("match profileResults:" + JSON.stringify(profileResults));
+				console.log("slug test: " + profileResults[0].get("slug"));
+				var traitQuery = new Parse.Query(Trait);
+				traitQuery.containedIn("objectId", _.keys(req.query));
+				return traitQuery.find()
+			}
+		).then( 
+			function(traits) {
+				res.render("match-profiles", {traits: traits, profiles: profileResults});
 			}
 		);
 	}

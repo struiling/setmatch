@@ -1,10 +1,25 @@
 
 <%= JSON.stringify(profiles) %>
+<br />
+<%= JSON.stringify(traits) %>
 <h1>Profile matches</h1>
-<p>Where 
-    <% _.each(_.keys(traits), function(key) { %>
-        <%- key + " is " + traits.key %>
+<p> 
+    <% _.each(traits, function(trait, i) { %>
+        <%- trait.get("name") + " is " + profiles[0].get("t_" + trait.id) %>
+        <% if (i !== trait.length) { %> 
+        <br />  
+        <% } %>
     <% }); %>
+</p>
+
+<% if (typeof(profiles) !== 'undefined' && profiles.length > 0) { %>
+<ul>
+    <% _.each(profiles, function(profile, i) { %>
+        <li><a href="/profile/<%= profile.get("slug") %>">
+            <%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></a></li>
+    <% }); %>
+</ul>
+<% } %>
 
 <script src="/js/d3.v3.min.js"></script>
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>

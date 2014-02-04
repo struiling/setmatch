@@ -44,8 +44,8 @@ exports.match = function(req, res) {
 		}
 	).then( 
 		function(results) {
-			console.log("results:" + JSON.stringify(results));
-			res.json(200, results);
+			//console.log("results:" + JSON.stringify(results));
+			res.json(results);
 		}
 	);
 };
