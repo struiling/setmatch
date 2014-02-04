@@ -1,4 +1,4 @@
-var _ = require('underscore');
+var _ = require('cloud/lib/underscore');
 var settings = require('cloud/settings');
 var Group = Parse.Object.extend("Group");
 var Profile = Parse.Object.extend("Profile");
@@ -25,39 +25,67 @@ exports.match = function(req, res) {
 		console.log("req.query: " + JSON.stringify(req.query));
 	if (_.isEmpty(req.query)) {
 		console.log("no req.query");
+		// TODO: probably want to make this friendlier
 		res.redirect("/");
 	} else {
-		console.log("req.query.length: " + req.query.length);
 		var profileQuery = new Parse.Query(Profile);
 		var userQuery = new Parse.Query(Parse.User);
 		var profileResults = [];
+		var groupResults = [];
+		var groupedProfiles;
 		// TODO: sanitize GET variables?
 		_.each(_.keys(req.query), function(key) {
 			profileQuery.equalTo("t_" + key, req.query[key]);
 		});
 		userQuery.matchesQuery("profile", profileQuery);
 		userQuery.include("profile");
+		userQuery.include("groups");
 		userQuery.find().then(
 			function(userResults) {
-				//var profileResults = userResults.get("profile");
-
 				_.each(userResults, function(userResult) {
-					var profileResult = {};
-					profileResult = userResult.get("profile");
+					var profileResult = userResult.get("profile");
+					var groupArray = [];
 					profileResult.set("slug", userResult.get("slug"));
+					_.each(userResult.get("groups"), function(group) {
+						if (group.id != settings.global.groupId) {
+							groupArray.push(group.get("slug"));
+
+							var groupResult = { slug: group.get("slug"), name: group.get("name") };
+							if (_.findWhere(groupResults, groupResult) == null) {
+							    groupResults.push(groupResult);
+							}
+						}
+					});
+					profileResult.set("groups", groupArray);
 					profileResults.push(profileResult);
 				});
-				//return profileResults;
+
+				groupedProfiles = _(profileResults).reduce(function(memo, o) {
+			    	_(o.get("groups")).each(function(i) {
+				        memo[i] = memo[i] || [ ];
+				        memo[i].push(o);
+				    });
+				    return memo;
+				}, { });
+				console.log("groupedProfiles: " + JSON.stringify(groupedProfiles));
 			}
 		).then( 
 			function() {
 				var traitQuery = new Parse.Query(Trait);
 				traitQuery.containedIn("objectId", _.keys(req.query));
-				return traitQuery.find()
+				return traitQuery.find().then( 
+					function(traits) {
+						_.each(traits, function(trait) {
+							trait.set("value", req.query[trait.id]);
+						});
+						return traits;
+					}
+				);
 			}
 		).then( 
 			function(traits) {
-				res.render("match-profiles", {traits: traits, profiles: profileResults});
+				console.log("traits:" + JSON.stringify(traits));
+				res.render("match-profiles", {traits: traits, profiles: groupedProfiles, groups: groupResults});
 			}
 		);
 	}

@@ -1,21 +1,26 @@
 <h1>Profile matches</h1>
+
+<% if (typeof(traits) !== 'undefined' && traits.length > 0) { %>
 <p> 
     <% _.each(traits, function(trait, i) { %>
-        <%- trait.get("name") + ": " + profiles[0].get("t_" + trait.id) %>
+        <%- trait.get("name") + ": " + trait.get("value") %>
         <% if (i !== trait.length) { %> 
         <br />  
         <% } %>
     <% }); %>
 </p>
-
-<% if (typeof(profiles) !== 'undefined' && profiles.length > 0) { %>
-<ul>
-    <% _.each(profiles, function(profile, i) { %>
-        <li><a href="/profile/<%= profile.get("slug") %>">
-            <%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></a></li>
-    <% }); %>
-</ul>
 <% } %>
+
+<% _.each(groups, function(group) { %>
+    <h3><a href="/group/<%= group.slug %>"><%= group.name %></a></h3>
+    <ul>
+    <% _.each(profiles[group.slug], function(profile) { %>
+        <li><a href="/profile/<%= profile.get("slug") %>"><%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></a></li>
+    <% }); %>
+    </ul>
+<% }); %>
+
+
 
 <script src="/js/d3.v3.min.js"></script>
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
