@@ -57,11 +57,6 @@ console.log("savedGroup: " + JSON.stringify(savedGroup));
 };
 
 exports.delete = function(req, res) {
-	// Do most of this in afterDelete so the same functions will run on deleting a group
-	// TODO: remove pointer from traits array in Group
-	// TODO: clear all data that column in Profile
-	// TODO: delete column in Profile table (not currently possible)
-	// TODO: destroy() row in Trait
 	var trait = new Trait();
 	var traitName;
 	trait.id = req.params.traitId;
@@ -143,21 +138,22 @@ exports.match = function(req, res) {
 	);
 };
 exports.save = function(req, res) {
-// TODO: this function
-	var user = Parse.User.current();
-	var group = new Group();
-
-	// Explicitly specify which fields to save to prevent bad input data
-	group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then(function(object) {
-
-	    
-
-	}).then( function() {
-		user.addUnique("groups", {"__type":"Pointer","className":"Group","objectId":groupId});
-        return user.save();
-	}).then( function (success) {
-    	res.redirect('/group/' + object.get("slug"));
-	}, function(error) {
-		res.send(500, "Could not create group: " + error.message);
-	});
+	var trait = new Trait();
+	trait.id = req.body.id;
+	for (var key in req.body) {
+		if (key != "id") {
+			trait.set(key, req.body[key]);
+			console.log("trait values: " + key + ": " + req.body[key]);
+		}
+	}
+    trait.save().then( 
+    	function(success) {
+			res.flash("message", "Trait saved.");
+    		res.redirect("back");
+		}, 
+		function(error) {
+			res.flash("message", error.message);
+    		res.redirect("back");
+		}
+	);
 };

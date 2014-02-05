@@ -108,7 +108,6 @@ app.get('/group/:groupSlug/join', requireUser, groupController.join);
 
 // create new group trait (custom field)
 app.post('/trait/create', requireUser, traitController.create);
-// TODO: NOT SET UP YET
 // save edits group trait (custom field) definition
 app.put('/trait/:traitId', requireUser, traitController.save);
 // TODO: NOT SET UP YET

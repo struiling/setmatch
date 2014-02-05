@@ -101,6 +101,9 @@ Parse.Cloud.afterDelete(Parse.User, function(req, res) {
     return promise;
 });
 Parse.Cloud.afterDelete("Trait", function(req, res) {
+    // TODO: clear all data that column in Profile
+    // TODO: delete column in Profile table (not currently possible)
+    // or move to background job that runs daily
     var trait = req.object;
     console.log("var trait: " + trait.id);
     var group = new Group();
@@ -122,9 +125,6 @@ Parse.Cloud.beforeDelete("Group", function(req, res) {
 });
 */
 Parse.Cloud.afterDelete("Group", function(req, res) {
-    // TODO: delete group members' Profile trait values that were part of this group
-    //       or move to background job that runs daily
-
     Parse.Cloud.useMasterKey();
     var group = req.object;
     var traits = group.get("traits");
