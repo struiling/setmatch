@@ -33,8 +33,8 @@
         <input name="name" id="name" type="text" placeholder="Name" value="">
         
         <br />
-        <label for="type">Type</label>
-        <select name="type" id="type">
+        <label for="newTraitType">Type</label>
+        <select name="type" id="newTraitType">
             <option value="text">Text</option>
             <option value="date">Date</option>
             <option value="radio">Radio buttons</option>
@@ -59,9 +59,9 @@
                 <label for="name">Name</label>
                 <input name="name" id="name" type="text" placeholder="Name" value="<%= trait.get("name") %>">
                 <br />
-                <label for="type">Type</label>
+                <label for="editTraitType">Type</label>
                 
-                <select name="type" id="type">
+                <select name="type" id="editTraitType">
                     <option value="text"<% if (trait.get("type") == "text") { %> selected="selected"<% } %>>Text</option>
                     <option value="date"<% if (trait.get("type") == "date") { %> selected="selected"<% } %>>Date</option>
                     <option value="radio"<% if (trait.get("type") == "radio") { %> selected="selected"<% } %>>Radio buttons</option>
