@@ -65,10 +65,10 @@
             Modernizr.load([
                 
                 { 
-                    load: '//code.jquery.com/jquery-1.10.1.min.js',
+                    load: '//code.jquery.com/jquery-1.11.0.min.js',
                     complete: function () {
                         if ( !window.jQuery ) {
-                            Modernizr.load('/js/vendor/jquery.js');
+                            Modernizr.load('/js/vendor/jquery.min.js');
                         }
                     }
                 },

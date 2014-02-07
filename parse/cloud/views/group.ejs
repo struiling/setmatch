@@ -1,7 +1,7 @@
 
 <h1><%- group.get("name") %></h1>
 <% if (group.get("description")) { %>
-	<p><%- group.get("description") %></p>
+	<p><%= group.get("description") %></p>
 <% } %>
 
 <p><a href="/group/<%- group.get("slug") %>/edit">Edit group info</a></p>
