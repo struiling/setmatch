@@ -1,6 +1,6 @@
 Guardfile
 cleanup
-dist
+build
 node_modules
 components
 .sass-cache
