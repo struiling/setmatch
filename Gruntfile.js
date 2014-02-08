@@ -23,26 +23,42 @@ module.exports = function(grunt) {
             },
             dist: {
                 src: [
-                    'src/js/lib/!(jquery.min.js)*.js' // All JS in the lib folder
+                    'src/js/lib/!(jquery.min.js|d3.v3.min.js|modernizr.js)*.js' // All JS in the lib folder
                     //'src/js/foundation/*.js'  // Uncomment if paring down the Foundation JS and remove foundation.min.js in lib
                 ],
                 dest: 'src/js/source.js',
             }
         },
         copy: {
-            target: {
-                files: [{
+            build: {
+                files: [
+                    {
+                        dest: 'build/css/index.css',
+                        src: 'src/css/index.css'
+                    },
+                    {
                         dest: 'build/js/index.js',
-                        src: 'src/js/index.js'},
+                        src: 'src/js/index.js'
+                    },
                     {
-                        dest: 'parse/public/js/index.js',
-                        src: 'build/js/index.js'},
-                    {
-                        dest: 'parse/public/js/source.min.js',
-                        src: 'build/js/source.min.js'},
+                        dest: 'build/js/source.min.js',
+                        src: 'src/js/source.min.js'
+                    }
+                ]
+            },
+            deploy: {
+                files: [
                     {
                         dest: 'parse/public/css/index.css',
                         src: 'build/css/index.css'
+                    },
+                    {
+                        dest: 'parse/public/js/index.js',
+                        src: 'build/js/index.js'
+                    },
+                    {
+                        dest: 'parse/public/js/source.min.js',
+                        src: 'build/js/source.min.js'
                     }
                 ]
             }
@@ -83,8 +99,8 @@ module.exports = function(grunt) {
         },
         watch: {
             scripts: {
-                files: ['js/*.js'],
-                tasks: ['newer:concat', 'newer:uglify'],
+                files: ['src/js/*.js'],
+                tasks: ['newer:concat', 'newer:uglify', 'newer:copy:build', 'newer:copy:deploy'],
                 options: {
                     spawn: false,
                 },
@@ -95,7 +111,7 @@ module.exports = function(grunt) {
             },
             styles: {
                 files: ['src/css/index.css'],
-                tasks: ['autoprefixer']
+                tasks: ['autoprefixer', 'newer:copy:build', 'newer:copy:deploy']
             }
         },
         uglify: {
@@ -121,8 +137,8 @@ module.exports = function(grunt) {
     // 4. Where we tell Grunt what to do when we type "grunt" into the terminal.
     grunt.registerTask('default', ['common', 'watch']);
 
-    grunt.registerTask('common', [/*'clean', *//*'jshint',*/ 'sass', 'newer:concat', 'newer:uglify']);
+    grunt.registerTask('common', [/*'clean',*/ /*'jshint',*/ 'sass', 'newer:concat', 'newer:uglify', 'autoprefixer', 'newer:copy']);
 
-    grunt.registerTask('deploy', ['common', 'autoprefixer', 'newer:copy']);
+    // grunt.registerTask('deploy', ['common', 'autoprefixer', 'newer:copy']);
 
 };

@@ -1,7 +1,7 @@
 // Make sure the charset is set appropriately
 @charset "UTF-8";
 
-@import "layout";
+@import 'normalize';
 
 // Behold, here are all the Foundation components.
 @import
@@ -41,3 +41,5 @@
   "foundation/components/type",
   "foundation/components/offcanvas",
   "foundation/components/visibility";
+
+@import "layout";

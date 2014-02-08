@@ -41,8 +41,6 @@
             <option value="select">Dropdown list</option>
             <option value="checkbox">Checkboxes</option>
         </select>
-        <input type="text" name="listoption[]" value="" /> <br />
-        <input type="text" name="listoption[]" value="" /> <br />
 
         <input type="hidden" name="group" value="<%- group.id %>" />
         <br />
@@ -68,14 +66,22 @@
                     <option value="select"<% if (trait.get("type") == "select") { %> selected="selected"<% } %>>Dropdown list</option>
                     <option value="checkbox"<% if (trait.get("type") == "checkbox") { %> selected="selected"<% } %>>Checkboxes</option>
                 </select>
-                <br />
                 <% if (trait.get("type") == "radio" || 
                     trait.get("type") == "select" ||
-                    trait.get("type") == "checkbox") { 
-                        _.each(trait.get("listoption"), function(option) { %>
-                        <input type="text" name="listoption[]" value="<%= option %>" /> <br />
-                    <% }); 
-                } %>
+                    trait.get("type") == "checkbox") { %>
+                        <div class="list-options">
+                        <% _.each(trait.get("listoption"), function(option) { %>
+                            <div class="row-collapse">
+                                option: <%= option %>
+                                <input type="text" name="listoption[]" class="list-option" value="<%= option %>" />
+                                <a href="#" class="remove-list-option">x</a>
+                            </div>
+                        <% }); %>
+                            <div class="row">
+                                <a href="#" class="add-list-option">+</a>
+                            </div>
+                        </div>
+                <% } %>
                 <br />
                 <input type="hidden" name="id" value="<%= trait.id %>" />
                 <input type="hidden" name="_method" value="put" />
