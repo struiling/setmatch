@@ -30,6 +30,15 @@
                 <section class="top-bar-section">
                     <!-- Right Nav Section -->
                     <ul class="right">
+                        <li class="has-dropdown">
+                            <a href="/groupws">Groups</a>
+                            <ul class="dropdown">
+                                <% _.each(basicGroups, function(group, i) { %>
+                                    <li><a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a></li>
+                                <% } ) %>
+                                <li><a href="/group/new">+ new group</a></li>
+                            </ul>
+                        </li>
                         
                         <% if (Parse.User.current()) { %>
                         <li class="has-dropdown">
@@ -39,15 +48,6 @@
                             <ul class="dropdown">
                                 <li><a href="/profile/edit">Edt profile</a></li>
                                 <li><a href="/logout">Logout</a></li>
-                            </ul>
-                        </li>
-                        <li class="has-dropdown">
-                            <a href="/groups">Groups</a>
-                            <ul class="dropdown">
-                                <% _.each(basicGroups, function(group, i) { %>
-                                    <li><a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a></li>
-                                <% } ) %>
-                                <li><a href="/group/new">+ new group</a></li>
                             </ul>
                         </li>
                         <% } %>

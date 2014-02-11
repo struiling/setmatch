@@ -1,0 +1,16 @@
+<h1>Your groups</h1>
+
+<ul>
+	<% _.each(groups, function(group, i) { %>
+		<li><a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a></li>
+	<% } ) %>
+</ul>
+
+<h2>Groups you've been invited to</h2>
+<ul>
+	<% _.each(invites, function(invite, i) { %>
+		<li><%= invite.get("name") %> <a href="/group/<%= invite.get("slug") %>">Join</a></li>
+	<% } ) %>
+</ul>
+
+<p><a href="/group/new">Create a new group?</a></p>

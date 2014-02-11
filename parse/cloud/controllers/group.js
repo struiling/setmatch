@@ -124,9 +124,33 @@ exports.edit = function(req, res) {
 		}
 	);			
 };
+
+exports.groups = function(req, res) {
+	var user = Parse.User.current();
+	var groups;
+	var invitations;
+
+	Parse.Cloud.run("getProfileData", {}).then( 
+		function(results) {
+			console.log("results.profile: " + JSON.stringify(results.userProfile));
+			if (results.userProfile !== undefined) {
+			    res.render("groups", {
+			    	groups: results.customGroups, 
+			    	invites: results.groupsInvited
+			    });
+			} else {
+				res.render("404");
+			}
+		},	
+		function(error) {
+			//res.error(error.message);
+			res.flash("error", "Can't retrieve your groups.");
+			res.redirect("/profile");
+		}
+	);
+};
 		
 exports.invite = function(req, res) {
-	
 	/*
 	var membersJSON = req.body.addMembers.replace(/\s/g, '').split(',').map(function(email) {
         return {newMember: email};
@@ -151,10 +175,7 @@ exports.invite = function(req, res) {
 			res.redirect("back");
 		}
 	);
-
-	
     //console.log("req.url: " + req.url);
-
 };
 
 exports.join = function(req, res) {
@@ -170,7 +191,6 @@ exports.join = function(req, res) {
 			res.redirect('back');
 		}
 	);
-
 };
 
 exports.leave = function(req, res) {
@@ -210,14 +230,13 @@ exports.leave = function(req, res) {
 };
 
 exports.members = function(req, res) {
-	var groupSlug = req.params.groupSlug;
-
 	var groupQuery = function(slug) {
 		var query = new Parse.Query(Group);
 		query.equalTo("slug", slug);
 		return query.first();
 	};
 
+	var groupSlug = req.params.groupSlug;
 	var group;
 	var members;
 	var invitations;

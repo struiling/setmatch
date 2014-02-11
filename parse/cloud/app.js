@@ -85,6 +85,9 @@ app.get('/profile/:userSlug', requireUser, profileController.view);
 // TODO: change to app.put('/profile') and change in profile-edit.ejs
 app.post('/profile/save', requireUser, profileController.save);
 
+// view all groups
+app.get('/groups', requireUser, groupController.groups);
+
 // view group creation form
 app.get('/group/new', requireUser, groupController.new);
 // save new group (create)

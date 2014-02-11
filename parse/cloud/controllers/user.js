@@ -9,7 +9,7 @@ exports.delete = function(req, res) {
     user.destroy().then(
 		function() {
 			Parse.User.logOut();
-			res.flash('message', 'Your account has been deleted.');
+			res.flash('success', 'Your account has been deleted.');
 		    res.redirect('/');		
 		}
 	);

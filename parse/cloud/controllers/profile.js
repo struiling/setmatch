@@ -152,14 +152,4 @@ exports.view = function(req, res) {
 			res.redirect("/");
 		}
 	);
-
-/*	}).then( function(userInvites) {
-		console.log("userInvites: " + JSON.stringify(userInvites));	
-		return {groups: userGroups, profile: userProfile, invites: userInvites};
-	}).then( function(userData) {
-		console.log("userData.invites: " + JSON.stringify(userData.invites));
-	    res.render("profile", { user: user, groups: userData.groups, invites: userData.invites, profile: userData.profile });
-	}, function(error) {
-		res.redirect("logout");
-	});*/
 };

@@ -1,16 +1,11 @@
-
-<% if (typeof(error) !== 'undefined') { %>
-	<p><%= error %></p>
-	<p><%= errorParseMessage %></p>
-<% } %>
-<% if (typeof(message) !== 'undefined') { %>
-	<p><%= message %></p>
-<% } %>
-<h1><%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %></h1>
+<h1><%= profile.get("t_" + settings.global.fname) %> <%= profile.get("t_" + settings.global.lname) %> <img src="<%= basicUser.get("gravatar") %>?s=60&d=identicon" /></h1>
 <h2>Basic information</h2>
+<% if (selfView) { %>
+	<p><a href="/profile/edit">Edit your profile</a></p>
+<% } %>
+
 <h5>Email address</h5>
 <p><%= user.getEmail() %></p>
-<%- JSON.stringify(settings.global.group) %>
 <% _.each(globalGroup.get("traits"), function(trait) { %>
 	<h5><a href="/match/<%= trait.id %>"><%= trait.get("name") %></a></h5>
 
@@ -77,10 +72,4 @@
 	<% _.each(customGroups, function(group) { %>
 		 <a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a><br />
 	<% } ); %>
-<% } %>
-
-<br />
-
-<% if (selfView) { %>
-	<p><a href="/profile/edit">Edit profile</a></p>
 <% } %>
