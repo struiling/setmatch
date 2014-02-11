@@ -27,6 +27,7 @@ queryRole.first({
 	    	console.log("role: " + JSON.stringify(role));
 	    	console.log("groupId: " + groupId);
 	    	if (role != null) {
+	    		// check if current user is an admin
 	    		var adminRelation = new Parse.Relation(role, 'users');
 		        var queryAdmins = adminRelation.query();
 		        queryAdmins.equalTo('objectId', Parse.User.current().id);

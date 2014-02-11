@@ -4,7 +4,9 @@
 	<p><%= group.get("description") %></p>
 <% } %>
 
+<% if (isAdmin) { %>
 <p><a href="/group/<%- group.get("slug") %>/edit">Edit group info</a></p>
+<% } %>
 
 <h3>Members</h3>
 

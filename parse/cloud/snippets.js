@@ -64,7 +64,7 @@ if (request.object.existed()) {
 }
 
 /* shorthand for exporting out of a js file, like require-user.js or settings.js */
-/* in module file */
+/* in module file (settings) */
 exports.my_password = 'value'
 /* in app.js or other */
 settings.my_password // 'value'

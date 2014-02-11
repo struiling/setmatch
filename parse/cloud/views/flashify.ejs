@@ -1,5 +1,15 @@
 <% if (flash.message != undefined) { %>
-	<div class="flashify">
+	<div class="alert-box">
 		<%- flash.message %>
+	</div>
+<% } %>
+<% if (flash.error != undefined) { %>
+	<div class="alert-box alert">
+		<%- flash.error %>
+	</div>
+<% } %>
+<% if (flash.success != undefined) { %>
+	<div class="alert-box success">
+		<%- flash.success %>
 	</div>
 <% } %>

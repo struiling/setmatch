@@ -42,7 +42,8 @@ exports.create = function(req, res) {
     }).then( function () {
         res.redirect('/group/' + group.get("slug"));
     }, function(error) {
-        res.send(500, "Could not create group: " + error.message);
+        res.flash("error", "Couldn't create group: " + error.message);
+        res.redirect("back");
     });
 };
 
@@ -61,7 +62,8 @@ exports.delete = function(req, res) {
 		function(promise) {
 			res.flash('message', "You've succesfully deleted the " + group.get("name") + ' group.');
 		    res.redirect('/');		
-		}, function(error) {
+		}, 
+		function(error) {
 			if (error.code == Parse.Error.AGGREGATE_ERROR) {
 		        for (var i = 0; i < error.errors.length; i++) {
 		          console.log("Couldn't delete " + error.errors[i].object.id + 
@@ -117,7 +119,7 @@ exports.edit = function(req, res) {
 			}
 	    },
 	    function(error) {
-			res.flash("message", "Group not found.");	
+			res.flash("error", "Group not found.");	
 			res.redirect("/");	
 		}
 	);			
@@ -141,7 +143,12 @@ exports.invite = function(req, res) {
 	console.log("New members list in JSON: " + JSON.stringify(inviteMemberList));
 	Parse.Cloud.run("addInviteToUser", { users: inviteMemberList, group: req.body.group }).then(
 		function() {
-			res.redirect('/group/' + req.params.groupSlug + "/edit");		
+			res.flash("success", "Invitations sent!");
+			res.redirect("back");		
+		},
+		function(error) {
+			res.flash("error", "There was a problem sending invitations: " + error.message);
+			res.redirect("back");
 		}
 	);
 
@@ -156,6 +163,10 @@ exports.join = function(req, res) {
 	Parse.Cloud.run("addUserToGroup", { group: req.params.groupSlug }).then( 
 		function(group) {
 			res.flash("message", "You've joined " + group.get("name") + ".");
+			res.redirect('back');
+		},
+		function(error) {
+			res.flash("error", "There was a problem joining " + group.get("name") + ": " + error.message);
 			res.redirect('back');
 		}
 	);
@@ -192,6 +203,7 @@ exports.leave = function(req, res) {
 			res.flash("message", "You are no longer a member of " + group.get("name"));
 			res.redirect("/");
 		}, function(error) {
+			res.flash("message", "Couldn't leave " + group.get("name") + ": " + error.message);
 			res.redirect("/group/" + req.params.groupSlug);
 		}
 	);
@@ -208,7 +220,8 @@ exports.save = function(req, res) {
     	group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then(function(object) {
     		res.redirect('/group/' + object.get("slug"));	
     	}, function(error) {
-			res.send(500, "Could not save group: " + error.message);
+			res.flash("error", "Could not save group: " + error.message);
+			res.redirect("back");
 		});
 	});
 };
@@ -263,11 +276,21 @@ exports.view = function(req, res) {
 			console.log("Group members: " + JSON.stringify(members));
 			console.log("Group: " + JSON.stringify(group));
 
-			var query = new Parse.Query(Invitation);
-			query.equalTo("groups", group);
-			// only get email addresses. Doesn't matter whether they already have a SM account
-			query.select("email");
-			return query.find();
+			var roleQuery = new Parse.Query(Parse.Role);
+			roleQuery.equalTo('name', group.id + '_admin');
+			return roleQuery.first();
+		}
+	).then( 
+		function(adminRole) {
+			console.log("adminRole" + JSON.stringify(adminRole));
+			if (adminRole != null) {
+				isAdmin = adminRole;
+				var invitationQuery = new Parse.Query(Invitation);
+				invitationQuery.equalTo("groups", group);
+				// only get email addresses. Doesn't matter whether they already have a SM account
+				invitationQuery.select("email");
+				return invitationQuery.find();
+			}
 		}
 	).then( 
 		function(invitationResult) {
@@ -276,11 +299,12 @@ exports.view = function(req, res) {
 			res.render('group', {
 		    	group: group,
 		    	members: members,
-		    	invitations: invitations
+		    	invitations: invitations,
+		    	isAdmin: isAdmin
 			});
 		},
 		function(error) {
-			res.flash("message", error);
+			res.flash("error", error);
 			res.redirect("/");	
 		}
 	);
