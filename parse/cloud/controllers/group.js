@@ -209,6 +209,72 @@ exports.leave = function(req, res) {
 	);
 };
 
+exports.members = function(req, res) {
+	var groupSlug = req.params.groupSlug;
+
+	var groupQuery = function(slug) {
+		var query = new Parse.Query(Group);
+		query.equalTo("slug", slug);
+		return query.first();
+	};
+
+	var group;
+	var members;
+	var invitations;
+	var admin;
+
+	groupQuery(groupSlug).then(
+		function(groupResult) {
+			group = groupResult;
+			if (group != null) {
+				var query = new Parse.Query(Parse.User);
+				query.equalTo("groups", group);
+				query.include("profile");
+				return query.find();
+			} else {
+				return Parse.Promise.error("You don't have permission to see this page.");
+			}
+		}
+	).then( 
+		function(memberResult) {
+			members = memberResult;
+			console.log("Group members: " + JSON.stringify(members));
+			console.log("Group: " + JSON.stringify(group));
+
+			var roleQuery = new Parse.Query(Parse.Role);
+			roleQuery.equalTo('name', group.id + '_admin');
+			return roleQuery.first();
+		}
+	).then( 
+		function(adminRole) {
+			console.log("adminRole" + JSON.stringify(adminRole));
+			if (adminRole != null) {
+				admin = adminRole;
+				var invitationQuery = new Parse.Query(Invitation);
+				invitationQuery.equalTo("groups", group);
+				// only get email addresses. Doesn't matter whether they already have a SM account
+				invitationQuery.select("email");
+				return invitationQuery.find();
+			}
+		}
+	).then( 
+		function(invitationResult) {
+			invitations = invitationResult;
+			console.log("Group invitations: " + JSON.stringify(invitations));
+			res.render('group-members', {
+		    	group: group,
+		    	members: members,
+		    	invitations: invitations,
+		    	admin: admin
+			});
+		},
+		function(error) {
+			res.flash("error", error);
+			res.redirect("/");	
+		}
+	);
+};
+
 exports.new = function(req, res) {
 	res.render('group-new');
 };
@@ -243,20 +309,11 @@ exports.view = function(req, res) {
 		return query.find();
 	};
 
-	var invitationQuery = function(group) {
-		var query = new Parse.Query(Invitation);
-		query.containedIn("invites", group.id);
-		// only get email addresses. Doesn't matter whether they already have a SM account
-		query.select("email")
-		return query.find();
-	};
-
 	/* -------------------- */
 
 	var group;
 	var members;
-	var invitations;
-	var isAdmin;
+	var admin;
 
 	groupQuery(groupSlug).then(
 		function(groupResult) {
@@ -284,12 +341,7 @@ exports.view = function(req, res) {
 		function(adminRole) {
 			console.log("adminRole" + JSON.stringify(adminRole));
 			if (adminRole != null) {
-				isAdmin = adminRole;
-				var invitationQuery = new Parse.Query(Invitation);
-				invitationQuery.equalTo("groups", group);
-				// only get email addresses. Doesn't matter whether they already have a SM account
-				invitationQuery.select("email");
-				return invitationQuery.find();
+				admin = adminRole;
 			}
 		}
 	).then( 
@@ -300,7 +352,7 @@ exports.view = function(req, res) {
 		    	group: group,
 		    	members: members,
 		    	invitations: invitations,
-		    	isAdmin: isAdmin
+		    	admin: admin
 			});
 		},
 		function(error) {

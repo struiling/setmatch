@@ -1,0 +1,35 @@
+
+<h1><%- group.get("name") %></h1>
+<% if (group.get("description")) { %>
+	<p><%= group.get("description") %></p>
+<% } %>
+
+<% if (admin) { %>
+<p><a href="/group/<%- group.get("slug") %>/edit">Edit group info</a></p>
+<% } %>
+
+<h3>Members</h3>
+<ul>
+	<% _.each(members, function(member, i) { %>
+		<li><a href="/group/#"><%= member.get("profile").get("t_" + settings.global.fname) %> <%= member.get("profile").get("t_" + settings.global.lname) %></a><br /></li>
+	<% } ) %>
+</ul>
+<% if (invitations && invitations.length > 0) { %>
+	<h3>Invitations</h3>
+	<ul>
+		<% _.each(invitations, function(invitation, i) { %>
+			<li><%= invitation.get("email") %></li>
+		<% } ) %>
+	</ul>
+<% } %>
+
+<form method="post" action="<%- '/group/' + group.get('slug') + '/invite' %>">
+    <fieldset>
+        <legend>Invite members</legend>
+        <label for="inviteMembers">Enter email addresses separated by commas</label>
+        <br />
+        <textarea name="inviteMembers" id="inviteMembers" rows="3"></textarea>
+        <input type="hidden" name="group" value="<%- group.id %>" />
+        <input class="button" type="submit" value="Send invitations" />
+    </fieldset>
+</form>

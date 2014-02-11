@@ -94,6 +94,8 @@ app.post('/group/create', requireUser, groupController.create);
 
 // view group info
 app.get('/group/:groupSlug', requireUser, groupController.view);
+// view/manage group members
+app.get('/group/:groupSlug/members', requireUser, groupController.members);
 // view group edit form
 app.get('/group/:groupSlug/edit', requireUser, groupController.edit);
 // save edits to group info

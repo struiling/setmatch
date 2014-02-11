@@ -94,18 +94,4 @@
             
 <% } %>
 
-<form method="post" action="<%- '/group/' + group.get('slug') + '/invite' %>">
-    <fieldset>
-        <legend>Invite members</legend>
-        <label for="inviteMembers">Enter email addresses separated by commas</label>
-        <br />
-        <textarea name="inviteMembers" id="inviteMembers" rows="3"></textarea>
-        <input type="hidden" name="group" value="<%- group.id %>" />
-        <input class="button" type="submit" value="Send invitations" />
-    </fieldset>
-</form>
-
-<h3>Current members</h3>
-
-
 <p><a href="/group/<%- group.get("slug") %>/delete">Delete this group (there is no undo)</a></p>
