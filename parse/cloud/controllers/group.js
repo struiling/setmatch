@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var settings = require('cloud/settings');
 var Group = Parse.Object.extend('Group');
 var Invitation = Parse.Object.extend('Invitation');
 var Trait = Parse.Object.extend('Trait');
@@ -360,18 +361,22 @@ exports.view = function(req, res) {
 	).then( 
 		function(adminRole) {
 			console.log("adminRole" + JSON.stringify(adminRole));
-			if (adminRole != null) {
+			if (!adminRole && group.id == settings.global.groupId) {
+				// don't let non-admins of global group view the group
+				return Parse.Promise.error("You don't have permission to see this page.");
+			}
+
+			if (adminRole) {
+				// viewing a group you're an admin of
 				admin = adminRole;
 			}
+			return;
 		}
 	).then( 
-		function(invitationResult) {
-			invitations = invitationResult;
-			console.log("Group invitations: " + JSON.stringify(invitations));
+		function() {
 			res.render('group', {
 		    	group: group,
 		    	members: members,
-		    	invitations: invitations,
 		    	admin: admin
 			});
 		},
