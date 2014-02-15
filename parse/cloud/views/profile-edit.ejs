@@ -42,7 +42,7 @@
 					<% }); %>
 					</select>
 				<% } %>
-
+<!--
 				Type: 
 				<% if (trait.get("type") == "text") { %> Text<% } %>
                 <% if (trait.get("type") == "date") { %> Date<% } %>
@@ -50,7 +50,7 @@
                 <% if (trait.get("type") == "select") { %> Select<% } %>
                 <% if (trait.get("type") == "checkbox") { %> Checkbox<% } %>
                     
-                <br /><br />
+                <br /><br />-->
 			<% }); %>
         
         <label for="email">Email</label>
@@ -61,7 +61,10 @@
 
 		<% if (typeof(customGroups) !== 'undefined' && customGroups.length > 0) { %>
 		<h3>Group fields</h3>
-			<% _.each(customGroups, function(group) { %>
+			<% _.each(customGroups, function(group, i) { %>
+				<% if (i == 0) { %>
+				<p>Only people who are members of the same group will see your answers for that group.</p>
+				<% } %>
 				<h4><%= group.get("name") %></h4>
 				<% _.each(group.get("traits"), function(trait) { %>
 					<label for="t_<%= trait.id %>"><%= trait.get("name") %></label> <br />
@@ -75,7 +78,7 @@
 						<% if (trait.get("type") == "radio") { 
 							_.each(trait.get("listoption"), function(option) { %>
 								<input name="t_<%= trait.id %>" type="radio" value="<%= option %>"
-								<% if (profile.get("t_" + trait.id) == option) { %>selected="selected"<% } %> />
+								<% if (profile.get("t_" + trait.id) == option) { %>checked="checked"<% } %> />
 								<%= option %>
 								<br />
 							<% });
@@ -101,14 +104,14 @@
 							</select>
 						<% } %>
 
-						Type: 
+<!--						Type: 
 						<% if (trait.get("type") == "text") { %> Text<% } %>
 	                    <% if (trait.get("type") == "date") { %> Date<% } %>
 	                    <% if (trait.get("type") == "radio") { %> Radio<% } %>
 	                    <% if (trait.get("type") == "select") { %> Select<% } %>
 	                    <% if (trait.get("type") == "checkbox") { %> Checkbox<% } %>
 		                    
-		                <br /><br />
+		                <br /><br />-->
 				<% });
 			});
 		} %>
@@ -117,4 +120,4 @@
 	</fieldset>
 </form>
 
-<p><a href="/delete">Delete account (no undo)</a></p>
+<p><a href="/delete">Delete your account (no undo)</a></p>

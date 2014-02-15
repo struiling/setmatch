@@ -38,6 +38,39 @@ Parse.Cloud.beforeSave("Group", function(req, res) {
   	}
 });
 */
+Parse.Cloud.beforeSave("Group", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    if (!req.object.get("slug") && req.object.isNew()) {
+        res.error("A URL is required.");
+    } else if (req.object.get("slug")) {
+        groupSlug = req.object.get("slug").toLowerCase();
+        var cleanSlug = groupSlug.replace(/[^a-z0-9_\-]/gi, '').toLowerCase();
+        if (groupSlug !== cleanSlug) {
+            res.error("Group URL names can't have special characters. Please only use numbers, letters, underscore, and dash.");
+        } else {
+            req.object.set("slug", groupSlug);
+            res.success();
+        }
+    } else {
+        res.success();
+    }
+
+});
+Parse.Cloud.afterSave("Group", function(req, res) {
+    Parse.Cloud.useMasterKey();
+    if (!req.object.existed()) {
+        var user = req.user;
+        var userACL = user.get("ACL");
+        userACL.setRoleReadAccess(req.object.id + "_member", true);
+        user.setACL(userACL);
+
+        var profile = new Profile();
+        profile.id = user.get("profile").id;
+        profile.setACL(userACL);
+
+        return Parse.Object.saveAll([user, profile]);
+    }
+});
 
 /* TODO: Figure out why this function stops addInviteToUser, below, from saving a user change.
 Parse.Cloud.beforeSave(Parse.User, function(req, res) {
@@ -233,17 +266,17 @@ Parse.Cloud.define("getProfileData", function(req, res) {
                 user = result;
                 userGroups = result.get("groups");
                 userProfile = result.get("profile");
-                console.log("userGroups:" + JSON.stringify(userGroups));
-                console.log("invites:" + JSON.stringify(result.get("invitation")));
+                //console.log("userGroups:" + JSON.stringify(userGroups));
+                //console.log("invites:" + JSON.stringify(result.get("invitation")));
                 groupsInvited = result.get("invitation").get("groups");
-                console.log("groupsInvited:" + JSON.stringify(groupsInvited));
+                //console.log("groupsInvited:" + JSON.stringify(groupsInvited));
                 if (userGroups.length > 0) {
                     customGroups = _.filter(userGroups, function(group) {
                         if (group != null) {
                             return group.id !== settings.global.groupId;
                         }
                     });
-                    console.log("customGroups: " + JSON.stringify(customGroups));
+                    //console.log("customGroups: " + JSON.stringify(customGroups));
                 }
 
                 res.success( {
@@ -318,7 +351,7 @@ Parse.Cloud.define("addUserToGroup", function(req, res) {
                 return user.save();
             } else if (invitation != undefined) {
                 console.log("invitation != undefined");
-                var userACL = new Parse.ACL();
+                var userACL = user.get("ACL");
                 userACL.setRoleReadAccess(group.id + "_member", true);
                 user.setACL(userACL);
 
@@ -560,7 +593,9 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
         function() {
             // send email invite to users
             console.log("About to send email");
-            return Parse.Cloud.run("emailInvites", { existingUsers: existingUserRecipients, newUsers: newUsers, group: group.get("name") });
+            return Parse.Cloud.run("emailInvites", { 
+                inviterEmail: req.user.get("email"),
+                existingUsers: existingUserRecipients, newUsers: newUsers, group: group.get("name") });
         }
     ).then(
         function(message) {
@@ -568,13 +603,15 @@ Parse.Cloud.define("addInviteToUser", function(req, res) {
             res.success();
         }, 
         function(error) {
-            res.error("Group lookup failed.");
+            res.error(error.message);
         }
     );  
 });
 
 Parse.Cloud.define("emailInvites", function(req, res) {
+    Parse.Cloud.useMasterKey();
     console.log("In email function");
+    var inviter;
     var Mandrill = require('mandrill');
     Mandrill.initialize('cHThIIVKJFLq30kpDSYiHw');
 
@@ -591,36 +628,47 @@ Parse.Cloud.define("emailInvites", function(req, res) {
             },
             {
                 success: function(httpResponse) {
-                    res.success("Email sent to " + to);
+                    res.success("Email sent to " + JSON.stringify(to));
                 },
                 error: function(httpResponse) {
                     //console.error(httpResponse);
-                    res.error("Uh oh, something went wrong");
+                    res.error("Uh oh, problem sending the email invitations.");
                 }
             }
         );
     }
-    // this may be buggy
-    if (req.params.existingUsers.length > 0) {
-        console.log("existingUsers: " + JSON.stringify(req.params.existingUsers));
-        sendEmail(req.params.existingUsers, "You've been invited to join a SetMatch group!", 
-            "Woohoo, you've been invited to the " + req.params.group +
-            ' group. To accept, log in at https://www.setmatch.es');
-    }
-    if (req.params.newUsers.length > 0) {
-        var newUsers = [];
-        for (var i in req.params.newUsers) {
-            // format for Mandrill to:
-            newUsers.push( { 'email': req.params.newUsers[i] } );
-        }
-        console.log("newUsers: " + JSON.stringify(newUsers));
-        sendEmail(newUsers, "You've been invited to SetMatch!", 
-            "Hey! You've been invited to the " + req.params.group +
-            " group on SetMatch. To accept, create an account at https://www.setmatch.es");
-    }
 
+    var userQuery = new Parse.Query(Parse.User);
+    userQuery.equalTo("email", req.params.inviterEmail);
+    userQuery.include("profile");
+    userQuery.first().then(
+        function(user) {
+            console.log("user: " + JSON.stringify(user));
+
+            inviter = user.get("profile").get("t_" + settings.global.fname) + " " + 
+                user.get("profile").get("t_" + settings.global.lname) + " (" + req.params.inviterEmail + ")";
+            // this may be buggy
+            if (req.params.existingUsers.length > 0) {
+                console.log("existingUsers: " + JSON.stringify(req.params.existingUsers));
+                sendEmail(req.params.existingUsers, "You've been invited to join a SetMatch group!", 
+                    "Woohoo, " + inviter + " has invited you to the " + req.params.group +
+                    ' group. To accept, log in at https://www.setmatch.es');
+            }
+            if (req.params.newUsers.length > 0) {
+                var newUsers = [];
+                for (var i in req.params.newUsers) {
+                    // format for Mandrill to:
+                    newUsers.push( { 'email': req.params.newUsers[i] } );
+                }
+                console.log("newUsers: " + JSON.stringify(newUsers));
+                sendEmail(newUsers, "You've been invited to SetMatch!", 
+                    "Hey! " + inviter + " has invited you to the " + req.params.group +
+                    " group on SetMatch. To accept, create an account using this email address at https://www.setmatch.es");
+            }
+        }
+    );
     // ??
-    res.success();
+    //res.success();
 });
 
 /* Not currently in use */

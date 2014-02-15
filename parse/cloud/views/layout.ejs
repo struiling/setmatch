@@ -29,9 +29,10 @@
                 </ul>
                 <section class="top-bar-section">
                     <!-- Right Nav Section -->
+                    <% if (Parse.User.current()) { %>
                     <ul class="right">
                         <li class="has-dropdown">
-                            <a href="/groupws">Groups</a>
+                            <a href="/groups">Groups</a>
                             <ul class="dropdown">
                                 <% _.each(basicGroups, function(group, i) { %>
                                     <li><a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a></li>
@@ -40,18 +41,19 @@
                             </ul>
                         </li>
                         
-                        <% if (Parse.User.current()) { %>
+                        
                         <li class="has-dropdown">
                             <a href="/profile/"><img src="<%= basicUser.get("gravatar") %>?s=40&d=identicon" />
                                 <%= basicProfile.get("t_" + settings.global.fname) %>
                                 <%= basicProfile.get("t_" + settings.global.lname) %></a>
                             <ul class="dropdown">
-                                <li><a href="/profile/edit">Edt profile</a></li>
+                                <li><a href="/profile/edit">Edit profile</a></li>
                                 <li><a href="/logout">Logout</a></li>
                             </ul>
                         </li>
-                        <% } %>
+                        
                     </ul>
+                    <% } %>
 
                 </section>
             </nav>

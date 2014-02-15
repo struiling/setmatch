@@ -1,5 +1,4 @@
-<p><a href="/group/<%- group.get("slug") %>">View group</a></p>
-
+<h1><a href="/group/<%- group.get("slug") %>"><%- group.get("name") %></a></h1>
 
 <form method="post" action="<%- '/group/' + group.get('slug') %>">
 	<fieldset>
@@ -12,7 +11,7 @@
         <input name="slug" id="group-slug" type="text" placeholder="URL" value="<%- group.get("slug") %>">
         
         <label for="description">Description</label>
-        <input name="description" id="description" type="textarea" placeholder="Description" value="<%- group.get("description") %>">
+        <textarea name="description" id="description" placeholder="Description"><%- group.get("description") %></textarea>
 
         <input type="hidden" name="id" value="<%- group.id %>" />
         <br />
@@ -28,15 +27,13 @@
 <form method="post" action="/trait/create">
     <fieldset>
         <legend>Add a new group custom trait</legend>
-        <p>How does this work? TODO: add tooltip and guidance</p>
         <label for="name">Name</label>
         <input name="name" id="name" type="text" placeholder="Name" value="">
         
-        <br />
         <label for="addTraitType">Type</label>
         <select name="type" id="addTraitType">
             <option value="text">Text</option>
-            <option value="date">Date</option>
+            <!--<option value="date">Date</option>-->
             <option value="radio">Radio buttons</option>
             <option value="select">Dropdown list</option>
             <option value="checkbox">Checkboxes</option>
@@ -61,7 +58,7 @@
                 
                 <select name="type" id="editTraitType">
                     <option value="text"<% if (trait.get("type") == "text") { %> selected="selected"<% } %>>Text</option>
-                    <option value="date"<% if (trait.get("type") == "date") { %> selected="selected"<% } %>>Date</option>
+                    <!--<option value="date"<% if (trait.get("type") == "date") { %> selected="selected"<% } %>>Date</option>-->
                     <option value="radio"<% if (trait.get("type") == "radio") { %> selected="selected"<% } %>>Radio buttons</option>
                     <option value="select"<% if (trait.get("type") == "select") { %> selected="selected"<% } %>>Dropdown list</option>
                     <option value="checkbox"<% if (trait.get("type") == "checkbox") { %> selected="selected"<% } %>>Checkboxes</option>

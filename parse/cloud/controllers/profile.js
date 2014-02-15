@@ -103,6 +103,7 @@ exports.save = function(req, res) {
 			continue;
 		}
 		profile.set(key, req.body[key]);
+		console.log("key, req.body[key]" + key + ", " + req.body[key]);
 	}
 
 	user.set("email", req.body.email);
@@ -110,12 +111,13 @@ exports.save = function(req, res) {
 	user.set("password", req.body.password);
 
 	user.save().then( function() {
+		console.log("user saved");
 		return profile.save();
 	}).then( function() {
-		res.flash('message', "Your profile has been saved.");
+		res.flash('success', "Your profile has been saved.");
 		res.redirect("profile/edit");
 	}, function(error) {
-		res.flash('message', error.message);
+		res.flash('error', error.message);
 		res.redirect("profile/edit");
 	});
 };
@@ -128,12 +130,14 @@ exports.view = function(req, res) {
 	if (user.get("slug") == req.params.userSlug) {
 		params.selfView = true;
 		params.userSlug = user.get("slug");
+	} else if (req.params.userSlug == undefined) {
+		params.selfView = true;
 	} else {
 		params.userSlug = req.params.userSlug;
 	}
 	Parse.Cloud.run("getProfileData", params).then( 
 		function(results) {
-			console.log("results.profile: " + JSON.stringify(results.userProfile));
+			//console.log("results.profile: " + JSON.stringify(results.userProfile));
 			if (results.userProfile !== undefined) {
 			    res.render("profile", { 
 			    	user: results.user,

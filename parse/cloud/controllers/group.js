@@ -9,7 +9,7 @@ exports.create = function(req, res) {
     var group = new Group();
 
     // Explicitly specify which fields to save to prevent bad input data
-    group.save(_.pick(req.body, 'name', 'slug', 'description', 'secretive')).then( function() {
+    group.save(_.pick(req.body, 'name', 'slug', 'description')).then( function() {
         console.log("group id: " + group.id);
         //create admin role
         var adminRoleACL = new Parse.ACL();
@@ -21,7 +21,7 @@ exports.create = function(req, res) {
         adminRoleACL.setRoleWriteAccess(group.id + "_admin", true);
         return adminRole.save();
     }).then(function(adminRole) {
-        // create user role
+        // create member role
         var userRoleACL = new Parse.ACL();
         var userRole = new Parse.Role(group.id + "_member", userRoleACL);
         userRoleACL.setPublicReadAccess(false);
@@ -138,8 +138,9 @@ exports.groups = function(req, res) {
 			    	groups: results.customGroups, 
 			    	invites: results.groupsInvited
 			    });
+			    
 			} else {
-				res.render("404");
+				res.render("groups");
 			}
 		},	
 		function(error) {

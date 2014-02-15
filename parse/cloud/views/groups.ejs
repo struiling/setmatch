@@ -1,16 +1,21 @@
-<h1>Your groups</h1>
-
+<% if (typeof(groups) !== 'undefined' && groups.length > 0) { %>
+<h2>Your groups</h2>
 <ul>
 	<% _.each(groups, function(group, i) { %>
 		<li><a href="/group/<%= group.get("slug") %>"><%= group.get("name") %></a></li>
 	<% } ) %>
 </ul>
+<% } else { %>
+<h2>What, no groups?</h2>
+<% } %>
 
+<% if (typeof(invites) !== 'undefined' && invites.length > 0) { %>
 <h2>Groups you've been invited to</h2>
 <ul>
 	<% _.each(invites, function(invite, i) { %>
 		<li><%= invite.get("name") %> <a href="/group/<%= invite.get("slug") %>">Join</a></li>
 	<% } ) %>
 </ul>
+<% } %>
 
-<p><a href="/group/new">Create a new group?</a></p>
+<p><a href="/group/new">Create a new group</a></p>
